@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как добавить голосовое управление в робот-пылесос: инструкции и приложения — SOS-Пылесос</title>
+    <meta name="description" content="Полное руководство: как настроить голосовой помощник на роботе-пылесосе. Обзор приложений, совместимость с Алисой и Siri, настройка через Home Assistant.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-na-robot-pylesos-postavit-golos.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как добавить голосовое управление в робот-пылесос: инструкции и приложения">
+    <meta property="og:description" content="Полное руководство: как настроить голосовой помощник на роботе-пылесосе. Обзор приложений, совместимость с Алисой и Siri, настройка через Home Assistant.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как добавить голосовое управление в робот-пылесос: инструкции и приложения</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как добавить голосовое управление в робот-пылесос</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение">Введение</a></li><li><a href="#официальные-интеграции-с-голосовыми-ассистентами">Официальные интеграции с голосовыми ассистентами</a></li><li><a href="#изменение-голоса-и-настройки-озвучки-устройства">Изменение голоса и настройки озвучки устройства</a></li><li><a href="#настройка-через-home-assistant-для-продвинутых-пользователей">Настройка через Home Assistant для продвинутых пользователей</a></li><li><a href="#таблица-совместимости-брендов-и-ассистентов">Таблица совместимости брендов и ассистентов</a></li><li><a href="#решение-проблем-и-частые-ошибки">Решение проблем и частые ошибки</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение">Введение</h2>
+
+<p>В современном доме умная техника должна не только убирать мусор, но и подчиняться голосовым командам, делая жизнь пользователя максимально комфортной. Многие владельцы роботов-пылесосов сталкиваются с проблемой: приложение бренда поддерживает только русский язык с акцентом или не поддерживает голосовое управление вовсе. <strong>Голосовое управление</strong> становится ключевым фактором удобства, позволяя запускать уборку, не прерывая просмотр фильма или разговор.</p>
+
+<p>К счастью, существует несколько проверенных способов интегрировать <em>робот-пылесос</em> в экосистему умного дома. Это можно сделать через официальные интеграции с голосовыми ассистентами, сторонние мосты или даже прошивки сообщества. В этой статье мы разберем все доступные методы, от простых настроек до сложных технических решений, чтобы вы могли заставить своего помощника говорить и слушаться.</p>
+
+<p>Важно понимать, что сама «речь» пылесоса и его реакция на голос — это две разные вещи. В большинстве случаев речь идет о том, как вы управляете устройством голосом, а не о том, как оно говорит с вами. <strong>Синтез речи</strong> внутри устройства часто ограничен заводскими настройками, но управление через облачные сервисы открывает огромные возможности.</p>
+
+<p>Ниже мы рассмотрим, как связать ваш <em>робот-пылесос</em> с Яндекс Алисой, Google Assistant или Siri, а также как изменить озвучку на более приятную глазу и уху. <mark>Многие пользователи игнорируют возможность настройки отложенного старта через голос, теряя часть функционала своего устройства.</mark></p>
+
+<h2 id="официальные-интеграции-с-голосовыми-ассистентами">Официальные интеграции с голосовыми ассистентами</h2>
+
+<p>Самый простой и надежный способ дать роботу-пылесосу «голос» — это подключить его к популярной голосовой экосистеме. Практически все современные бренды, такие как <em>Xiaomi</em>, <em>Roborock</em>, <em>Ecovacs</em> и <em>Dreame</em>, имеют официальную поддержку интеграции. Вам не нужно быть программистом, достаточно иметь аккаунты в соответствующих сервисах.</p>
+
+<p>Для начала убедитесь, что ваш <em>робот-пылесос</em> подключен к Wi-Fi и работает в стабильном режиме. Зайдите в приложение вашего ассистента: в случае с Яндексом это приложение «Дом с Алисой», для Google — «Дом Google», а для Apple — «Дом». В разделе «Устройства» или «Сервисы» найдите кнопку добавления новой техники.</p>
+
+<p>Список популярных голосовых ассистентов и их особенности:</p>
+<ul>
+<li>🎤 <strong>Яндекс Алиса</strong> — отлично поддерживает русский язык и имеет множество навыков для конкретных брендов.</li>
+<li>🤖 <strong>Google Assistant</strong> — мощная экосистема, но требует аккаунт Google и иногда работает нестабильно с российскими сервисами.</li>
+<li>🍎 <strong>Siri (Shortcuts)</strong> — работает только через приложение «Команды» и поддерживает не все модели напрямую.</li>
+</ul>
+
+<p>После выбора бренда в списке сервисов вам потребуется авторизоваться. Это действие свяжет ваш аккаунт производителя <em>робота-пылесоса</em> с аккаунтом голосового помощника. Система автоматически обнаружит подключенные устройства. Если робот не появился, попробуйте перезагрузить роутер или сам пылесос.</p>
+
+<blockquote>⚠️ Внимание: При привязке устройства к голосовому ассистенту убедитесь, что регион в приложении пылесоса и в приложении ассистента совпадает. Несоответствие регионов часто приводит к ошибке авторизации.</blockquote>
+
+<p>После успешной привязки вы можете произносить команды вроде «Алиса, позови Робота» или «Google, запусти уборку на кухне». Это базовый уровень, который покрывает 80% потребностей большинства пользователей.</p>
+
+<div class="poll-widget" id="poll-55c99128"><div class="poll-widget-question">📊 Какую систему вы используете?</div><div class="poll-widget-option" data-poll="55c99128" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Яндекс Алиса</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="55c99128" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Google Assistant</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="55c99128" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Siri (HomeKit)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="55c99128" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Пока не использую</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="изменение-голоса-и-настройки-озвучки-устройства">Изменение голоса и настройки озвучки устройства</h2>
+
+<p>Часто пользователи имеют в виду под вопросом «поставить голос» именно смену заводской озвучки, которой робот сообщает о своих действиях. Например, вместо механического «Начинаю уборку» он может сказать «Добрый день, я начал работу». К сожалению, на штатном уровне это доступно не всегда, но есть обходные пути.</p>
+
+<p>В некоторых приложениях, таких как <em>Roborock</em> или <em>Xiaomi Home</em>, в разделе настроек звука можно выбрать язык интерфейса и голосового сопровождения. Однако выбор часто ограничен стандартными наборами. Если вы хотите добавить уникальный голос, вам придется использовать сторонние методы или модифицированные приложения.</p>
+
+<p>Для продвинутых пользователей доступен метод смены голоса через <strong>Root-права</strong> или специальные утилиты. Этот процесс требует разблокировки загрузчика, что может привести к потере гарантии. Будьте предельно осторожны при выполнении таких операций.</p>
+
+<p>Вот основные шаги для замены голоса на примере устройств Xiaomi:</p>
+<ul>
+<li>🔧 Скачайте утилиту <em>Mi Home Mod</em> или аналогичный инструмент с открытым исходным кодом.</li>
+<li>📲 Загрузите аудиозапись нужного голоса в формате <code>.wav</code> или <code>.mp3</code> (16 бит, 16 кГц).</li>
+<li>⚙️ Замените системный файл озвучки через <em>ADB</em> или файловый менеджер с доступом к корневой системе.</li>
+</ul>
+
+<p>Если вы не хотите рисковать гарантией, можно использовать «хитрость» с умной колонкой. Разместите рядом умную колонку, настроенную так, чтобы она проигрывала звук при получении команды от пылесоса. Это создаст иллюзию, что робот говорит другим голосом.</p>
+
+
+
+<h2 id="настройка-через-home-assistant-для-продвинутых-пользователей">Настройка через Home Assistant для продвинутых пользователей</h2>
+
+<p>Если стандартные методы вас не устраивают, <strong>Home Assistant</strong> станет идеальным решением. Это мощная платформа для умного дома с открытым исходным кодом, которая позволяет создавать сложные сценарии и интеграции. С её помощью можно превратить любого робота-пылесоса в полностью управляемый голосом агрегат.</p>
+
+<p>Для начала вам понадобится компьютер или сервер (например, Raspberry Pi), на который будет установлена <em>Home Assistant</em>. Далее необходимо установить соответствующую интеграцию для вашего бренда робота-пылесоса. В репозитории HACS (Home Assistant Community Store) доступны интеграции для большинства популярных моделей.</p>
+
+<p>Процесс настройки выглядит следующим образом:</p>
+<ol>
+<li>Установите интеграцию <code>Roborock</code> или <code>Xiaomi Miio</code>.</li>
+<li>Введите IP-адрес вашего робота и токен (его можно получить через специальные утилиты).</li>
+<li>Настройте автоматизации, связывающие состояние пылесоса с голосовым помощником.</li>
+</ol>
+
+<p>В этом режиме вы можете настроить <strong>уникальные голосовые реакции</strong>. Например, если робот застрял, система может отправить уведомление на умную колонку с конкретным сообщением: «Внимание, робот застрял под диваном». Это гораздо информативнее стандартных сигналов.</p>
+
+<p>Особенностью использования <em>Home Assistant</em> является возможность создания локального управления. В отличие от облачных решений, команды исполняются мгновенно и не зависят от интернета. Это критически важно для стабильной работы голосовых команд.</p>
+
+
+
+<div class="checklist-block"><h4>☑️ Подготовка к интеграции в Home Assistant</h4><label class="check-item"><input type="checkbox"><span>Установить Home Assistant</span></label><label class="check-item"><input type="checkbox"><span>Найти IP-адрес пылесоса</span></label><label class="check-item"><input type="checkbox"><span>Получить токен доступа</span></label><label class="check-item"><input type="checkbox"><span>Настроить интеграцию в панели управления</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="таблица-совместимости-брендов-и-ассистентов">Таблица совместимости брендов и ассистентов</h2>
+
+<p>Чтобы вам было проще выбрать подходящий способ, мы собрали таблицу совместимости популярных брендов с голосовыми ассистентами. Обратите внимание, что поддержка может зависеть от региональной версии прошивки.</p>
+
+<table>
+<thead>
+ <tr>
+  <th>Бренд</th>
+  <th>Яндекс Алиса</th>
+  <th>Google Assistant</th>
+  <th>Siri HomeKit</th>
+  <th>Особенности</th>
+ </tr>
+</thead>
+<tbody>
+ <tr>
+  <td>Xiaomi / Viomi</td>
+  <td>Да (через skill)</td>
+  <td>Да (через Mi Home)</td>
+  <td>Нет (только через Home Assistant)</td>
+  <td>Нужен китайский сервер для полного функционала</td>
+ </tr>
+ <tr>
+  <td>Roborock</td>
+  <td>Да (официально)</td>
+  <td>Да (официально)</td>
+  <td>Да (через HomeKit)</td>
+  <td>Отличная поддержка зон уборки голосом</td>
+ </tr>
+ <tr>
+  <td>Ecovacs Deebot</td>
+  <td>Да (через skill)</td>
+  <td>Да (через skill)</td>
+  <td>Нет</td>
+  <td>Иногда задержки в выполнении команд</td>
+ </tr>
+ <tr>
+  <td>Dreame</td>
+  <td>Да</td>
+  <td>Да</td>
+  <td>Нет</td>
+  <td>Интеграция работает стабильно</td>
+ </tr>
+ <tr>
+  <td>Neato</td>
+  <td>Нет</td>
+  <td>Да</td>
+  <td>Нет</td>
+  <td>Только английский голосовой интерфейс</td>
+ </tr>
+</tbody>
+</table>
+
+<p>Как видно из таблицы, <em>Roborock</em> является одним из лидеров по совместимости, поддерживая даже нативный HomeKit. Если вы используете <em>Xiaomi</em>, вам может потребоваться смена региона в приложении на «Китай», чтобы получить доступ к расширенным функциям, но это создаст сложности с другими устройствами умного дома.</p>
+
+<blockquote>⚠️ Внимание: Если вы меняете регион в приложении производителя робота, это может сбросить настройки расписания и сохраненные карты помещений. Сохраняйте их перед сменой региона.</blockquote>
+
+
+
+<h2 id="решение-проблем-и-частые-ошибки">Решение проблем и частые ошибки</h2>
+
+<p>Даже после успешной настройки могут возникнуть ситуации, когда голосовой помощник не понимает команды или робот не реагирует. Самая частая причина — это <strong>неверная формулировка</strong> команды. Голосовые ассистенты имеют ограниченный словарный запас для конкретных устройств.</p>
+
+<p>Если вы говорите «Алиса, начни уборку», а робот молчит, попробуйте более конкретную фразу: «Алиса, включи робот-пылесос». Иногда ассистент путает устройства, если у вас несколько пылесосов. В этом случае нужно явно указывать имя устройства, например, «Алиса, отправь пылесос в гостиную».</p>
+
+<p>Другая частая проблема — потеря связи с облаком. Роботы-пылесосы часто работают через сервера производителей, которые могут быть недоступны из-за сети или географических ограничений. В таком случае голосовое управление перестает работать, даже если локальный Wi-Fi исправен.</p>
+
+<p>Что делать, если команда не выполняется:</p>
+<ul>
+<li>🔄 Перезагрузите умную колонку и сам робот-пылесос.</li>
+<li>📡 Проверьте стабильность подключения к интернету на обоих устройствах.</li>
+<li>🔍 Проверьте, не заблокирована ли интеграция в настройках аккаунта.</li>
+</ul>
+
+<p>Иногда помогает удаление интеграции и повторное добавление устройства в настройки голосового помощника. Это сбросит токен авторизации и восстановит связь. Не забывайте, что обновления прошивки робота могут временно сломать работу голосовых команд, пока разработчики не выпустят патч совместимости.</p>
+
+
+
+<p> То, что работало вчера, может измениться завтра. Регулярно проверяйте обновления в приложениях и следите за новостями сообщества пользователей вашего бренда. <strong>Поддержка сообщества</strong> часто позволяет найти решения там, где официальная документация молчит.</p>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Можно ли заставить робота-пылесос говорить голосом конкретного человека?</summary>
+<p>Напрямую в заводской прошивке это сделать нельзя. Однако, используя Home Assistant и умную колонку, можно настроить сценарий, при котором колонка будет воспроизводить заранее записанный голос (например, голос актера из фильма) при определенных событиях работы робота.</p>
+</details>
+
+<details>
+<summary>Нужен ли Root-доступ для смены голоса?</summary>
+<p>Да, для замены системных файлов синтеза речи внутри самого робота-пылесоса почти всегда требуется Root-доступ. Это сложный процесс, который аннулирует гарантию. Для управления голосом Root не нужен, достаточно подключить устройство к Алисе или Google.</p>
+</details>
+
+<details>
+<summary>Работает ли голосовое управление без интернета?</summary>
+<p>Нет, большинство голосовых помощников (Алиса, Google, Siri) требуют подключения к интернету для обработки команд. Если вам нужно управление без интернета, используйте локальные сценарии через Home Assistant, но для распознавания голоса все равно потребуется сервер (например, Vosk или Mycroft), работающий в локальной сети.</p>
+</details>
+
+<details>
+<summary>Почему робот не реагирует на команду «Остановись»?</summary>
+<p>Проверьте, правильно ли вы настроили имя устройства. Иногда ассистент привязывает команду к другому устройству. Также убедитесь, что робот не находится в режиме паузы или зарядки, так как некоторые команды в этих состояниях могут быть заблокированы.</p>
+</details>
+
+<details>
+<summary>Как узнать, какая версия прошивки поддерживает голосовые команды?</summary>
+<p>Информацию о поддержке функций можно найти на официальном сайте производителя в разделе поддержки или в чате пользователя. Обычно новые версии прошивок добавляют больше возможностей интеграции, но старые модели могут быть ограничены.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение">Введение</a></li><li><a href="#официальные-интеграции-с-голосовыми-ассистентами">Официальные интеграции с голосовыми ассистентами</a></li><li><a href="#изменение-голоса-и-настройки-озвучки-устройства">Изменение голоса и настройки озвучки устройства</a></li><li><a href="#настройка-через-home-assistant-для-продвинутых-пользователей">Настройка через Home Assistant для продвинутых пользователей</a></li><li><a href="#таблица-совместимости-брендов-и-ассистентов">Таблица совместимости брендов и ассистентов</a></li><li><a href="#решение-проблем-и-частые-ошибки">Решение проблем и частые ошибки</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/p/py/pylesos-xiaomi-kak-nastroit-komnaty.html" class="related-card">Как настроить комнаты в пылесосе Xiaomi: полная инструкция</a></li><li><a href="/articles/k/ka/kak-upravlyat-robot-pylesos-cherez-telefon-xiaomi.html" class="related-card">Как управлять роботом-пылесосом Xiaomi через телефон: полная инструкция</a></li><li><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-chtoby-razgovarival.html" class="related-card">Как настроить робот-пылесос Xiaomi для озвучки: полная инструкция</a></li><li><a href="/articles/k/ka/kak-smenit-golos-u-robota-pylesosa.html" class="related-card">Как сменить голос у робота-пылесоса: полная инструкция по смене языка</a></li><li><a href="/articles/k/ka/kak-polzovatsya-prilozheniem-mi-khoum-dlya-robot-pylesosa.html" class="related-card">Полная настройка робот-пылесоса в приложении Mi Home: от подключения до карт</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/p/py/pylesos-xiaomi-kak-nastroit-komnaty.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить комнаты в пылесосе Xiaomi: полная инструкция</span><span class="related-bottom-desc">Пошаговая настройка зон и комнат в приложении Mi Home для роботов-пылесосов Xiaomi. Разделение на зо</span></a><a href="/articles/k/ka/kak-upravlyat-robot-pylesos-cherez-telefon-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как управлять роботом-пылесосом Xiaomi через телефон: полная инструкция</span><span class="related-bottom-desc">Научитесь настраивать, управлять и контролировать чистку роботом-пылесосом Xiaomi со смартфона. Гайд</span></a><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-chtoby-razgovarival.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить робот-пылесос Xiaomi для озвучки: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство: как включить голосовые подсказки на роботе-пылесосе Xiaomi. Настройки в прило</span></a><a href="/articles/k/ka/kak-smenit-golos-u-robota-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Как сменить голос у робота-пылесоса: полная инструкция по смене языка</span><span class="related-bottom-desc">Узнайте, как поменять голос робота-пылесоса с китайского на русский или английский. Пошаговые настро</span></a><a href="/articles/k/ka/kak-polzovatsya-prilozheniem-mi-khoum-dlya-robot-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Полная настройка робот-пылесоса в приложении Mi Home: от подключения до карт</span><span class="related-bottom-desc">Пошаговая инструкция по подключению робот-пылесоса к Mi Home. Настройка Wi-Fi, создание карт, управл</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-k-telefonu-bez-vajfaya-routera.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi без Wi-Fi роутера: Полный гайд</span><span class="related-bottom-desc">Пошаговая инструкция по настройке робот-пылесоса Xiaomi без интернета и роутера. Прямое подключение,</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

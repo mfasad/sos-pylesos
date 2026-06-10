@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как робот-пылесос убирает углы: технологии, алгоритмы и ограничения — SOS-Пылесос</title>
+    <meta name="description" content="Подробный разбор методов уборки углов роботом-пылесосом. Виры, сканеры, щетки и алгоритмы навигации. Узнайте, как повысить эффективность очистки.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-rabotaet-robot-pylesos-v-uglakh.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как робот-пылесос убирает углы: технологии, алгоритмы и ограничения">
+    <meta property="og:description" content="Подробный разбор методов уборки углов роботом-пылесосом. Виры, сканеры, щетки и алгоритмы навигации. Узнайте, как повысить эффективность очистки.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как робот-пылесос убирает углы: технологии, алгоритмы и ограничения</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как робот-пылесос убирает углы: технологии, алгоритмы и ограничения</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение-почему-углы-самая-сложная-проблема-для-робота">Введение: почему углы — самая сложная проблема для робота</a></li><li><a href="#физическая-геометрия-круг-против-квадрата">Физическая геометрия: круг против квадрата</a></li><li><a href="#алгоритмы-движения-вираж-и-спиральная-уборка">Алгоритмы движения: вираж и спиральная уборка</a></li><li><a href="#роль-навигации-лидары-камеры-и-датчики-касания">Роль навигации: лидары, камеры и датчики касания</a></li><li><a href="#конструкция-щеток-и-всасывающего-канала">Конструкция щеток и всасывающего канала</a></li><li><a href="#сравнительный-анализ-технологий-уборки-углов">Сравнительный анализ технологий уборки углов</a></li><li><a href="#практические-советы-по-улучшению-уборки">Практические советы по улучшению уборки</a></li><li><a href="#особенности-уборки-в-разных-типах-помещений">Особенности уборки в разных типах помещений</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение-почему-углы-самая-сложная-проблема-для-робота">Введение: почему углы — самая сложная проблема для робота</h2>
+
+<p>Убрать в углах комнаты для обычного человека — элементарная задача, но для автономного устройства это настоящая инженерная головоломка. <strong>Физические ограничения</strong> корпуса робота не позволяют ему идеально прижаться к стыку двух стен, так как большинство моделей имеют округлую форму. В результате в зонах соприкосновения мебели и стен неизбежно образуются <strong>мертвые зоны</strong>, где пыль скапливается быстрее всего.</p>
+
+<p>Современные производители борются с этим недостатком, внедряя сложные алгоритмы движения и меняя геометрию корпуса. Вам нужно понимать разницу между классическими круглыми моделями и устройствами с <strong>прямоугольным дизайном</strong>, чтобы выбрать правильный вариант для своей планировки. Эффективность уборки углов напрямую зависит от типа навигации и конструкции <strong>боковых щеток</strong>.</p>
+
+<p>В этой статье мы разберем, как именно роботы справляются с этой задачей и какие технологии позволяют им достигать максимальной чистоты в труднодоступных местах. Мы рассмотрим работу <em>виртуальных стен</em>, алгоритмы виража и физические особенности конструкции, которые влияют на результат.</p>
+
+<h2 id="физическая-геометрия-круг-против-квадрата">Физическая геометрия: круг против квадрата</h2>
+
+<p>Большинство роботов-пылесосов имеют классическую круглую форму, что обеспечивает им отличную маневренность вокруг ножек стульев и столов. Однако именно эта геометрия становится главной причиной неубранных участков в углах. Когда <strong>круглый корпус</strong> касается двух стен одновременно, между датчиками, щетками и самой стеной остается треугольное пространство, которое физически недоступно для всасывания.</p>
+
+<p>Чтобы компенсировать этот недостаток, инженеры используют <strong>выносную боковую щетку</strong>. Она вращается и выметает мусор из-под корпуса, доставая в зону, куда сам робот зайти не может. Тем не менее, если угол слишком острый или загроможден, даже длинная щетка может не справиться с задачей, оставляя скопления пыли.</p>
+
+<p>Решением этой проблемы стала разработка моделей с <strong>прямоугольным или D-образным корпусом</strong>. Такие устройства, как <em>Neato Botvac</em> или новые линейки от <em>Xiaomi</em>, могут вплотную прижиматься к стенам, устраняя зазор в углу. Это кардинально меняет подход к уборке, позволяя роботу заезжать в стык стен практически полностью.</p>
+
+<blockquote>⚠️ Внимание: Даже модели с прямоугольным корпусом могут иметь проблемы с углами, если они сильно закруглены (радиус скругления велик). Всегда проверяйте радиус скругления углов корпуса перед покупкой, если для вас критична чистота именно в стыках стен.</blockquote>
+
+<h2 id="алгоритмы-движения-вираж-и-спиральная-уборка">Алгоритмы движения: вираж и спиральная уборка</h2>
+
+<p>Даже если физика корпуса неидеальна, <strong>программное обеспечение</strong> может помочь роботу очистить угол эффективнее. Ключевым механизмом здесь является функция "виража" (Corner Cleaning). Когда датчики фиксируют столкновение со стеной или лазерный дальномер определяет приближение к углу, алгоритм переводит устройство в специальный режим движения.</p>
+
+<p>В этом режиме робот начинает двигаться по дуге, постепенно погружаясь в угол, а затем выходя из него. <strong>Боковая щетка</strong> в этот момент работает на максимальной скорости, выметая пыль наружу, чтобы мотор всасывания мог её захватить. Этот процесс повторяется несколько раз, чтобы гарантировать чистоту.</p>
+
+<p>Кроме виража, многие модели используют <strong>спиральную уборку</strong> при обнаружении локального загрязнения. Если датчик обнаруживает много пыли в углу, робот начинает двигаться по спирали от центра к краям, интенсивно перемалывая мусор. Это позволяет глубоко проработать проблемную зону, не пытаясь просто проехать мимо нее.</p>
+
+<div class="poll-widget" id="poll-531d387f"><div class="poll-widget-question">📊 Какая форма корпуса у вашего текущего робота-пылесоса?</div><div class="poll-widget-option" data-poll="531d387f" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Круглая</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="531d387f" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Прямоугольная (D-образная)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="531d387f" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Смешанная фактура</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="531d387f" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Пока нет робота</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="роль-навигации-лидары-камеры-и-датчики-касания">Роль навигации: лидары, камеры и датчики касания</h2>
+
+<p>Точность уборки углов напрямую зависит от того, насколько хорошо робот "видит" препятствия. <strong>Лидары</strong> (лазерные дальномеры) на вращающихся "башнях" позволяют строить карту с высокой точностью и заранее планировать маршрут так, чтобы пройти вдоль стен максимально близко. Это снижает количество случайных столкновений и улучшает охват периметра.</p>
+
+<p>Модели, оснащенные <strong>оптическими камерами</strong> (VSLAM), могут распознавать текстуру стен и углов, что помогает им лучше ориентироваться в пространстве. В отличие от гироскопических моделей, которые могут "заблудиться" и пропустить угол, камеры с визуальной одометрией запоминают особенности геометрии комнаты и возвращаются в пропущенные зоны.</p>
+
+<p>Однако не стоит недооценивать и простые <strong>датчики касания</strong>. В некоторых ситуациях физический контакт со стеной необходим для запуска алгоритма виража. Если робот слишком "разумный" и объезжает препятствия за счет инфракрасных датчиков, он может не заехать в самый тупик, оставив узкую полоску пыли вдоль плинтуса.</p>
+
+<details class="faq-item"><summary>Почему робот может игнорировать угол?</summary><div class="faq-answer"><p>Иногда робот пропускает угол, если на полу лежит темный коврик или прозрачная пленка, которую датчики принимают за стену или яму. Также причиной может быть накопление пыли на датчиках, блокирующая их работу.</p></div></details>
+
+<h2 id="конструкция-щеток-и-всасывающего-канала">Конструкция щеток и всасывающего канала</h2>
+
+<p>Эффективность уборки в углах зависит не только от движения, но и от того, как мусор попадает внутрь контейнера. <strong>Боковая щетка</strong> играет решающую роль: её длина, жесткость и угол наклона определяют, насколько далеко она сможет "засунуться" в угол и выбить пыль. Длинные и гибкие щетки справляются лучше, но они быстрее изнашиваются.</p>
+
+<p>Важным фактором является расположение <strong>всасывающего отверстия</strong>. В некоторых моделях мотор всасывания расположен ближе к передней части корпуса, что позволяет подтягивать мусор, выметенный боковой щеткой, не заезжая глубоко в угол. В других конструкциях отверстие находится по центру, что требует более плотного прилегания к стене.</p>
+
+<p>Некоторые бренды используют <strong>двойные боковые щетки</strong>, вращающиеся в разные стороны. Это позволяет выметать мусор как из-под корпуса, так и из боковых зон, создавая постоянный поток воздуха, направляющий пыль к всасывающему каналу. Такая система особенно эффективна при уборке длинных волос и шерсти животных в углах.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка эффективности щеток</h4><label class="check-item"><input type="checkbox"><span>Измерьте длину щетки относительно корпуса</span></label><label class="check-item"><input type="checkbox"><span>Осмотрите щетку на предмет износа</span></label><label class="check-item"><input type="checkbox"><span>Проверьте вращение в обе стороны</span></label><label class="check-item"><input type="checkbox"><span>Удалите намотанные волосы с оси</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="сравнительный-анализ-технологий-уборки-углов">Сравнительный анализ технологий уборки углов</h2>
+
+<p>Чтобы наглядно понять разницу в подходах, рассмотрим таблицу, сравнивающую основные методы уборки углов разными типами роботов. Выбор технологии определяет итоговую чистоту вашего пола в труднодоступных местах.</p>
+
+<table>
+<thead>
+<tr>
+<th>Технология</th>
+<th>Эффективность в углах</th>
+<th>Плюсы</th>
+<th>Минусы</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Круглый корпус + одна щетка</td>
+<td>Средняя</td>
+<td>Низкая цена, маневренность</td>
+<td>Оставляет пылевые дорожки в углах</td>
+</tr>
+<tr>
+<td>D-образный корпус</td>
+<td>Высокая</td>
+<td>Полное прилегание к стене, нет мертвых зон</td>
+<td>Меньше маневренности вокруг ножек</td>
+</tr>
+<tr>
+<td>Алгоритм виража (Corner Mode)</td>
+<td>Высокая</td>
+<td>Глубокая проработка угла, интеллект</td>
+<td>Увеличивает время уборки</td>
+</tr>
+<tr>
+<td>Многощеточная система</td>
+<td>Средне-Высокая</td>
+<td>Лучшее выметание пыли, меньше застреваний</td>
+<td>Сложнее в обслуживании</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>⚠️ Внимание: Если ваш робот имеет функцию виража, но вы наблюдаете скопление пыли в углах, проверьте, не отключена ли эта функция в настройках приложения. Иногда по умолчанию режим "Только вдоль стен" может игнорировать углы для экономии времени.</blockquote>
+
+<h2 id="практические-советы-по-улучшению-уборки">Практические советы по улучшению уборки</h2>
+
+<p>Даже самый совершенный робот может работать хуже, если окружение не подготовлено. Вам нужно убрать из углов мелкие предметы, которые могут блокировать датчики или мешать прохождению щетки. <strong>Пылесборник</strong> должен быть чистым, так как при полном контейнере сила всасывания падает, и робот просто не сможет затянуть пыль, выметенную в угол.</p>
+
+<p>Регулярная очистка <strong>датчиков касания</strong> и инфракрасных сенсоров критически важна. Пыль на этих элементах может заставить робота "думать", что угол уже пройден, или, наоборот, препятствовать заезду. Протирайте их сухой тряпкой раз в неделю, чтобы обеспечить корректную работу алгоритмов.</p>
+
+<p>Используйте режим <strong>точечной уборки</strong> для особо грязных зон. Если вы заметили, что в определенном углу всегда скапливается много мусора, запустите там ручную уборку после основной. Это заставит робот вернуться и обработать зону по спирали несколько раз, гарантируя идеальную чистоту.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если у вас есть ковер с высоким ворсом, робот может не заехать в угол комнаты на нем. Попробуйте отключить виртуальные стены или настроить зону "неуборки" вокруг ковра, чтобы робот мог заехать на него и пропылесосить периметр.</p></div>
+
+<blockquote>⚠️ Внимание: Производители постоянно обновляют прошивки, которые могут менять логику поведения робота в углах. Детали работы алгоритма могут измениться в зависимости от версии ПО. Сверяйте актуальные настройки в приложении производителя.</blockquote>
+
+<h2 id="особенности-уборки-в-разных-типах-помещений">Особенности уборки в разных типах помещений</h2>
+
+<p>В квартирах-студиях с минималистичным дизайном и отсутствием мебели в углах робот справляется отлично. Однако в классических интерьерах с массивными шкафами и гардинами возникают проблемы. <strong>Тканевые шторы</strong> могут запутать боковую щетку, а низкие ножки мебели создают "туннели", куда робот не может заехать.</p>
+
+<p>Для решения этих проблем существуют <strong>дополнительные аксессуары</strong>, такие как ограничители движения или специальные накладки на корпус. Они помогают роботу лучше ориентироваться и не застревать в узких пространствах. Также полезно использовать карту зон, чтобы запретить уборку в местах, где робот постоянно натыкается на препятствия.</p>
+
+<p>В больших домах с множеством комнат алгоритм <strong>разбиения на зоны</strong> становится критичным. Робот должен уметь запоминать, где находятся углы каждой комнаты, и возвращаться к ним. Модели без памяти карты будут пропускать углы, так как не будут знать, где они находятся, если заехали в другую зону.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Главная особенность прямоугольных роботов — это возможность заезжать в углы вплотную, но они требуют больше места для маневра вокруг мебели, чем круглые аналоги.</p></div>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: часто задаваемые вопросы</h2>
+
+<details>
+<summary>Почему мой круглый робот всегда оставляет пыль в углах?</summary>
+<p>Это физическое ограничение круглого корпуса. Робот не может зайти в угол, так как его корпус упирается в стены раньше, чем щетка достигнет самого стыка. Используйте режим виража или выберите модель с прямоугольным корпусом.</p>
+</details>
+
+<details>
+<summary>Можно ли настроить робот, чтобы он чаще убирал углы?</summary>
+<p>Да, в большинстве современных приложений есть функция "Точечная уборка" или возможность задать зоны с повышенной частотой уборки. Вы можете вручную запустить уборку в конкретном углу, если заметили скопление пыли.</p>
+</details>
+
+<details>
+<summary>Влияет ли тип щетки на уборку углов?</summary>
+<p>Безусловно. Более длинные и жесткие щетки лучше выметают пыль из труднодоступных мест. Проверьте, не изношена ли ваша щетка, и при необходимости замените её на оригинальную или совместимую модель с увеличенной длиной.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот застревает в углах?</summary>
+<p>Это часто случается с моделями, у которых датчики не распознают низкие препятствия. Попробуйте убрать из углов мелкие предметы, проверить датчики на чистоту или настроить виртуальные стены вокруг проблемных зон.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение-почему-углы-самая-сложная-проблема-для-робота">Введение: почему углы — самая сложная проблема для робота</a></li><li><a href="#физическая-геометрия-круг-против-квадрата">Физическая геометрия: круг против квадрата</a></li><li><a href="#алгоритмы-движения-вираж-и-спиральная-уборка">Алгоритмы движения: вираж и спиральная уборка</a></li><li><a href="#роль-навигации-лидары-камеры-и-датчики-касания">Роль навигации: лидары, камеры и датчики касания</a></li><li><a href="#конструкция-щеток-и-всасывающего-канала">Конструкция щеток и всасывающего канала</a></li><li><a href="#сравнительный-анализ-технологий-уборки-углов">Сравнительный анализ технологий уборки углов</a></li><li><a href="#практические-советы-по-улучшению-уборки">Практические советы по улучшению уборки</a></li><li><a href="#особенности-уборки-в-разных-типах-помещений">Особенности уборки в разных типах помещений</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/i/ir/irobot-pylesos-che-proizvodstvo.html" class="related-card">Где и кто производит пылесосы iRobot: История бренда и сборка</a></li><li><a href="/articles/d/de/deshevyj-robot-pylesos-kakoj-vybrat.html" class="related-card">Дешевый робот-пылесос: какой выбрать в 2026 году? Топ моделей и советы</a></li><li><a href="/articles/r/ro/robot-pylesos-ilife-kakoj-luchshe-vybrat.html" class="related-card">Робот пылесос iLife: какой лучше выбрать — рейтинг и советы</a></li><li><a href="/articles/k/ka/kak-nauchit-robot-pylesos-materitsya-xiaomi-materitsya.html" class="related-card">Почему робот-пылесос Xiaomi говорит ругательства: мифы и реальность</a></li><li><a href="/articles/k/ka/kak-otklyuchit-pylesos-robot.html" class="related-card">Как отключить робот-пылесос: полная инструкция, сброс и блокировка</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/i/ir/irobot-pylesos-che-proizvodstvo.html" class="related-bottom-card"><span class="related-bottom-title">Где и кто производит пылесосы iRobot: История бренда и сборка</span><span class="related-bottom-desc">Узнайте, чье производство у роботов-пылесосов iRobot. Где собирают модели Roomba, Braava и Jet. Обзо</span></a><a href="/articles/d/de/deshevyj-robot-pylesos-kakoj-vybrat.html" class="related-bottom-card"><span class="related-bottom-title">Дешевый робот-пылесос: какой выбрать в 2026 году? Топ моделей и советы</span><span class="related-bottom-desc">Ищете бюджетный робот-пылесос? Полный разбор характеристик: навигация, мощность всасывания, карта по</span></a><a href="/articles/r/ro/robot-pylesos-ilife-kakoj-luchshe-vybrat.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос iLife: какой лучше выбрать — рейтинг и советы</span><span class="related-bottom-desc">Как выбрать идеального робота-пылесоса iLife? Сравнение моделей, технические характеристики, отзывы </span></a><a href="/articles/k/ka/kak-nauchit-robot-pylesos-materitsya-xiaomi-materitsya.html" class="related-bottom-card"><span class="related-bottom-title">Почему робот-пылесос Xiaomi говорит ругательства: мифы и реальность</span><span class="related-bottom-desc">Узнайте, почему робот-пылесос Xiaomi может издавать странные звуки, напоминающие брань. Разбор сбоев</span></a><a href="/articles/k/ka/kak-otklyuchit-pylesos-robot.html" class="related-bottom-card"><span class="related-bottom-title">Как отключить робот-пылесос: полная инструкция, сброс и блокировка</span><span class="related-bottom-desc">Подробное руководство по отключению робота-пылесоса: временная пауза, полный сброс, отключение Wi-Fi</span></a><a href="/articles/p/py/pylesos-sam-ezdit-kak-nazyvaetsya.html" class="related-bottom-card"><span class="related-bottom-title">Как называется пылесос, который сам ездит? Обзор роботов-мойщиков</span><span class="related-bottom-desc">Узнайте, как называется устройство, убирающее пол без участия человека. Полный гид по роботам-пылесо</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

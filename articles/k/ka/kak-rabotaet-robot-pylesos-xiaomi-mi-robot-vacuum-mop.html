@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как работает робот-пылесос Xiaomi Mi Robot Vacuum Mop: обзор технологий — SOS-Пылесос</title>
+    <meta name="description" content="Подробный разбор принципа работы Xiaomi Mi Robot Vacuum Mop. Навигация, алгоритмы уборки, управление через приложение и особенности моющего модуля.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-rabotaet-robot-pylesos-xiaomi-mi-robot-vacuum-mop.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как работает робот-пылесос Xiaomi Mi Robot Vacuum Mop: обзор технологий">
+    <meta property="og:description" content="Подробный разбор принципа работы Xiaomi Mi Robot Vacuum Mop. Навигация, алгоритмы уборки, управление через приложение и особенности моющего модуля.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как работает робот-пылесос Xiaomi Mi Robot Vacuum Mop: обзор технологий</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как работает робот-пылесос Xiaomi Mi Robot Vacuum Mop: полный разбор алгоритмов</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#система-навигации-и-создание-карты-помещения">Система навигации и создание карты помещения</a></li><li><a href="#механика-уборки-и-система-фильтрации">Механика уборки и система фильтрации</a></li><li><a href="#принципы-работы-моющего-модуля">Принципы работы моющего модуля</a></li><li><a href="#алгоритмы-обхода-препятствий-и-прокладки-маршрута">Алгоритмы обхода препятствий и прокладки маршрута</a></li><li><a href="#энергопотребление-и-управление-зарядом">Энергопотребление и управление зарядом</a></li><li><a href="#интеграция-со-смартфоном-и-голосовыми-помощниками">Интеграция со смартфоном и голосовыми помощниками</a></li><li><a href="#техническое-обслуживание-и-профилактика">Техническое обслуживание и профилактика</a></li><li><a href="#возможные-проблемы-и-способы-их-решения">Возможные проблемы и способы их решения</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Современная автоматизация быта достигла уровня, когда рутинные задачи по уборке помещений полностью доверяются интеллектуальным устройствам. В центре этого процесса находится <em>Xiaomi Mi Robot Vacuum Mop</em>, который сочетает в себе механическую очистку и влажную обработку пола. Пользователи часто задаются вопросом, каким образом маленький корпус способен самостоятельно ориентироваться в пространстве, избегать препятствий и эффективно собирать мусор.</p>
+
+<p>Секрет эффективности кроется в сложном программном обеспечении, которое управляет физическими компонентами устройства. Вместо хаотичного движения, характерного для бюджетных моделей, здесь используется продвинутая система <strong>визуальной навигации</strong> или лазерного картографирования. Это позволяет роботу запоминать планировку квартиры и строить оптимальный маршрут уборки, экономя заряд батареи и время.</p>
+
+<p>Взаимодействие человека и машины осуществляется через мобильное приложение <code>Mi Home</code>, где вы можете задать виртуальные стены, запретные зоны и расписание работы. Понимание того, как именно <em>Xiaomi Mi Robot Vacuum Mop</em> обрабатывает данные с датчиков и принимает решения, поможет вам максимально эффективно эксплуатировать устройство и продлить срок его службы.</p>
+
+<h2 id="система-навигации-и-создание-карты-помещения">Система навигации и создание карты помещения</h2>
+
+<p>Фундаментом работы любого современного роботизированного пылесоса является его способность понимать, где он находится и куда нужно двигаться. <em>Xiaomi Mi Robot Vacuum Mop</em> использует лазерный дальномер (LDS), установленный в «башне» на верхней крышке. Этот механизм вращается с высокой скоростью, испуская инфракрасные лучи и фиксируя их отражение от стен и предметов мебели.</p>
+
+<p>На основе полученных данных строится точная <strong>карта помещения</strong> в реальном времени. Алгоритмы SLAM (Simultaneous Localization and Mapping) позволяют устройству одновременно определять свое местоположение и обновлять карту окружения. Это объясняет, почему робот не бьется об одни и те же углы и не пропускает целые комнаты во время уборки.</p>
+
+<p>В некоторых модификациях, таких как версия Pro или S10, используется камера для визуального распознавания объектов. Однако базовая модель полагается на лазер, который обладает преимуществами в темноте и при отсутствии яркого освещения. <strong>Датчики гироскопа и акселерометра</strong> помогают удерживать траекторию движения прямой и выровненной, даже если колеса наезжают на неровности покрытия.</p>
+
+<p>Особенностью работы является возможность создания виртуальных границ. В приложении вы можете нарисовать линию, которую робот не пересечет, или выделить зону, требующую особой тщательности. Это критически важно для многоуровневых квартир или помещений с зоной для домашних животных.</p>
+
+<blockquote>⚠️ Внимание: Лазерный дальномер не должен быть закрыт посторонними предметами или пылью во время работы, так как это приведет к потере ориентации и хаотичному движению.</blockquote>
+
+<div class="poll-widget" id="poll-8b98d836"><div class="poll-widget-question">📊 Какой тип навигации вы предпочитаете?</div><div class="poll-widget-option" data-poll="8b98d836" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Лазерный (LDS)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="8b98d836" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Визуальный (Камера)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="8b98d836" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскопический</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="8b98d836" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Случайное движение</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="механика-уборки-и-система-фильтрации">Механика уборки и система фильтрации</h2>
+
+<p>После того как маршрут построен, в работу вступают механические компоненты. Основной элемент сбора сухого мусора — это вращающаяся боковая щетка и мощная турбощетка внутри пылесборника. <strong>Боковая щетка</strong> выдвигается вперед и сметает пыль из-под диванов и в углах в зону всасывания.</p>
+
+<p>Внутри корпуса расположена мощная турбина, создающая воздушный поток с заявленной силой всасывания от 2000 Па и выше в зависимости от модели. Воздух проходит через систему многоступенчатой фильтрации. Сначала крупные частицы задерживаются в контейнере, затем мелкая пыль фильтруется через HEPA-фильтр, предотвращая выброс аллергенов обратно в воздух комнаты.</p>
+
+<p>Для эффективной работы важно регулярно очищать фильтры и щетки от намотавшейся шерсти и волос. Засорение <strong>всасывающего тракта</strong> резко снижает эффективность уборки и может привести к перегреву мотора. Некоторые пользователи отмечают, что при работе на ковровых покрытиях робот автоматически увеличивает мощность всасывания.</p>
+
+<details class="faq-item"><summary>Что скрывается под контейнером для пыли?</summary><div class="faq-answer"><p>Под контейнером находится датчик заполнения, а также контактные площадки для соединения с моющим модулем (если он установлен). Важно проверять чистоту этих контактов для стабильной работы электроники.</p></div></details>
+
+<p>Скорость всасывания и режим работы выбираются автоматически или вручную через приложение. В режиме"Турбо" робот тратит больше энергии, но справляется с глубоким загрязнением ковролина. В режиме"Шепот" он работает практически бесшумно, что удобно для уборки в ночное время.</p>
+
+<div class="checklist-block"><h4>☑️ Еженедельный осмотр перед уборкой</h4><label class="check-item"><input type="checkbox"><span>Очистить боковую щетку от волос</span></label><label class="check-item"><input type="checkbox"><span>Помыть контейнер для пыли</span></label><label class="check-item"><input type="checkbox"><span>Проверить чистоту HEPA-фильтра</span></label><label class="check-item"><input type="checkbox"><span>Осмотреть колеса на наличие мусора</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="принципы-работы-моющего-модуля">Принципы работы моющего модуля</h2>
+
+<p>Название модели <em>Xiaomi Mi Robot Vacuum Mop</em> подразумевает не только сухую уборку, но и влажную. Для этого снизу корпуса крепится специальный модуль с резервуаром для воды. В отличие от традиционных швабр, робот не отжимает тряпку самостоятельно, а использует метод протирания под давлением.</p>
+
+<p>Вода из резервуара подается на микрофибровую тряпку через систему капиллярного смачивания или, в более новых версиях, через ультразвуковую систему вибровыдавливания. Это позволяет увлажнять поверхность ровно настолько, чтобы собрать грязь, но не намочить пол чрезмерно. <strong>Скорость подачи воды</strong> регулируется программно, что делает процесс безопасным для паркета и ламината.</p>
+
+<p>Важно понимать, что робот не справляется с застарелыми пятнами или липкими загрязнениями так, как это сделал бы человек с шваброй. Его задача — поддержание чистоты и удаление пыли, которая становится грязью при намокании. Поэтому перед включением моющего режима рекомендуется убрать с пола крупные предметы и провода.</p>
+
+<p>В режиме одновременной уборки и мытья робот сначала проходит по территории с сухой щеткой, собирая основной мусор, а затем возвращается с влажной тряпкой. Либо, в зависимости от настроек, делает это за один проход, чередуя зоны. <em>Система интеллектуального управления</em> следит, чтобы мокрая тряпка не попала в зоны, где есть электрические розетки на плинтусах или коврики, которые нельзя мочить.</p>
+
+<blockquote>⚠️ Внимание: Используйте только дистиллированную или очищенную воду, чтобы избежать образования белого налета на полу и засорения микросистемы подачи воды.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед установкой моющего модуля убедитесь, что тряпка из микрофибры закреплена на липучках максимально плотно, иначе она может сместиться во время движения и испачкать мебель.</p></div>
+
+<h2 id="алгоритмы-обхода-препятствий-и-прокладки-маршрута">Алгоритмы обхода препятствий и прокладки маршрута</h2>
+
+<p>Интеллект устройства проявляется в том, как оно реагирует на внезапные препятствия. Если лазерный дальномер видит стену, он строит маршрут вокруг нее. Но что делать с маленькими игрушками, проводами или коврами? Здесь вступают в работу <strong>датчики столкновения</strong> и инфракрасные сенсоры, расположенные по периметру корпуса.</p>
+
+<p>Когда робот приближается к объекту, инфракрасные лучи отражаются и дают сигнал микропроцессору о необходимости изменить траекторию. Если робот все же слегка задевает предмет, механическая буферная камера срабатывает, и устройство разворачивается, чтобы не застрять. Это называется <strong>активной защитой</strong>.</p>
+
+<p>Особое внимание уделяется работе с проводами и кабелями. Старые алгоритмы могли наматывать их на боковую щетку или колеса, блокируя движение. Современные версии <em>Xiaomi Mi Robot Vacuum Mop</em> используют улучшенные алгоритмы распознавания, чтобы избегать запутывания, хотя идеальной защиты от всех типов кабелей пока не существует.</p>
+
+<p>При переходе через порожки или пороги датчики (cliff sensors) внизу корпуса мгновенно определяют перепад высот. Если робот подъезжает к лестнице или глубокому проему, он останавливается и разворачивается, предотвращая падение. Эта система работает даже в полной темноте благодаря активному излучению.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Грамотное распределение препятствий в доме (складывание проводов, уборка мелких предметов) напрямую влияет на скорость и качество уборки, позволяя роботу работать без остановок.</p></div>
+
+<h2 id="энергопотребление-и-управление-зарядом">Энергопотребление и управление зарядом</h2>
+
+<p>Автономность работы — один из ключевых параметров для пользователя. <em>Xiaomi Mi Robot Vacuum Mop</em> оснащен литий-ионным аккумулятором, емкостью которого хватает на уборку площади от 150 до 250 квадратных метров в зависимости от режима. В процессе работы <strong>система мониторинга батареи</strong> в реальном времени отслеживает уровень заряда.</p>
+
+<p>Если (заряд) падает до критического уровня (обычно около 20%), робот прерывает текущую уборку. Он запоминает точку остановки, находит док-станцию и возвращается для зарядки. После того как батарея зарядится до определенного порога (например, 80%), устройство автоматически возвращается в точку прерывания и продолжает уборку с того же места.</p>
+
+<p>Эта функция «возврата к прерванной уборке» критически важна для больших квартир. Она гарантирует, что в комнате не останется неубранных углов только потому, что у пылесоса села батарейка. <strong>Продуманная логика управления питанием</strong> позволяет экономить ресурс батареи за счет перехода в режим ожидания при простоях.</p>
+
+<table>
+<thead>
+<tr>
+<th>Режим работы</th>
+<th>Потребляемая мощность (Вт)</th>
+<th>Примерное время работы (мин)</th>
+<th>Сила всасывания (Па)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Зарядка</td>
+<td>40-50</td>
+<td>300-360</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Тихий (Silent)</td>
+<td>25-30</td>
+<td>180-200</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>Стандарт (Standard)</td>
+<td>35-45</td>
+<td>120-150</td>
+<td>1400</td>
+</tr>
+<tr>
+<td>Максимум (Max)</td>
+<td>60-75</td>
+<td>60-80</td>
+<td>2000+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Срок службы аккумулятора зависит от условий эксплуатации. Не рекомендуется постоянно разряжать его в ноль или оставлять на зарядке годами без использования. Оптимальный диапазон для сохранения емкости — от 20% до 80% заряда.</p>
+
+<h2 id="интеграция-со-смартфоном-и-голосовыми-помощниками">Интеграция со смартфоном и голосовыми помощниками</h2>
+
+<p>Управление <em>Xiaomi Mi Robot Vacuum Mop</em> выходит далеко за рамки одной кнопки на корпусе. Основным инструментом управления является мобильное приложение <code>Mi Home</code>. Через него доступны все функции: от выбора режима уборки до просмотра истории перемещений по карте помещения.</p>
+
+<p>В приложении можно создавать <strong>многосекционные карты</strong> для двух- или трехэтажных домов. Вы можете задать разные настройки для каждой комнаты: например, в кухне включить максимальное всасывание и влажную уборку, а в спальне выставить тихий режим без воды. Это делает работу робота действительно адаптивной под нужды конкретной зоны.</p>
+
+<p>Дополнительно устройство поддерживает интеграцию с голосовыми помощниками, такими как <code>Alexa</code>, <code>Google Assistant</code> и <code>Siri Shortcuts</code>. Это позволяет запускать уборку голосовой командой: «Алиса, включи пылесос» или «Нажми на паузу». Такой уровень интеграции превращает робота в полноценный элемент умного дома.</p>
+
+<p>Обновление прошивки осуществляется по воздуху (OTA). Разработчики периодически выпускают новые версии ПО, которые улучшают алгоритмы обхода препятствий, добавляют новые языки или исправляют ошибки. Важно следить за обновлениями, так как они могут существенно изменить поведение устройства.</p>
+
+<details class="faq-item"><summary>Как работает зона"No-Go"?</summary><div class="faq-answer"><p>Зона"No-Go" — это виртуальная граница, которую робот не пересечет. Она создается на цифровой карте в приложении. В отличие от магнитной ленты, ее можно легко изменить или удалить в любой момент без физических манипуляций.</p></div></details>
+
+<h2 id="техническое-обслуживание-и-профилактика">Техническое обслуживание и профилактика</h2>
+
+<p>Долговечность <em>Xiaomi Mi Robot Vacuum Mop</em> напрямую зависит от регулярного обслуживания. Пыль, шерсть животных и мелкий мусор накапливаются в узлах, что может привести к поломке датчиков или моторов. <strong>Еженедельная чистка</strong> является обязательной процедурой для поддержания работоспособности.</p>
+
+<p>Особое внимание следует уделятьmain brush (главной щетке). На ней часто накручиваются волосы и нитки, которые могут заблокировать подшипники. Используйте специальный нож или ножницы из комплекта, чтобы аккуратно срезать намотку. Также необходимо очищать лопатки турбины от пыли, чтобы не нарушить балансировку вентилятора.</p>
+
+<p>Датчики в нижней части корпуса, отвечающие за обрывы и застревание, должны быть протираемы сухой тряпкой. Загрязнение линз этими датчиками может привести к тому, что робот будет думать, будто он падает с обрыва, и откажется двигаться вперед. <strong>Резиновые колеса</strong> также нужно проверять на наличие застрявших камешков или ниток.</p>
+
+<p>Резервуар для воды требует ежедневного опорожнения и промывки, особенно если вы используете специальные моющие средства. Застоявшаяся вода может стать причиной неприятного запаха или образования плесени внутри трубок подачи. Сменные фильтры и тряпки следует менять по мере износа, обычно раз в 2-3 месяца.</p>
+
+<blockquote>⚠️ Внимание: Запрещается погружать основной корпус пылесоса в воду. Мокрой тряпкой можно протереть только датчики и боковую щетку, избегая попадания влаги в разъемы и вентиляционные отверстия.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярная очистка датчиков и щеток — это залог того, что робот не потеряет ориентации в пространстве и не заблокирует свой собственный мотор, что сэкономит вам деньги на ремонте в будущем.</p></div>
+
+<h2 id="возможные-проблемы-и-способы-их-решения">Возможные проблемы и способы их решения</h2>
+
+<p>Несмотря на высокую надежность, пользователи могут столкнуться с рядом проблем. Самая частая — робот не может найти базу. Это может происходить из-за того, что база сдвинута, перекрываются инфракрасные маяки или в комнате слишком много зеркал, создающих помехи.</p>
+
+<p>Если робот постоянно застревает на одном месте, проверьте, нет ли там порогов выше допустимых 2 см или проводов. Также стоит проверить заряженность батареи. Иногда проблема решается простым перезапуском устройства или сбросом настроек до заводских. <strong>Ошибка датчиков</strong> может возникнуть, если на них попала пыль или жидкость.</p>
+
+<p>При проблемах с моющим модулем (вода не течет или течет слишком сильно), проверьте уровень воды и положение крышки резервуара. В некоторых случаях требуется очистка сопел подачи воды от известкового налета. Если робот не убирает пыль, возможно, забит HEPA-фильтр или загрязнен воздуховод.</p>
+
+<p>В случае сложных ошибок, которые не решаются перезагрузкой, стоит обратиться в сервисный центр. Однако большинство проблем с логикой работы и подключением решаются обновлением прошивки или переустановкой приложения <code>Mi Home</code>. Важно сохранять чистоту контактов между модулями, чтобы избежать ложных сообщений об ошибках.</p>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Можно ли использовать обычную воду в резервуаре для влажной уборки?</summary>
+<p>Можно, но рекомендуется использовать дистиллированную воду. Обычная вода из-под крана содержит соли и минералы, которые со временем образуют налет на внутренних деталях и могут оставить разводы на полу.</p>
+</details>
+
+<details>
+<summary>Как часто нужно менять HEPA-фильтр на Xiaomi Mi Robot Vacuum Mop?</summary>
+<p>Фильтр следует промывать раз в 2-3 недели, но менять полностью рекомендуется каждые 3-6 месяцев, в зависимости от интенсивности использования и количества шерсти животных в доме.</p>
+</details>
+
+<details>
+<summary>Почему робот не возвращается на базу после уборки?</summary>
+<p>Возможные причины: база отключена от сети, перед ней стоят препятствия, датчики базы загрязнены или в помещении слишком темно для камеры навигации. Также проверьте, не сдвинули ли вы базу.</p>
+</details>
+
+<details>
+<summary>Может ли робот убирать на коврах с высоким ворсом?</summary>
+<p>Роботы с лазерной навигацией могут заезжать на ковры, но если ворс слишком высокий или ковер имеет бахрому, робот может застрять или не распознать его как твердую поверхность. Рекомендуется использовать режим"только уборка" на таких покрытиях.</p>
+</details>
+
+<details>
+<summary>Работает ли робот без интернета после построения карты?</summary>
+<p>Да, после того как карта сохранена, робот может работать автономно по расписанию даже без Wi-Fi. Однако удаленное управление через приложение и голосовые команды будут недоступны.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#система-навигации-и-создание-карты-помещения">Система навигации и создание карты помещения</a></li><li><a href="#механика-уборки-и-система-фильтрации">Механика уборки и система фильтрации</a></li><li><a href="#принципы-работы-моющего-модуля">Принципы работы моющего модуля</a></li><li><a href="#алгоритмы-обхода-препятствий-и-прокладки-маршрута">Алгоритмы обхода препятствий и прокладки маршрута</a></li><li><a href="#энергопотребление-и-управление-зарядом">Энергопотребление и управление зарядом</a></li><li><a href="#интеграция-со-смартфоном-и-голосовыми-помощниками">Интеграция со смартфоном и голосовыми помощниками</a></li><li><a href="#техническое-обслуживание-и-профилактика">Техническое обслуживание и профилактика</a></li><li><a href="#возможные-проблемы-и-способы-их-решения">Возможные проблемы и способы их решения</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/s/sa/samsung-pylesos-chej.html" class="related-card">Samsung пылесос: чей бренд, производство и страна-изготовитель</a></li><li><a href="/articles/y/y-/y-obraznaya-uborka-robot-pylesos-chto-znachit.html" class="related-card">Y-образная уборка робот-пылесоса: что это и как работает</a></li><li><a href="/articles/k/ka/kak-sokhranit-kartu-v-robote-pylesose-xiaomi.html" class="related-card">Как сохранить карту в роботе-пылесосе Xiaomi: полное руководство</a></li><li><a href="/articles/k/ka/kak-proshit-robot-pylesos-xiaomi-mi.html" class="related-card">Инструкция: как прошить робот-пылесос Xiaomi Mi и вернуть работоспособность</a></li><li><a href="/articles/r/ro/robot-pylesos-roborock-kakoj-luchshe-vybrat.html" class="related-card">Как выбрать робот-пылесос Roborock: обзор моделей и советы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/s/sa/samsung-pylesos-chej.html" class="related-bottom-card"><span class="related-bottom-title">Samsung пылесос: чей бренд, производство и страна-изготовитель</span><span class="related-bottom-desc">Кто на самом деле производит пылесосы Samsung? Разбираем страну бренда, заводы в Корее и Китае, лине</span></a><a href="/articles/y/y-/y-obraznaya-uborka-robot-pylesos-chto-znachit.html" class="related-bottom-card"><span class="related-bottom-title">Y-образная уборка робот-пылесоса: что это и как работает</span><span class="related-bottom-desc">Разбираем, что значит Y-образная уборка в роботах-пылесосах. Преимущества перед зигзагом, точность н</span></a><a href="/articles/k/ka/kak-sokhranit-kartu-v-robote-pylesose-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как сохранить карту в роботе-пылесосе Xiaomi: полное руководство</span><span class="related-bottom-desc">Узнайте, как избежать потери карты уборки на Xiaomi Mi Home. Инструкция по резервному копированию, н</span></a><a href="/articles/k/ka/kak-proshit-robot-pylesos-xiaomi-mi.html" class="related-bottom-card"><span class="related-bottom-title">Инструкция: как прошить робот-пылесос Xiaomi Mi и вернуть работоспособность</span><span class="related-bottom-desc">Полное руководство по перепрошивке Xiaomi Mi Robot. Узнайте, как снять блокировку региона, обновить </span></a><a href="/articles/r/ro/robot-pylesos-roborock-kakoj-luchshe-vybrat.html" class="related-bottom-card"><span class="related-bottom-title">Как выбрать робот-пылесос Roborock: обзор моделей и советы</span><span class="related-bottom-desc">Полный гид по выбору робота-пылесоса Roborock: сравнение серий S, Q, Dyad и Dyad Pro. Узнайте, какая</span></a><a href="/articles/i/ir/irobot-pylesos-gde-proizvodyat.html" class="related-bottom-card"><span class="related-bottom-title">Где производят роботы-пылесосы iRobot: История заводов и сборка</span><span class="related-bottom-desc">Узнайте, где собирают роботы-пылесосы iRobot: США, Китай или Тайвань. Разбор производственных цепоче</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

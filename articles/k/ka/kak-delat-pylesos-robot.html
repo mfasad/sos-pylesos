@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как сделать робота-пылесос своими руками: пошаговая инструкция — SOS-Пылесос</title>
+    <meta name="description" content="Подробный гид по сборке робота-пылесоса. Выбор платформы, моторов, датчиков и программирование Arduino. Этапы создания автономного уборщика.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-delat-pylesos-robot.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как сделать робота-пылесос своими руками: пошаговая инструкция">
+    <meta property="og:description" content="Подробный гид по сборке робота-пылесоса. Выбор платформы, моторов, датчиков и программирование Arduino. Этапы создания автономного уборщика.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/remont-i-zapchasti/">Ремонт и запчасти</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как сделать робота-пылесос своими руками: пошаговая инструкция</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Создание робота-пылесоса своими руками: Полный гайд конструктора</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#выбор-платформы-и-механической-части">Выбор платформы и механической части</a></li><li><a href="#электронное-управление-и-микроконтроллер">Электронное управление и микроконтроллер</a></li><li><a href="#система-навигации-и-сенсоры">Система навигации и сенсоры</a></li><li><a href="#модуль-всасывания-и-уборки">Модуль всасывания и уборки</a></li><li><a href="#программирование-логики-работы">Программирование логики работы</a></li><li><a href="#питание-и-система-зарядки">Питание и система зарядки</a></li><li><a href="#особенности-эксплуатации-и-обслуживания">Особенности эксплуатации и обслуживания</a></li><li><a href="#заключение-и-перспективы-развития">Заключение и перспективы развития</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Создание собственного <strong>автономного уборщика</strong> — это увлекательный проект, который объединяет в себе механику, электронику и программирование. Многие энтузиасты задаются вопросом, как сделать робота-пылесос, чтобы получить устройство, идеально адаптированное под конкретные условия их жилья или просто ради технического опыта.</p>
+
+<p>Процесс сборки требует внимательного подхода к выбору компонентов, так как от них зависит <strong>маневренность</strong> и эффективность очистки. В отличие от покупных моделей, самодельный аппарат позволяет полностью контролировать каждый узел системы и дорабатывать его под свои нужды.</p>
+
+<p>В этой статье мы разберем основные этапы создания такого устройства, от подбора платформы до написания кода управления. Вы узнаете, какие датчики необходимы для навигации и как обеспечить достаточную мощность всасывания.</p>
+
+<h2 id="выбор-платформы-и-механической-части">Выбор платформы и механической части</h2>
+
+<p>Первый и самый важный шаг — определение базы, на которой будет двигаться ваш <em>робот-пылесос</em>. Чаще всего для этих целей используют готовые шасси из пластика или металла, которые можно приобрести в магазинах радиоэлектроники. Однако продвинутые мастера предпочитают вырезать корпус самостоятельно из фанеры или листового акрила.</p>
+
+<p>Ключевым элементом механики являются моторы. Вам понадобятся два независимых <strong>колесных привода</strong> с редукторами для обеспечения точного поворота. Кроме того, необходимо предусмотреть место для установки третьего опорного колеса, которое будет обеспечивать устойчивость конструкции при движении.</p>
+<ul>
+<li>🔧 Используйте моторы с энкодерами для точного контроля скорости вращения колес.</li>
+<li>🔋 Закрепите аккумуляторный отсек ближе к центру тяжести для лучшей балансировки.</li>
+<li>🧹 Предусмотрите крепления для щеток и корпуса пылесборника в нижней части платформы.</li>
+</ul>
+
+<p> Если корпус будет слишком тяжелым, <strong>автономность</strong> вашего устройства может упасть в два раза. Поэтому старайтесь минимизировать количество лишних деталей и используйте легкие материалы.</p>
+
+<h2 id="электронное-управление-и-микроконтроллер">Электронное управление и микроконтроллер</h2>
+
+<p>Мозгом вашего устройства станет микроконтроллерная плата. Наиболее популярным выбором для таких проектов является Arduino или Raspberry Pi. Первая отлично подходит для базовых задач навигации, а вторая — если вы планируете внедрить <strong>компьютерное зрение</strong> и сложную логику.</p>
+
+<p>Для управления моторами необходим специальный драйвер, способный выдерживать ток, потребляемый двигателями. Без него прямое подключение к плате приведет к перегреву и выходу из строя процессора. Подберите <strong>драйвер моторов</strong> с соответствующими характеристиками.</p>
+<ul>
+<li>🔌 Убедитесь, что драйвер поддерживает широтно-импульсную модуляцию (ШИМ) для плавного управления.</li>
+<li>📶 Если используете Raspberry Pi, предусмотрите модуль Wi-Fi для удаленного управления через приложение.</li>
+<li>🔋 Разделите питание: логика должна работать от одного источника, а моторы — от другого, чтобы избежать помех.</li>
+</ul>
+
+<blockquote>⚠️ Внимание: При сборке схемы обязательно используйте развязывающие конденсаторы на выводах питания моторов, иначе помехи от их работы могут привести к нестабильной работе микроконтроллера и сбоям в программе.</blockquote>
+
+<h2 id="система-навигации-и-сенсоры">Система навигации и сенсоры</h2>
+
+<p>Чтобы робот не врезался в стены и мебель, ему необходима система датчиков. Базовый набор включает в себя ультразвуковые датчики расстояния, которые работают по принципу сонара. Они позволяют определять наличие преград перед устройством и корректировать траекторию движения.</p>
+
+<p>Для более продвинутого уровня управления можно добавить инфракрасные датчики падения, которые предотвратят падение с лестницы. Также существуют <strong>лидары</strong> и камеры, но их интеграция требует более сложного программирования и мощного процессора. Выбор сенсоров зависит от алгоритма, который вы планируете реализовать.</p>
+<ul>
+<li>📡 Ультразвуковые модули HC-SR04 отлично подходят для обнаружения стен на расстоянии до 4 метров.</li>
+<li>🔦 ИК-датчики падения необходимо установить по периметру нижней части корпуса.</li>
+<li>📹 Датчики прикосновения (бамперы) помогут роботу мягко определять границы препятствий.</li>
+</ul>
+
+<p>Некоторые энтузиасты используют комбинацию сенсоров для создания карты помещения. Это позволяет устройству двигаться не хаотично, а по спирали или змейкой, обеспечивая более качественную уборку. Однако такая логика требует значительных вычислительных ресурсов.</p>
+
+<div class="poll-widget" id="poll-fdb7da47"><div class="poll-widget-question">📊 Какой микроконтроллер вы планируете использовать?</div><div class="poll-widget-option" data-poll="fdb7da47" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Arduino</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="fdb7da47" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Raspberry Pi</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="fdb7da47" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">ESP32</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="fdb7da47" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">STM32</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="модуль-всасывания-и-уборки">Модуль всасывания и уборки</h2>
+
+<p>Главная функция устройства — уборка пыли и мусора. Для этого потребуется мощный <strong>вентилятор</strong> (турбина), способный создавать достаточный разрежение. Обычно используются турбины от старых компьютеров или специализированные моторы с высокими оборотами.</p>
+
+<p>Система сбора мусора должна быть герметичной, чтобы не допустить выброса пыли обратно в помещение. Можно использовать прозрачный пластиковый контейнер, через который будет видно уровень наполнения. Важно предусмотреть простую конструкцию для быстрой очистки резервуара.</p>
+
+<p>Помимо всасывания, необходимо реализовать систему механической очистки пола. В самодельных роботах часто используются вращающиеся щетки, приводимые в действие отдельным мотором или ременной передачей от основного двигателя. Эффективность уборки зависит от <strong>скорости вращения</strong> щеток и их жесткости.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка системы всасывания</h4><label class="check-item"><input type="checkbox"><span>Проверить герметичность воздуховода</span></label><label class="check-item"><input type="checkbox"><span>Убедиться в герметичности контейнера</span></label><label class="check-item"><input type="checkbox"><span>Проверить мощность турбины</span></label><label class="check-item"><input type="checkbox"><span>Откалибровать датчик заполнения</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<p>Если вы используете мощную турбину, не забудьте установить фильтр, чтобы мелкая пыль не забивала подшипники мотора. Отсутствие фильтра может привести к преждевременному износу вентилятора.</p>
+
+<blockquote>⚠️ Внимание: Не устанавливайте слишком мощный вентилятор без надлежащей теплоизоляции, так как мотор может перегреться при длительной работе и расплавить пластиковые элементы корпуса.</blockquote>
+
+<details class="faq-item"><summary>Секреты сборки воздуховода для максимальной тяги</summary><div class="faq-answer"><p>Для улучшения тяги воздуховод должен быть максимально коротким и прямым. Изгибы уменьшают эффективность всасывания. Рекомендуется использовать трубки диаметром не менее 30 мм для прохода мусора среднего размера.</p></div></details>
+
+<h2 id="программирование-логики-работы">Программирование логики работы</h2>
+
+<p>Написание кода — это этап, где физическая сборка превращается в интеллектуальное устройство. Вам нужно реализовать алгоритм движения, который будет обрабатывать данные с датчиков и отдавать команды моторам. Базовая логика обычно строится на цикле «проверить датчик — принять решение — выполнить действие».</p>
+
+<p>Одной из сложных задач является реализация алгоритма исследования неизвестной территории. Простые роботы двигаются прямо, пока не упрутся в стену, затем поворачивают под случайным углом. Более сложные системы строят карты и запоминают уже пройденные участки, чтобы не возвращаться туда повторно.</p>
+
+<p>Для реализации этих задач часто используются библиотеки для <strong>робототехники</strong>, которые упрощают работу с таймерами и прерываниями. Код должен быть оптимизирован так, чтобы робот реагировал на изменения в окружающей среде мгновенно, иначе он будет постоянно натыкаться на препятствия.</p>
+
+<p>Не забывайте про режимы работы: «автоматическая уборка», «точечная уборка», «возврат на базу». Реализация этих режимов требует четкой структуры программы и надежной работы сенсоров заряда батареи.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Напишите отдельную функцию для калибровки датчиков при старте, чтобы робот мог определять «ноль» для инфракрасных сенсоров в зависимости от освещения в комнате.</p></div>
+
+<h2 id="питание-и-система-зарядки">Питание и система зарядки</h2>
+
+<p>Энергоэффективность — критический параметр для любого автономного устройства. Наиболее подходящим источником питания являются литий-ионные аккумуляторы, так как они обладают высокой плотностью энергии и низким саморазрядом. Вам понадобится батарея достаточной емкости, чтобы робот мог работать минимум 30-60 минут.</p>
+
+<p>Для автоматического возврата на базу необходимо предусмотреть систему контактной зарядки. Это может быть простая платформа с металлическими пластинами, к которым робот прикасается своими щупами. Также можно использовать инфракрасные маяки, которые направляют робота к зарядной станции.</p>
+
+<p>Схема управления зарядом должна защищать аккумуляторы от перезаряда и глубокого разряда. Использование готовых модулей защиты (BMS) значительно повысит безопасность и долговечность вашей системы питания. Без защиты <strong>литиевые элементы</strong> могут выйти из строя или даже воспламениться.</p>
+
+<table>
+<thead>
+<tr>
+<th>Компонент</th>
+<th>Рекомендуемые характеристики</th>
+<th>Примечание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Аккумулятор</td>
+<td>Li-Ion 18650, 3000-5000 мАч</td>
+<td>Обеспечивает до 1 часа работы</td>
+</tr>
+<tr>
+<td>Моторы колес</td>
+<td>100-200 об/мин, высокий крутящий момент</td>
+<td>Для уверенного преодоления ковров</td>
+</tr>
+<tr>
+<td>Турбина</td>
+<td>10 000 - 15 000 об/мин</td>
+<td>Необходима для создания тяги</td>
+</tr>
+<tr>
+<td>Датчики</td>
+<td>Ультразвуковые + ИК падения</td>
+<td>Базовый набор для навигации</td>
+</tr>
+<tr>
+<td>Контроллер</td>
+<td>Arduino Mega или Raspberry Pi Zero</td>
+<td>Выбор зависит от сложности кода</td>
+</tr>
+</tbody>
+</table>
+
+<p>Важно предусмотреть индикацию уровня заряда, чтобы вы могли вовремя заменить батареи или подключить устройство к сети. Светодиодные индикаторы или сообщение через Bluetooth — отличные решения для этой задачи.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Эффективная система питания и зарядки — залог того, что ваш самодельный робот сможет работать автономно длительное время без вмешательства человека.</p></div>
+
+<h2 id="особенности-эксплуатации-и-обслуживания">Особенности эксплуатации и обслуживания</h2>
+
+<p>Самодельный робот не застрахован от поломок, поэтому регулярное обслуживание обязательно. Вам придется периодически чистить датчики от пыли, проверять надежность креплений и заменять щетки. В отличие от заводских моделей, где ремонт часто невозможен, здесь вы сами контролируете состояние каждого узла.</p>
+
+<p>Одной из частых проблем является засорение воздуховода мелкой пылью или нитками. Проверяйте проходимость каналов после каждой интенсивной уборки. Также следите за состоянием колес: если они изношены, робот может начать «есть» пол или терять сцепление.</p>
+
+<p>Со временем программное обеспечение может потребовать доработки. Вы можете добавить новые функции, например, управление со смартфона или интеграцию с системой «Умный дом». Это делает процесс создания бесконечным экспериментом и возможностью постоянно улучшать устройство.</p>
+
+<p>Помните, что безопасность превыше всего. Убедитесь, что конструкция корпуса не имеет острых краев, а электрическая схема надежно изолирована. <strong>Короткое замыкание</strong> в самодельном устройстве может привести к возгоранию, поэтому используйте качественные паяльные материалы и термоусадку.</p>
+
+<blockquote>⚠️ Внимание: Если вы планируете использовать робот в доме с домашними животными, убедитесь, что вращающиеся части щеток закрыты защитными решетками, чтобы предотвратить намотку шерсти и травму лап животных.</blockquote>
+
+<details class="faq-item"><summary>Как продлить жизнь аккумулятору?</summary><div class="faq-answer"><p>Не допускайте полного разряда батареи до 0%. Старайтесь ставить робота на зарядку, когда уровень заряда падает до 20%. Также храните аккумуляторы в прохладном месте.</p></div></details>
+
+<h2 id="заключение-и-перспективы-развития">Заключение и перспективы развития</h2>
+
+<p>Создание робота-пылесоса своими руками — это сложный, но невероятно rewarding проект. Вы получаете уникальное устройство, которое полностью соответствует вашим требованиям и позволяет глубоко понять принципы работы современной робототехники. Даже если результат не будет идеальным с первой попытки, полученный опыт бесценен.</p>
+
+<p>В будущем вы можете доработать модель, добавив искусственный интеллект для распознавания типов препятствий или даже мусора. Технологии развиваются стремительно, и доступные микроконтроллеры позволяют реализовывать функции, которые еще недавно были доступны только в промышленных образцах.</p>
+
+<p>Главное — не бойтесь экспериментировать и ошибаться. Каждая ошибка в коде или неудачная пайка — это шаг к созданию совершенного устройства. Удачи в сборке и чистоте в доме!</p>
+
+<details>
+<summary>Какой самый сложный этап при сборке самодельного пылесоса?</summary>
+<p>Чаще всего трудности возникают при настройке алгоритмов навигации, чтобы робот не застревал в одних и тех же местах, или при обеспечении достаточной мощности всасывания при ограниченной емкости батареи.</p>
+</details>
+
+<details>
+<summary>Можно ли использовать старый пылесос для создания робота?</summary>
+<p>Использовать мотор от старого пылесоса можно, но турбина и корпус обычно слишком громоздки. Лучше взять мощный вентилятор от компьютерного охлаждения или специализированный мотор для роботов, а корпус разработать свой.</p>
+</details>
+
+<details>
+<summary>Сколько времени занимает сборка такого робота?</summary>
+<p>Время зависит от навыков конструктора. Простая модель может быть собрана за 2-3 дня, тогда как создание полноценного робота с картографированием и автономной зарядкой может занять несколько недель.</p>
+</details>
+
+<details>
+<summary>Нужны ли специальные навыки программирования?</summary>
+<p>Базовые знания языка C++ (для Arduino) или Python (для Raspberry Pi) необходимы. Однако в интернете много готовых примеров кода для датчиков и моторов, которые можно адаптировать под свои задачи.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#выбор-платформы-и-механической-части">Выбор платформы и механической части</a></li><li><a href="#электронное-управление-и-микроконтроллер">Электронное управление и микроконтроллер</a></li><li><a href="#система-навигации-и-сенсоры">Система навигации и сенсоры</a></li><li><a href="#модуль-всасывания-и-уборки">Модуль всасывания и уборки</a></li><li><a href="#программирование-логики-работы">Программирование логики работы</a></li><li><a href="#питание-и-система-зарядки">Питание и система зарядки</a></li><li><a href="#особенности-эксплуатации-и-обслуживания">Особенности эксплуатации и обслуживания</a></li><li><a href="#заключение-и-перспективы-развития">Заключение и перспективы развития</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-snyat-krylchatku-s-dvigatelya-pylesosa-tomas-video.html" class="related-card">Как снять крыльчатку с двигателя пылесоса Thomas: видео-инструкция и разбор</a></li><li><a href="/articles/k/ka/kak-razobrat-motor-pylesosa-filips-fc9071.html" class="related-card">Как разобрать мотор пылесоса Philips FC9071: Пошаговая инструкция по ремонту</a></li><li><a href="/articles/k/ka/kak-razobrat-pylesos-filips-2000-vatt.html" class="related-card">Как разобрать пылесос Philips 2000 Вт: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kak-sdelat-sebe-priyatno-s-pomoshchyu-pylesosa.html" class="related-card">Как использовать пылесос для приятного массажа и расслабления</a></li><li><a href="/articles/p/py/pylesos-roventa-kak-razobrat.html" class="related-card">Как разобрать пылесос Rowenta: пошаговая инструкция по ремонту</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-snyat-krylchatku-s-dvigatelya-pylesosa-tomas-video.html" class="related-bottom-card"><span class="related-bottom-title">Как снять крыльчатку с двигателя пылесоса Thomas: видео-инструкция и разбор</span><span class="related-bottom-desc">Пошаговая инструкция по снятию крыльчатки с мотора пылесоса Thomas. Разборка, видео-примеры, инструм</span></a><a href="/articles/k/ka/kak-razobrat-motor-pylesosa-filips-fc9071.html" class="related-bottom-card"><span class="related-bottom-title">Как разобрать мотор пылесоса Philips FC9071: Пошаговая инструкция по ремонту</span><span class="related-bottom-desc">Подробное руководство по разборке турбомотора Philips FC9071. Инструкция по замене щеток, подшипнико</span></a><a href="/articles/k/ka/kak-razobrat-pylesos-filips-2000-vatt.html" class="related-bottom-card"><span class="related-bottom-title">Как разобрать пылесос Philips 2000 Вт: пошаговая инструкция</span><span class="related-bottom-desc">Подробное руководство по разборке бытового пылесоса Philips мощностью 2000 Вт. Инструкция по замене </span></a><a href="/articles/k/ka/kak-sdelat-sebe-priyatno-s-pomoshchyu-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Как использовать пылесос для приятного массажа и расслабления</span><span class="related-bottom-desc">Узнайте, как безопасно использовать вакуумный массаж пылесосом для снятия напряжения. Техника, предо</span></a><a href="/articles/p/py/pylesos-roventa-kak-razobrat.html" class="related-bottom-card"><span class="related-bottom-title">Как разобрать пылесос Rowenta: пошаговая инструкция по ремонту</span><span class="related-bottom-desc">Подробное руководство по разборке пылесосов Rowenta. Инструкция по замене щетки, мотора и фильтра. С</span></a><a href="/articles/p/py/pylesos-thomas-kak-ispravit.html" class="related-bottom-card"><span class="related-bottom-title">Как исправить поломки пылесоса Thomas: полное руководство по ремонту</span><span class="related-bottom-desc">Узнайте, как самостоятельно устранить неисправности пылесосов Thomas. Диагностика проблем с перегрев</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

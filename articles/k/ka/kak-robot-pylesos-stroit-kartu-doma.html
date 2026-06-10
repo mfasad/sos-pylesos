@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как робот-пылесос строит карту дома: технологии и настройки — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем, как робот-пылесос создает план помещения. LiDAR, камеры, вибросенсоры. Советы по подготовке квартиры для идеальной навигации.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-robot-pylesos-stroit-kartu-doma.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как робот-пылесос строит карту дома: технологии и настройки">
+    <meta property="og:description" content="Разбираем, как робот-пылесос создает план помещения. LiDAR, камеры, вибросенсоры. Советы по подготовке квартиры для идеальной навигации.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как робот-пылесос строит карту дома: технологии и настройки</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как робот-пылесос строит карту дома: технологии и алгоритмы</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#технологии-навигации-lidar-vslam-и-гироскопы">Технологии навигации: LiDAR, VSLAM и гироскопы</a></li><li><a href="#процесс-первичного-замера-и-калибровки-помещения">Процесс первичного замера и калибровки помещения</a></li><li><a href="#подготовка-квартиры-к-успешному-сканированию">Подготовка квартиры к успешному сканированию</a></li><li><a href="#обработка-данных-и-создание-виртуальной-модели">Обработка данных и создание виртуальной модели</a></li><li><a href="#работа-с-многоэтажными-домами-и-зонами">Работа с многоэтажными домами и зонами</a></li><li><a href="#решение-проблем-с-ошибочным-построением-карты">Решение проблем с ошибочным построением карты</a></li><li><a href="#будущее-навигации-искусственный-интеллект">Будущее навигации: искусственный интеллект</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Современный <strong>робот-пылесос</strong> перестал быть просто автоматизированной метлой, которая хаотично бродит по комнатам, ударяясь о стены и мебель. Сегодня это высокотехнологичный навигационный комплекс, способный запоминать планировку жилья, разделять зоны уборки и даже избегать препятствий в динамике. Механизм, с помощью которого устройство «видит» и запоминает ваше жилище, называется навигацией, и именно от её типа зависит эффективность всего процесса.</p>
+
+<p>Понимание того, как именно происходит построение карты, позволяет владельцам правильно подготовить помещение к первому запуску. Если вы знаете, какие сенсоры использует ваша модель, вы сможете убрать ковры или провода, которые могут сбить алгоритм с толку. Без этого базового знания устройство может тратить часы на построение плана или создавать ложные препятствия, что приведет к некачественной уборке.</p>
+
+<p>В этой статье мы подробно разберем различия между основными технологиями навигации, объясним этапы создания цифрового макета квартиры и дадим практические рекомендации по оптимизации пространства. Вы узнаете, почему некоторые модели требуют темных комнат, а другие, наоборот, не любят яркого света, и как исправить ошибки в уже созданной карте.</p>
+
+<h2 id="технологии-навигации-lidar-vslam-и-гироскопы">Технологии навигации: LiDAR, VSLAM и гироскопы</h2>
+
+<p>В основе работы любого современного уборочного устройства лежит один из трех основных методов определения местоположения и построения маршрута. Самым точным и распространенным в среднем и премиальном сегменте является технология <strong>LiDAR</strong> (Light Detection and Ranging). Этот метод использует вращающийся лазерный дальномер, установленный на «башне» устройства, который проецирует невидимые лучи на стены и мебель.</p>
+
+<p>Лазерный луч отражается от поверхностей и возвращается к датчику, измеряя время полета сигнала. За одну секунду такой модуль может выполнить тысячи измерений, создавая облако точек, которое программное обеспечение превращает в четкий контур комнаты. Модели с <em>LiDAR</em>, такие как серии Roborock S-серии или Xiaomi Robot Vacuum, обычно строят карту быстрее всего и с минимальными погрешностями.</p>
+
+<p>Альтернативой лазеру является технология VSLAM (Visual Simultaneous Localization and Mapping), которая использует камеры. В отличие от лазера, <strong>камеры</strong> анализируют визуальные особенности помещения: узоры на обоях, мебель, дверные проемы. Принцип работы напоминает человеческое зрение: устройство сравнивает текущую картинку с предыдущими кадрами, чтобы определить, где оно находится. Это решение часто встречается в более компактных моделях, где нет места для высокой башни.</p>
+
+<p>Существует также устаревший, но еще встречающийся метод на базе <strong>гироскопа</strong> и одометрии колес. Здесь робот не «видит» стены, а вычисляет свое положение, считая обороты колес и отслеживая повороты корпуса с помощью гироскопа. Такой подход часто приводит к ошибкам накопления: если колесо проскочило или скользнуло, вся карта может «поехать». Поэтому для точной навигации сейчас используют именно оптические или лазерные системы.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Использование технологии VSLAM в полной темноте невозможно или крайне затруднительно, так как камерам требуется освещение для распознавания визуальных маркеров.</p>
+</blockquote>
+
+<h2 id="процесс-первичного-замера-и-калибровки-помещения">Процесс первичного замера и калибровки помещения</h2>
+
+<p>Первый запуск после покупки — это самый важный этап, от которого зависит качество работы устройства на долгие годы. Вы включаете робот, и он начинает движение по периметру комнаты, не пытаясь сразу убирать весь пол. В этот момент алгоритм собирает данные о геометрии пространства, создавая <strong>векторную карту</strong>. Это не просто картинка, а набор координат и объектов, которые будут храниться в памяти устройства.</p>
+
+<p>Для успешного построения карты необходимо, чтобы робот мог свободно перемещаться по всей площади без препятствий. Если в доме есть закрытые двери, устройство не сможет определить границы комнат и создаст одну большую замкнутую зону или множество разрозненных фрагментов. Рекомендуется на время первого цикла уборки открыть все внутренние двери и убрать временные препятствия.</p>
+
+<p>Процесс может занять от 30 минут до часа в зависимости от площади квартиры и сложности планировки. В это время вы можете наблюдать за тем, как на экране смартфона в реальном времени прорисовываются стены. Если робот зациклился или начал ездить по одному и тому же пути, возможно, возникла ошибка калибровки, и процедуру придется запустить заново.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Во время первичного сканирования категорически не рекомендуется переставлять мебель, так как это приведет к рассинхронизации виртуальной и реальной карты.</p>
+</blockquote>
+
+<div class="poll-widget" id="poll-e3079032"><div class="poll-widget-question">📊 Какой тип навигации использует ваш робот?</div><div class="poll-widget-option" data-poll="e3079032" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">LiDAR (башня с лазером)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e3079032" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">VSLAM (камера)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e3079032" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскоп (без камеры и лазера)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e3079032" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не знаю</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="подготовка-квартиры-к-успешному-сканированию">Подготовка квартиры к успешному сканированию</h2>
+
+<p>Чтобы робот-пылесос построил идеальную карту, пользователю необходимо провести подготовительные работы в помещении. Это не означает, что нужно вынести всю мебель, но определенные элементы могут стать серьезной помехой для сенсоров. Ключевым фактором является освещенность и наличие отражающих поверхностей.</p>
+
+<p>Если ваша модель использует камеру (VSLAM), избегайте чрезмерно яркого солнечного света, падающего прямо на пол, так как это может ослепить сенсор или создать ложные тени. Напротив, в темное время суток комната должна быть adequately освещена искусственным светом. Для лазерных моделей (LiDAR) свет не так важен, но они могут ошибаться на глянцевых поверхностях.</p>
+
+<p>Особое внимание уделите прозрачным и зеркальным объектам. Лазерный луч или камера могут не распознать стеклянную дверь или зеркало как твердое препятствие, что приведет к тому, что робот «застрянет» или построит карту с «дырами». Также удалите с пола кабели, игрушки и мелкие предметы, которые могут запутаться в колесах или быть приняты за деталь интерьера.</p>
+
+<ul>
+<li>✅ Уберите с пола провода и удлинители, чтобы робот не наматывал их на щетку во время движения.</li>
+<li>✅ Закройте или заклейте скотчем зеркала и стеклянные двери, если они создают помехи для сенсоров.</li>
+<li>✅ Обеспечьте равномерное освещение комнаты, избегая резких теней и бликов на полу.</li>
+</ul>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если у вас дома есть животные, временно уберите их с территории уборки на время первого сканирования, так как бегущий кот может быть воспринят как движущееся препятствие и исказить карту.</p></div>
+
+<h2 id="обработка-данных-и-создание-виртуальной-модели">Обработка данных и создание виртуальной модели</h2>
+
+<p>После того как робот объехал периметр, он переносит собранные данные в облачный сервер или обрабатывает их локально в процессоре устройства. Здесь вступает в работу сложное программное обеспечение, которое соединяет разрозненные точки в единые линии стен. Алгоритм сопоставляет данные с генеральным планом, удаляя шум и ложные сигналы.</p>
+
+<p>На этом этапе система создает <strong>сетку карты</strong> (occupancy grid map), где каждая ячейка имеет значение: свободно, занято или неизвестно. Это позволяет роботу быстро планировать маршрут уборки, прокладывая идеальный путь «змейкой» или «лабиринтом», а не ерзая хаотично. Чем выше разрешение сетки, тем точнее робот сможет объезжать ножки стульев и углы.</p>
+
+<p>Современные нейросети позволяют устройству распознавать не только стены, но и типы объектов. Например, робот может понять, что полосу на карте создала не стена, а диван, и пометить эту зону как «неубираемую» или «осторожную». Это значительно повышает интеллект устройства и снижает риск застревания.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип сенсора</th>
+<th>Точность построения</th>
+<th>Зависимость от света</th>
+<th>Скорость сканирования</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LiDAR</strong></td>
+<td>Высокая (до см)</td>
+<td>Не зависит</td>
+<td>Быстрая</td>
+</tr>
+<tr>
+<td><strong>VSLAM (Камера)</strong></td>
+<td>Средняя/Высокая</td>
+<td>Сильная</td>
+<td>Средняя</td>
+</tr>
+<tr>
+<td><strong>Гироскоп</strong></td>
+<td>Низкая</td>
+<td>Не зависит</td>
+<td>Медленная</td>
+</tr>
+<tr>
+<td><strong>Hybrid (LiDAR + Камера)</strong></td>
+<td>Максимальная</td>
+<td>Минимальная</td>
+<td>Очень быстрая</td>
+</tr>
+</tbody>
+</table>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Именно локальная обработка данных позволяет роботу работать даже при отключении интернета, сохраняя карту в памяти устройства.</p></div>
+
+<h2 id="работа-с-многоэтажными-домами-и-зонами">Работа с многоэтажными домами и зонами</h2>
+
+<p>Одной из самых востребованных функций современных моделей является возможность сохранения нескольких карт. Если вы живете в двухэтажном доме или часто переезжаете между квартирой и дачей, вам не нужно запускать процесс сканирования заново. Робот способен хранить в памяти от 2 до 10 различных планировок, автоматически переключаясь между ними при смене локации.</p>
+
+<p>Для активации этой функции необходимо сохранить карту с именем, например, «Кухня» или «Спальня», а затем при перемещении устройства в новое место нажать кнопку «Создать новую карту» в приложении. Робот запомнит уникальный профиль сенсорных данных этой локации и начнет убирать, используя уже существующий алгоритм, но для новых координат.</p>
+
+<p>Также на этапе построения карты пользователь может вручную разделить помещение на зоны, комнаты или создать виртуальные барьеры. Это делается уже после того, как робот завершил первичное сканирование. Вы можете нарисовать на экране телефона границы комнат, чтобы настроить различные режимы уборки для каждой зоны.</p>
+
+<ul>
+<li>🏠 Разделение на комнаты позволяет настроить разную силу всасывания для кухни и спальни.</li>
+<li>🚫 Виртуальные стены блокируют доступ робота в определенные зоны, например, к наполненным лоткам.</li>
+<li>🧹 Зоны интенсивной уборки позволяют задать повторный проход в сильно загрязненных местах.</li>
+</ul>
+
+<details class="faq-item"><summary>Как сохранить карту на разных этажах?</summary><div class="faq-answer"><p>Перед переездом на другой этаж убедитесь, что робот переехал без транспортировки в выключенном состоянии, если это поддерживается моделью, или просто запустите новый цикл сканирования и сохраните его как новую карту в приложении.</p></div></details>
+
+<h2 id="решение-проблем-с-ошибочным-построением-карты">Решение проблем с ошибочным построением карты</h2>
+
+<p>Иногда робот-пылесос может построить карту с ошибками: стены могут быть изогнутыми, комната — не квадратной, или пропущены дверные проемы. Это часто случается из-за низкой освещенности, наличия зеркал или слишком быстрого движения устройства. В таких случаях не нужно сразу бежать к мастеру, большинство проблем решается программно.</p>
+
+<p>В приложении большинства производителей есть функция редактирования карты. Вы можете соединить разорванные стены или объединить две комнаты, если они были ошибочно разделены. Также можно вручную удалить «лишние» объекты, которые робот воспринял как стены. Если ошибка критическая, проще всего стереть карту и запустить повторное сканирование.</p>
+
+<p>Важно учитывать, что некоторые модели имеют ограничение на количество ошибок. Если робот постоянно сбивается, возможно, проблема в аппаратной части: загрязнен лазерный модуль или камера. В этом случае необходимо аккуратно протереть сенсор чистой микрофиброй, чтобы убрать пыль и ворс.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Регулярная очистка лазерной башни и камеры является обязательной процедурой, так как даже слой пыли может привести к значительным ошибкам в навигации.</p>
+</blockquote>
+
+<div class="checklist-block"><h4>☑️ Чек-лист исправления карты</h4><label class="check-item"><input type="checkbox"><span>Проверить чистоту сенсоров</span></label><label class="check-item"><input type="checkbox"><span>Убедиться в достаточном освещении</span></label><label class="check-item"><input type="checkbox"><span>Убрать движущиеся объекты</span></label><label class="check-item"><input type="checkbox"><span>Запустить повторное сканирование</span></label><label class="check-item"><input type="checkbox"><span>Отредактировать стены вручную</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 5</div></div>
+
+<h2 id="будущее-навигации-искусственный-интеллект">Будущее навигации: искусственный интеллект</h2>
+
+<p>Технологии не стоят на месте, и современные роботы уже начинают использовать <strong>AI-алгоритмы</strong> для распознавания не только форм, но и объектов. Это означает, что робот может отличить зарядный кабель от проводной мыши, а носок — от тряпки. На основе этого анализа он принимает решение: объехать объект или проехать прямо, если он не мешает.</p>
+
+<p>В ближайшем будущем ожидается массовое внедрение 3D-сканирования и более глубокого обучения нейросетей. Это позволит роботам не просто строить карту стен, а понимать объем пространства, высоту предметов и даже текстуру пола. Такие системы смогут автоматически адаптировать режим уборки под тип покрытия, не требуя от пользователя настройки зон.</p>
+
+<p>Уже сейчас некоторые топовые модели оснащены RGB-камерами ночного видения, что позволяет им работать даже в полной темноте. Это открывает новые горизонты для ночной уборки, когда владелец спит, а робот бесшумно и эффективно наводит порядок, не натыкаясь на мебель.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Использование AI-распознавания объектов значительно снижает количество случаев застревания робота на проводах и мелких предметах.</p></div>
+
+<h2 id="часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</h2>
+
+<details>
+<summary>Можно ли робот-пылесос переносить руками между комнатами?</summary>
+<p>Да, современные модели с LiDAR и акселерометрами легко распознают перенос и продолжат уборку с того места, где их поставили, либо автоматически пересоберут карту, если вы перенесли их в другую комнату, где карта уже сохранена.</p>
+</details>
+
+<details>
+<summary>Почему робот строит разные карты при каждой уборке?</summary>
+<p>Это может происходить из-за проблем с освещением (для VSLAM), загрязнения сенсоров или если робот был перенесен в незнакомое место. Проверьте чистоту датчиков и убедитесь, что в приложении не включена функция «Сохранить новую карту» вместо «Загрузить существующую».</p>
+</details>
+
+<details>
+<summary>Сколько карт может хранить робот?</summary>
+<p>Количество зависит от модели и объема памяти. Обычно это от 2 до 10 карт. Премиальные модели могут хранить больше, но для корректной работы лучше использовать не более 3-4 активных планировок.</p>
+</details>
+
+<details>
+<summary>Мешают ли темные полы роботу строить карту?</summary>
+<p>Темные матовые полы могут вызывать проблемы у камер, так как они плохо отражают свет. Лазерные системы (LiDAR) почти нечувствительны к цвету пола, поэтому для темных покрытий предпочтительнее модели с лазерной навигацией.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот «видит» призрачные стены?</summary>
+<p>Это обычно вызвано бликами от зеркал, стеклянных дверей или блестящих поверхностей. Заклейте зеркальные участки малярным скотчем или уберите отражающие объекты, затем удалите артефакты карты вручную в приложении.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#технологии-навигации-lidar-vslam-и-гироскопы">Технологии навигации: LiDAR, VSLAM и гироскопы</a></li><li><a href="#процесс-первичного-замера-и-калибровки-помещения">Процесс первичного замера и калибровки помещения</a></li><li><a href="#подготовка-квартиры-к-успешному-сканированию">Подготовка квартиры к успешному сканированию</a></li><li><a href="#обработка-данных-и-создание-виртуальной-модели">Обработка данных и создание виртуальной модели</a></li><li><a href="#работа-с-многоэтажными-домами-и-зонами">Работа с многоэтажными домами и зонами</a></li><li><a href="#решение-проблем-с-ошибочным-построением-карты">Решение проблем с ошибочным построением карты</a></li><li><a href="#будущее-навигации-искусственный-интеллект">Будущее навигации: искусственный интеллект</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/z/za/zachem-kamera-v-robote-pylesose.html" class="related-card">Зачем нужна камера в роботе-пылесосе: навигация, безопасность и режимы</a></li><li><a href="/articles/k/ka/kak-nauchit-materitsya-pylesos.html" class="related-card">Как научить пылесос материться? Мифы, риски и настройка голоса</a></li><li><a href="/articles/k/ka/kak-polzovatsya-robotom-pylesosom-ilife-v55.html" class="related-card">Как пользоваться роботом-пылесосом iLife V55: Полное руководство</a></li><li><a href="/articles/d/da/datchik-lds-robot-pylesos-chto-eto.html" class="related-card">Что такое лазерный датчик LDS в роботе-пылесосе: принцип работы и настройка</a></li><li><a href="/articles/k/ka/kakoj-robot-pylesos-kupit-nedorogoj.html" class="related-card">Лучшие недорогие роботы-пылесосы: рейтинг 2026 года и советы по выбору</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/z/za/zachem-kamera-v-robote-pylesose.html" class="related-bottom-card"><span class="related-bottom-title">Зачем нужна камера в роботе-пылесосе: навигация, безопасность и режимы</span><span class="related-bottom-desc">Разбираем, зачем в роботе-пылесосе устанавливают камеру. Узнайте о преимуществах визуальной навигаци</span></a><a href="/articles/k/ka/kak-nauchit-materitsya-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Как научить пылесос материться? Мифы, риски и настройка голоса</span><span class="related-bottom-desc">Разбираем, можно ли заставить пылесос ругаться. Инструкция по настройке голосовых модулей, смена зву</span></a><a href="/articles/k/ka/kak-polzovatsya-robotom-pylesosom-ilife-v55.html" class="related-bottom-card"><span class="related-bottom-title">Как пользоваться роботом-пылесосом iLife V55: Полное руководство</span><span class="related-bottom-desc">Подробная инструкция по настройке, управлению и обслуживанию iLife V55. Советы по уборке, чистке дат</span></a><a href="/articles/d/da/datchik-lds-robot-pylesos-chto-eto.html" class="related-bottom-card"><span class="related-bottom-title">Что такое лазерный датчик LDS в роботе-пылесосе: принцип работы и настройка</span><span class="related-bottom-desc">Подробный разбор технологии LDS в роботизированных пылесосах. Как работает лидар, почему он важен дл</span></a><a href="/articles/k/ka/kakoj-robot-pylesos-kupit-nedorogoj.html" class="related-bottom-card"><span class="related-bottom-title">Лучшие недорогие роботы-пылесосы: рейтинг 2026 года и советы по выбору</span><span class="related-bottom-desc">Как выбрать бюджетный робот-пылесос без потери качества? Обзор моделей до 20000 руб, сравнение харак</span></a><a href="/articles/k/ka/kak-uznat-model-robota-pylesosa-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как узнать модель робота-пылесоса Xiaomi: полное руководство</span><span class="related-bottom-desc">Узнайте точную модель вашего робота Xiaomi. Методы проверки по корпусу, коробке, приложению Mi Home </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

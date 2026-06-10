@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как подключить робот-пылесос к Google Ассистенту: полная инструкция — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговая настройка интеграции робота-пылесоса с Google Ассистентом. Решение проблем синхронизации, голосовые команды и устранение ошибок.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-podklyuchit-robot-pylesos-k-gugl-assistentu.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как подключить робот-пылесос к Google Ассистенту: полная инструкция">
+    <meta property="og:description" content="Пошаговая настройка интеграции робота-пылесоса с Google Ассистентом. Решение проблем синхронизации, голосовые команды и устранение ошибок.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как подключить робот-пылесос к Google Ассистенту: полная инструкция</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Полное руководство по подключению робот-пылесоса к Google Ассистенту</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#подготовка-сети-и-устройств-перед-началом-настройки">Подготовка сети и устройств перед началом настройки</a></li><li><a href="#базовая-регистрация-в-приложении-google-home">Базовая регистрация в приложении Google Home</a></li><li><a href="#интеграция-через-экосистему-производителя">Интеграция через экосистему производителя</a></li><li><a href="#настройка-имен-и-зон-уборки-для-голосового-управления">Настройка имен и зон уборки для голосового управления</a></li><li><a href="#решение-частых-проблем-при-подключении">Решение частых проблем при подключении</a></li><li><a href="#продвинутые-сценарии-использования-и-ограничения">Продвинутые сценарии использования и ограничения</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Современные клининговые устройства перестали быть просто автоматами для уборки пола, превратившись в полноценный элемент умного дома. Интеграция <em>робота-пылесоса</em> с голосовым помощником позволяет запускать уборку, не вставая с дивана, достаточно просто произнести команду. Эта функция экономят время и значительно упрощают управление сложной техникой для пожилых людей или занятых специалистов.</p>
+
+<p>Процесс сопряжения может показаться тривиальным, однако многие пользователи сталкиваются с ошибками на этапе авторизации или выбора аккаунта. Неправильная настройка <strong>сети Wi-Fi</strong> или устаревшее приложение производителя часто становятся препятствием для успешной синхронизации. В этом материале мы подробно разберем алгоритм действий, чтобы вы могли наслаждаться голосовым управлением без технических сбоев.</p>
+
+<p>Успешная настройка открывает доступ к расширенным сценариям автоматизации: пылесос может начать работу, когда вы покидаете дом, или, наоборот, вернуться на базу перед вашим приходом. Важно понимать, что каждый бренд имеет свои нюансы интеграции, хотя общий принцип работы протоколов <em>Smart Home</em> остается единым для большинства платформ.</p>
+
+<h2 id="подготовка-сети-и-устройств-перед-началом-настройки">Подготовка сети и устройств перед началом настройки</h2>
+
+<p>Первым и самым критичным шагом является проверка состояния вашей домашней сети. Большинство современных <em>роботов-пылесосов</em> поддерживают только протокол <strong>Wi-Fi 2.4 ГГц</strong>, игнорируя более скоростные сети 5 ГГц. Если ваш роутер объединяет обе частоты под одним именем, устройство может не найти сеть или постоянно терять подключение.</p>
+
+<p>Необходимо зайти в настройки роутера и убедиться, что для частоты 2.4 ГГц установлено стабильное соединение без перегрузок. Также проверьте, что на смартфоне, с которого вы планируете выполнять настройку, включен <strong>Bluetooth</strong> и геолокация — это требуется для обнаружения устройства в близи.</p>
+
+<p>Убедитесь, что приложение производителя вашего устройства (например, <em>Xiaomi Home</em>, <em>Roborock</em> или <em>Eufy Home</em>) обновлено до последней версии. Старые версии ПО часто содержат устаревшие скрипты для OAuth-авторизации, что приводит к сбою при попытке привязки к аккаунту Google.</p>
+
+<p><strong>Внимание</strong>: Не пытайтесь настраивать устройство через мобильный интернет — подключение должно осуществляться исключительно через локальную сеть Wi-Fi, иначе <strong>протокол сопряжения</strong> не сможет завершить Handshake-процедуру.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка готовности к подключению</h4><label class="check-item"><input type="checkbox"><span>Убедиться, что робот на зарядной базе</span></label><label class="check-item"><input type="checkbox"><span>Подключить телефон к Wi-Fi 2.4 ГГц</span></label><label class="check-item"><input type="checkbox"><span>Обновить приложение производителя</span></label><label class="check-item"><input type="checkbox"><span>Включить Bluetooth и GPS</span></label><label class="check-item"><input type="checkbox"><span>Зарегистрироваться в Google Home</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 5</div></div>
+
+<p>Если вы используете сложный пароль от Wi-Fi, содержащий символы кириллицы или специальные знаки, стоит временно заменить его на латиницу. Некоторые прошивки <em>роботов-пылесосов</em> имеют ограничения по кодировке символов при вводе пароля через мобильное приложение.</p>
+
+<details class="faq-item"><summary>Почему важна частота 2.4 ГГц?</summary><div class="faq-answer"><p>Частота 2.4 ГГц обеспечивает лучшую проникающую способность через стены и имеет более широкий радиус действия по сравнению с 5 ГГц. Для устройств IoT, где скорость передачи данных вторична по сравнению со стабильностью, это наиболее предпочтительный вариант. Роботы-пылесосы редко поддерживают 5 ГГц из-за стоимости модулей и ограничений по дальности сигнала внутри помещений с множеством перегородок.</p></div></details>
+
+<h2 id="базовая-регистрация-в-приложении-google-home">Базовая регистрация в приложении Google Home</h2>
+
+<p>Прежде чем добавлять устройство, необходимо убедиться, что у вас есть активный аккаунт Google и установлено приложение <em>Google Home</em> (Дом с Google Ассистентом). Это центральное приложение, которое служит мостом между голосовым помощником и сторонними сервисами.</p>
+
+<p>Откройте приложение и перейдите во вкладку «Домашние устройства», затем нажмите на значок плюса «Добавить». Выберите опцию «Настроить устройство» и укажите, что вы хотите «Работать с Google». Этот шаг инициирует сканирование доступных на локальной сети устройств, которые уже готовы к сопряжению.</p>
+
+<p>Если приложение не находит ваш робот автоматически, не паникуйте. В 90% случаев требуется ручное добавление через раздел «Работает с Google» (Works with Google), где вы выбираете бренд производителя и входите в свой аккаунт. Это активирует <strong>токен доступа</strong>, позволяющий ассистенту отправлять команды.</p>
+
+<p><strong>Внимание</strong>: Убедитесь, что вы входите в тот же аккаунт Google, который используете на других устройствах умного дома, чтобы избежать рассинхронизации сценариев и дублирования команд.</p>
+
+<h2 id="интеграция-через-экосистему-производителя">Интеграция через экосистему производителя</h2>
+
+<p>Самый надежный способ подключить <em>робота-пылесоса</em> — использовать официальное приложение бренда. В меню настроек этого приложения всегда есть раздел «Умный дом», «Интеграции» или «Сторонние сервисы». Именно там находится кнопка привязки к Google.</p>
+
+<p>Нажмите на иконку Google, введите логин и пароль от своей учетной записи. Система запросит разрешение на управление устройством — подтвердите действие, отметив галочками нужные права доступа (например, запуск уборки, управление картой, просмотр статуса). После этого появится сообщение об успешной синхронизации.</p>
+
+<p>Вот список популярных брендов и их приложений, где нужно искать кнопку интеграции:</p>
+<ul>
+<li>🤖 <strong>Xiaomi / Roborock</strong>: Откройте приложение <em>Xiaomi Home</em> или <em>Roborock</em>, зайдите в профиль и выберите «Умный дом», затем найдите Google Assistant в списке партнеров.</li>
+<li>🧹 <strong>Neato / iRobot</strong>: В приложениях <em>iRobot Home</em> или <em>Neato Home</em> функция называется «Works with Google» и находится в разделе «Настройки» (Settings).</li>
+<li>🧼 <strong>Ecovacs</strong>: В приложении <em>Ecovacs Home</em> перейдите в профиль пользователя, найдите раздел «Сторонние сервисы» и выберите Google.</li>
+</ul>
+
+<p>После успешной привязки вернитесь в приложение <em>Google Home</em> и нажмите кнопку «Обновить устройства» (или подождите 5-10 минут, если автоматическое обновление не сработало). Ваш робот появится в списке доступных инструментов с именем, которое вы задали ранее.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если робот не отображается сразу после привязки, попробуйте полностью закрыть приложение Google Home (свайп вверх в списке недавних приложений) и открыть его заново. Кэширование списка устройств иногда задерживает появление новых девайсов.</p></div>
+
+<h2 id="настройка-имен-и-зон-уборки-для-голосового-управления">Настройка имен и зон уборки для голосового управления</h2>
+
+<p>По умолчанию робот будет назван техническим именем, например, «Robot Vacuum 12345». Для удобного голосового управления необходимо переименовать устройство в <code>Настройки устройства</code> в приложении Google. Используйте простые, четкие имена, понятные ассистенту, например, «Робот» или «Пылесос в гостиной».</p>
+
+<p>Особое внимание уделите настройке комнат (зон). Если ваш пылесос поддерживает создание виртуальных карт, убедитесь, что комнаты на карте сопоставлены с комнатами в вашем доме в приложении Google Home. Это позволит вам отдавать команды вида <em>«Очисти кухню»</em> или <em>«Помой коридор»</em>.</p>
+
+<p>Для этого в приложении Google Home зайдите в настройки устройства и выберите «Настроить комнаты». Создайте новую комнату или выберите существующую, затем назначьте пылесос в эту локацию. Если в одной комнате стоит несколько устройств, ассистент будет спрашивать уточнение, но для одного робота в комнате команда сработает мгновенно.</p>
+
+<p><strong>Внимание</strong>: Сложные имена, содержащие специальные символы или длинные предложения, могут вызывать ошибки распознавания речи. Ассистент лучше всего понимает короткие, односложные названия на русском языке.</p>
+
+<p>Теперь вы можете настроить сценарии автоматизации. Зайдите в раздел «Автоматизации» в приложении Google Home и создайте сценарий, например: «Когда я выхожу из дома, начать уборку». Это позволит системе самостоятельно определять ваше местоположение через GPS телефона.</p>
+
+<div class="poll-widget" id="poll-7bc443ab"><div class="poll-widget-question">📊 Как часто вы используете голосовое управление для уборки?</div><div class="poll-widget-option" data-poll="7bc443ab" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Ежедневно</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7bc443ab" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Несколько раз в неделю</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7bc443ab" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Только при тестировании</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7bc443ab" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Никогда не пользовался</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="решение-частых-проблем-при-подключении">Решение частых проблем при подключении</h2>
+
+<p>Несмотря на отлаженность протоколов, пользователи часто сталкиваются с ошибками. Самая распространенная проблема — «Устройство не найдено» или «Ошибка авторизации». В этом случае первым делом проверьте, не блокирует ли ваш роутер внешние запросы (функция AP Isolation).</p>
+
+<p>Если приложение производителя показывает статус «Онлайн», но Google Home пишет «Устройство недоступно», скорее всего, истек срок действия токена безопасности. Необходимо зайти в настройки привязки в приложении бренда, удалить связь с Google и подключить её заново.</p>
+
+<p>Ниже приведена таблица типичных ошибок и способы их устранения:</p>
+
+<table>
+<thead>
+<tr>
+<th>Проблема</th>
+<th>Причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Робот не ищет сеть Wi-Fi</td>
+<td>Подключен к 5 ГГц или неверный пароль</td>
+<td>Переключите телефон на 2.4 ГГц и введите пароль заново</td>
+</tr>
+<tr>
+<td>Ошибка синхронизации аккаунтов</td>
+<td>Разные регионы аккаунтов</td>
+<td>Проверьте регион в настройках Google и приложения бренда</td>
+</tr>
+<tr>
+<td>Команды не выполняются</td>
+<td>Робот на зарядке или в доке</td>
+<td>Убедитесь, что робот не заблокирован физически или программно</td>
+</tr>
+<tr>
+<td>Голосовой помощник не понимает команду</td>
+<td>Слишком сложное имя устройства</td>
+<td>Переименуйте устройство в Google Home на короткое название</td>
+</tr>
+</tbody>
+</table>
+
+<p>Иногда проблема кроется в настройках безопасности. Проверьте, не включена ли функция «Родительский контроль» или «Блокировка устройств» в вашем аккаунте Google, которая может ограничивать доступ сторонним сервисам.</p>
+
+<p><strong>Внимание</strong>: Если вы недавно меняли пароль от Wi-Fi, обязательно обновите настройки сети и в приложении производителя, иначе робот потеряет связь с интернетом и перестанет отвечать на команды ассистента.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Главная проблема при подключении — несовпадение региона аккаунтов или использование сети 5 ГГц. Всегда проверяйте эти два параметра в первую очередь при возникновении ошибок синхронизации.</p></div>
+
+<h2 id="продвинутые-сценарии-использования-и-ограничения">Продвинутые сценарии использования и ограничения</h2>
+
+<p>После успешной настройки вы можете реализовать сложные сценарии, недоступные через простое приложение. Например, создать связку, при которой робот начинает уборку только после того, как вы произносите фразу «Я ушел», и останавливается, когда вы говорите «Я дома».</p>
+
+<p>Многие пользователи спрашивают, можно ли управлять конкретными режимами уборки голосом. Ответ зависит от модели: <em>Roborock S7</em> или <em>Xiaomi Vacuum Mop</em> поддерживают команды «Установить мощность всасывания на турбо» или «Включить влажную уборку», тогда как бюджетные модели могут реагировать только на старт и стоп.</p>
+
+<p>Важно учитывать, что голосовые команды имеют задержку около 1-2 секунд из-за обработки запроса в облаке. Для мгновенной реакции лучше использовать физические кнопки на корпусе или приложение, а голосовое управление задействовать для планирования и общих команд.</p>
+
+<p>Некоторые бренды ограничивают функционал при интеграции через Google. Например, просмотр детальной карты или история уборки часто недоступны через голосового помощника и требуют доступа к нативному приложению. Это сделано в целях безопасности данных и защиты интеллектуальной собственности.</p>
+
+<p>Следите за обновлениями прошивки. Разработчики часто добавляют новые голосовые команды в обновлениях ПО. Если вы недавно обновили приложение, но новые команды не работают, проверьте наличие обновления прошивки непосредственно на устройстве.</p>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Почему Google Ассистент видит робот, но не может управлять им?</summary>
+<p>Чаще всего это связано с истекшим токеном авторизации или устаревшей версией приложения производителя. Попробуйте удалить интеграцию в приложении Google Home и подключить её заново через раздел «Работает с Google».</p>
+</details>
+
+<details>
+<summary>Можно ли подключить несколько роботов-пылесосов от разных брендов?</summary>
+<p>Да, Google Ассистент поддерживает одновременное подключение устройств от разных производителей. Вам нужно будет привязать каждое приложение (Xiaomi, iRobot, Ecovacs) отдельно в разделе «Работает с Google», после чего все пылесосы будут доступны в общем списке устройств.</p>
+</details>
+
+<details>
+<summary>Работает ли голосовое управление без интернета?</summary>
+<p>Нет, для обработки голосовых команд требуется подключение к облачным серверам Google. Если у вас отключен интернет, робот будет работать только по расписанию, заложенному в его памяти, или по командам из локального приложения (если оно поддерживает локальное управление).</p>
+</details>
+
+<details>
+<summary>Как переименовать пылесос, чтобы Ассистент понимал команду «Убери на кухне»?</summary>
+<p>В приложении Google Home зайдите в настройки устройства, выберите «Настройки» -> «Комнаты» и назначьте пылесос в комнату «Кухня». Убедитесь, что имя комнаты совпадает с тем, что вы произносите в команде.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#подготовка-сети-и-устройств-перед-началом-настройки">Подготовка сети и устройств перед началом настройки</a></li><li><a href="#базовая-регистрация-в-приложении-google-home">Базовая регистрация в приложении Google Home</a></li><li><a href="#интеграция-через-экосистему-производителя">Интеграция через экосистему производителя</a></li><li><a href="#настройка-имен-и-зон-уборки-для-голосового-управления">Настройка имен и зон уборки для голосового управления</a></li><li><a href="#решение-частых-проблем-при-подключении">Решение частых проблем при подключении</a></li><li><a href="#продвинутые-сценарии-использования-и-ограничения">Продвинутые сценарии использования и ограничения</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-proshit-robot-pylesos-xiaomi-mi-robot-vacuum-na-russkij.html" class="related-card">Как прошить робот-пылесос Xiaomi на русский язык: полная инструкция</a></li><li><a href="/articles/k/ka/kak-pomenyat-yazyk-na-robote-pylesose-mamibot-exvac660.html" class="related-card">Как поменять язык на роботе-пылесосе Mamibot EXVAC660: Полная инструкция</a></li><li><a href="/articles/p/po/pochemu-robot-pylesos-xiaomi-ne-govorit-na-russkom.html" class="related-card">Почему робот-пылесос Xiaomi не говорит по-русски: причины и решение</a></li><li><a href="/articles/k/ka/kak-obnulit-robot-pylesos-xiaomi.html" class="related-card">Как сбросить настройки и обнулить робот-пылесос Xiaomi: полная инструкция</a></li><li><a href="/articles/k/ka/kak-perezagruzit-robot-pylesos-genio.html" class="related-card">Как перезагрузить робот-пылесос Genio: полный гайд по сбросу и настройке</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-proshit-robot-pylesos-xiaomi-mi-robot-vacuum-na-russkij.html" class="related-bottom-card"><span class="related-bottom-title">Как прошить робот-пылесос Xiaomi на русский язык: полная инструкция</span><span class="related-bottom-desc">Пошаговая гайд по смене региона и прошивке Xiaomi Mi Robot Vacuum. Устранение языкового барьера, выб</span></a><a href="/articles/k/ka/kak-pomenyat-yazyk-na-robote-pylesose-mamibot-exvac660.html" class="related-bottom-card"><span class="related-bottom-title">Как поменять язык на роботе-пылесосе Mamibot EXVAC660: Полная инструкция</span><span class="related-bottom-desc">Пошаговая инструкция по смене языка интерфейса на модели Mamibot EXVAC660. Настройка через пульт и м</span></a><a href="/articles/p/po/pochemu-robot-pylesos-xiaomi-ne-govorit-na-russkom.html" class="related-bottom-card"><span class="related-bottom-title">Почему робот-пылесос Xiaomi не говорит по-русски: причины и решение</span><span class="related-bottom-desc">Робот-пылесос Xiaomi не озвучивает команды на русском языке? Узнайте реальные причины отсутствия под</span></a><a href="/articles/k/ka/kak-obnulit-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить настройки и обнулить робот-пылесос Xiaomi: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по полному сбросу и обнулению робота-пылесоса Xiaomi. Решение проблем с Wi-Fi,</span></a><a href="/articles/k/ka/kak-perezagruzit-robot-pylesos-genio.html" class="related-bottom-card"><span class="related-bottom-title">Как перезагрузить робот-пылесос Genio: полный гайд по сбросу и настройке</span><span class="related-bottom-desc">Инструкция по перезагрузке робота-пылесоса Genio. Мягкий и жесткий сброс, решение ошибок, сброс до з</span></a><a href="/articles/k/ka/kak-dobavit-robot-pylesos-v-prilozhenii.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить робот-пылесос в приложение: полная инструкция по подключению</span><span class="related-bottom-desc">Пошаговое руководство: как подключить робот-пылесос к смартфону, настроить Wi-Fi и добавить устройст</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

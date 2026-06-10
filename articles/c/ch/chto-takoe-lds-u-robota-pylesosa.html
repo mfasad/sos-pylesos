@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Что такое LDS у робота-пылесоса: технология, принцип работы и обзор — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем технологию LDS в роботах-пылесосах. Как работает лазерный дальномер, в чем отличие от VSLAM и гироскопа, плюсы и минусы системы навигации.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/c/ch/chto-takoe-lds-u-robota-pylesosa.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Что такое LDS у робота-пылесоса: технология, принцип работы и обзор">
+    <meta property="og:description" content="Разбираем технологию LDS в роботах-пылесосах. Как работает лазерный дальномер, в чем отличие от VSLAM и гироскопа, плюсы и минусы системы навигации.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Что такое LDS у робота-пылесоса: технология, принцип работы и обзор</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Технология LDS в роботах-пылесосах: принцип работы и преимущества</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#принцип-работы-лазерного-дальномера-lds">Принцип работы лазерного дальномера LDS</a></li><li><a href="#отличия-lds-от-vslam-и-гироскопической-навигации">Отличия LDS от VSLAM и гироскопической навигации</a></li><li><a href="#преимущества-использования-лазерной-навигации">Преимущества использования лазерной навигации</a></li><li><a href="#эксплуатация-и-уход-за-лазерным-модулем">Эксплуатация и уход за лазерным модулем</a></li><li><a href="#ограничения-технологии-lds">Ограничения технологии LDS</a></li><li><a href="#выбор-модели-с-lds-для-ваших-задач">Выбор модели с LDS для ваших задач</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Современные роботы-пылесосы перестали быть просто механическими «щётками с колесами», которые хаотично двигаются по комнате, натыкаясь на мебель. Сегодня их эффективность напрямую зависит от систем навигации, позволяющим создавать точные карты помещения. Одной из самых популярных и надежных технологий в этом сегменте является <strong>LDS</strong> — лазерный дальномер, установленный на «башне» верхней части устройства.</p>
+
+<p>Многие пользователи при выборе <em>Xiaomi Robot Vacuum</em>, <em>Dreame</em> или <em>Roborock</em> видят аббревиатуру LDS в характеристиках и часто думают, что это просто маркетинговый ход. Однако за этим сокращением скрывается сложный оптический механизм, который превращает уборку в высокотехнологичный процесс построения карты. Понимание того, как работает эта система, поможет вам правильно эксплуатировать технику и избегать ошибок при планировании маршрута.</p>
+
+<p>В этой статье мы детально разберем, что такое <strong>LDS</strong>, как именно лазерный луч сканирует пространство, в чем его принципиальное отличие от камерных систем и почему наличие этой башенки является критическим фактором для идеальной уборки больших квартир.</p>
+
+<h2 id="принцип-работы-лазерного-дальномера-lds">Принцип работы лазерного дальномера LDS</h2>
+
+<p>Аббревиатура <strong>LDS</strong> расшифровывается как Laser Distance Sensor (лазерный дальномер). Визуально это выглядит как вращающаяся башенка на корпусе робота, которая постоянно крутится во время работы. Внутри этого «шлема» находится лазерный диод и приемник, способные измерять расстояние до ближайших объектов с высокой точностью, буквально до миллиметра.</p>
+
+<p>Процесс сканирования происходит следующим образом: лазерный луч испускает сигналы в инфракрасном спектре, которые отражаются от стен, мебели и других препятствий. Датчик фиксирует время возвращения сигнала. Зная скорость света, процессор вычисляет расстояние до объекта. Башня вращается 360 градусов, обычно совершая от 600 до 2000 оборотов в минуту, создавая в реальном времени облако точек — карту окружения.</p>
+
+<p>Ключевым преимуществом <strong>LDS</strong> является его независимость от внешнего освещения. В отличие от камерных систем, лазерному лучу не нужно видеть комнату в темноте. Он «видит» геометрию пространства даже в полной темноте, что делает его идеальным для ночной уборки или помещений, где сложно поддерживать яркий свет.</p>
+
+<h2 id="отличия-lds-от-vslam-и-гироскопической-навигации">Отличия LDS от VSLAM и гироскопической навигации</h2>
+
+<p>На рынке существуют и другие методы навигации, такие как <strong>VSLAM</strong> (Visual Simultaneous Localization and Mapping) и гироскопическая система. VSLAM использует камеру для съемки окружающего пространства и сопоставления визуальных ориентиров. Это решение часто дешевле, но оно критически зависит от освещения: в темноте камера слепнет и робот начинает двигаться хаотично.</p>
+
+<p>Гироскопические же модели, не имеющие ни лазера, ни камеры, полагаются на датчики вращения колес и акселерометры. Они строят карту, грубо оценивая пройденное расстояние. Такой подход часто приводит к ошибкам: робот «забывает», где он был, если колесо проскальзывает на ковре, или строит карту неправильной формы.</p>
+
+<p>Система <strong>LDS</strong> занимает золотую середину по соотношению цены и точности. Она не требует сложной видеообработки, как VSLAM, и гораздо надежнее простых гироскопов. <em>Roborock S7</em> или <em>Dreame L10s</em> используют именно лазерный дальномер, чтобы строить идеальные карты, на которых можно виртуально выставлять стены и зоны уборки.</p>
+
+<blockquote>
+<p>⚠️ <strong>Внимание:</strong> Высота башенки LDS делает такие модели менее маневренными под низкими диванами и кроватями. Перед покупкой обязательно измерьте высоту препятствий в доме — если зазор менее 10-12 см, робот с лазером может не проехать под мебелью.</p>
+</blockquote>
+
+<p>Существует и модификация под названием <strong>LDS 2.0</strong> или <em>LDS 360</em>, где скорость вращения увеличена для еще более детального сканирования. В таких моделях время построения карты сокращается в разы, что позволяет роботам быстрее приступать к уборке после запуска.</p>
+
+<div class="poll-widget" id="poll-96451a0b"><div class="poll-widget-question">📊 Какой тип навигации используется в вашем роботе?</div><div class="poll-widget-option" data-poll="96451a0b" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">LDS (Лазер)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="96451a0b" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">VSLAM (Камера)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="96451a0b" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскоп</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="96451a0b" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не знаю</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="преимущества-использования-лазерной-навигации">Преимущества использования лазерной навигации</h2>
+
+<p>Основное преимущество <strong>LDS</strong> — это точность построения карты. Робот создает не просто набор координат, а детализированный план помещения. Это позволяет использовать функции виртуальных границ. Вы можете запретить роботу заезжать в зону с игрками детей или на кухню во время готовки, просто проведя линию на экране смартфона.</p>
+
+<p>Кроме того, лазерная навигация обеспечивает <strong>эффективность уборки</strong>. Чётко понимая геометрию комнаты, робот движется по змейке, а не хаотично бегает по углам. Это сокращает время уборки на 30-40% по сравнению с гироскопическими моделями и значительно снижает износ батареи.</p>
+
+<p>Дополнительные функции, доступные только с LDS:
+<ul>
+<li>🚀 <strong>Многоэтажная навигация:</strong> Робот запоминает карты разных этажей и автоматически переключается между ними при помощи алгоритмов распознавания или ручного выбора.</li>
+<li>📍 <strong>Точное позиционирование:</strong> При возвращении на базу робот точно знает, с какой стороны к ней подъехать, даже если база стоит в темном углу.</li>
+<li>🧹 <strong>Квадратурная уборка:</strong> Возможность выбрать уборку только конкретной комнаты, например, только ванной или спальни, без уборки всей квартиры.</li>
+</ul>
+</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Лазерная навигация LDS обеспечивает максимальную точность карт и позволяет использовать продвинутые функции зонной уборки, недоступные для простых моделей.</p></div>
+
+<h2 id="эксплуатация-и-уход-за-лазерным-модулем">Эксплуатация и уход за лазерным модулем</h2>
+
+<p>Несмотря на надежность, модуль <strong>LDS</strong> требует внимания. Пыль, оседающая на вращающейся крышке, может снижать точность измерений. Если вы заметили, что робот «теряется» в знакомой комнате или строит кривые стены, скорее всего, датчик загрязнен. Регулярная протирка вращающейся башни сухой мягкой тканью должна стать частью вашего чек-листа обслуживания.</p>
+
+<p>Механическая защита также важна. Башня LDS выступает над корпусом, что делает её уязвимой при ударах. Если робот врезается в стену с большой скоростью, механизм вращения может получить люфт или сломаться. Некоторые пользователи специально устанавливают <strong>защитные колпаки</strong> или обшивают углы мягкой мебелью, чтобы защитить датчик.</p>
+
+<div class="checklist-block"><h4>☑️ Уход за лазерным модулем</h4><label class="check-item"><input type="checkbox"><span>Протереть крышку башни сухой тканью</span></label><label class="check-item"><input type="checkbox"><span>Проверить плавность вращения</span></label><label class="check-item"><input type="checkbox"><span>Очистить датчики по бокам корпуса</span></label><label class="check-item"><input type="checkbox"><span>Убедиться, что башня не застревает в мебели</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<p>Также стоит учитывать, что вращение башни создает небольшой шум. Хотя современные модели <em>Dreame D9</em> или <em>Roborock Q7</em> работают достаточно тихо, звук вращающегося пластика может быть заметен в очень тихих помещениях, например, при работе ночной уборки в спальне.</p>
+
+<details class="faq-item"><summary>Что будет, если сломается башня LDS?</summary><div class="faq-answer"><p>Если лазерный модуль выйдет из строя, робот может продолжать работать в режиме «слепой» уборки, используя только гироскоп или датчики столкновения, но потеряет возможность строить карту и использовать виртуальные стены. Замена модуля часто стоит дорого и требуетльного ремонта.</p></div></details>
+
+<h2 id="ограничения-технологии-lds">Ограничения технологии LDS</h2>
+
+<p>Несмотря на все плюсы, у технологии есть свои недостатки. Главный из них — физическая высота. Чтобы лазерный луч мог сканировать пространство, башня должна возвышаться над полом. Это создает проблему с высотой корпуса: робот с LDS часто не может залезть под низкие предметы мебели, такие как старые диваны, низкие тумбы или кровати с минимальной высотой.</p>
+
+<p>Второй аспект — это стоимость. Модели с <strong>LDS</strong> всегда дороже аналогов без него. Разница в цене может достигать 30-50%, что для бюджетного сегмента является существенным фактором. Если вам нужен простой пылесос для небольшой студии, переплачивать за лазерную навигацию может быть нецелесообразно.</p>
+
+<p>Также существует риск помех от зеркал и темных поверхностей. Лазерный луч может отражаться от зеркальных стен или поглощаться абсолютно черными поверхностями, что иногда вызывает ошибки в построении карты в специфических интерьерах. Это редкость, но возможно в очень необычных дизайнах.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип навигации</th>
+<th>Точность карты</th>
+<th>Работа в темноте</th>
+<th>Высота корпуса</th>
+<th>Стоимость</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LDS (Лазер)</strong></td>
+<td>Высокая</td>
+<td>Да</td>
+<td>Высокая (10-12 см)</td>
+<td>Средняя/Высокая</td>
+</tr>
+<tr>
+<td>VSLAM (Камера)</td>
+<td>Средняя/Высокая</td>
+<td>Нет (зависит от света)</td>
+<td>Низкая</td>
+<td>Средняя</td>
+</tr>
+<tr>
+<td>Гироскоп</td>
+<td>Низкая</td>
+<td>Да</td>
+<td>Низкая</td>
+<td>Низкая</td>
+</tr>
+<tr>
+<td>Хаотичный</td>
+<td>Отсутствует</td>
+<td>Да</td>
+<td>Низкая</td>
+<td>Бюджетная</td>
+</tr>
+</tbody>
+</table>
+
+<p>Важно отметить, что производители постоянно совершенствуют алгоритмы обработки данных с <strong>LDS</strong>. Современные процессоры способны фильтровать ложные отражения от зеркал, делая систему все более устойчивой к сложным условиям.</p>
+
+<h2 id="выбор-модели-с-lds-для-ваших-задач">Выбор модели с LDS для ваших задач</h2>
+
+<p>При выборе робота-пылесоса с лазерной навигацией обращайте внимание на разрешение сканирования и скорость вращения башни. Более продвинутые модели, такие как <em>Roborock S8 Pro Ultra</em>, используют усовершенствованные алгоритмы, позволяющие строить 3D-карты и распознавать объекты, а не только стены. Это критично, если у вас есть животные или много игрушек на полу.</p>
+
+<p>Также стоит проверить, поддерживает ли приложение функцию <strong>Multi-floor mapping</strong>. Если вы живете в двухэтажном доме, вам нужен робот, который умеет хранить несколько карт. Это позволяет не перестраивать карту каждый раз при переносе устройства на другой этаж.</p>
+
+<p>Не забывайте проверять совместимость с системами умного дома. Почти все модели с <strong>LDS</strong> поддерживают интеграцию с <em>Alexa</em> и <em>Google Home</em>, но некоторые бюджетные китайские бренды могут требовать использования специфических приложений для настройки.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед покупкой робота с LDS измерьте высоту самых низких предметов мебели в доме. Если зазор меньше 10 см, рассмотрите модели с плоской навигацией (VSLAM) или просто без башни, чтобы робот мог убирать под мебелью.</p></div>
+
+<p>В конечном счете, наличие LDS — это гарантия того, что робот будет работать умно, быстро и эффективно. Это технология, которая превращает уборку из рутины в автоматизированный процесс, требующий минимального участия человека.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Для большинства современных квартир робот с LDS является оптимальным выбором, так как он сочетает высокую точность навигации, работу в темноте и доступную цену по сравнению с лидерами рынка.</p></div>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Может ли робот LDS работать без интернета?</summary>
+<p>Да, робот с LDS может убирать квартиру без подключения к интернету. Все данные о карте обрабатываются и сохраняются на встроенном чипе устройства. Однако для удаленного управления через приложение и получения обновлений ПО интернет потребуется.</p>
+</details>
+
+<details>
+<summary>Почему робот с LDS не может заехать под диван?</summary>
+<p>Потому что высота башенки с лазерным дальномером составляет около 10-12 см. Если высота вашего дивана меньше этого значения, физический корпус робота не пролезет под него. Это конструктивное ограничение технологии LDS.</p>
+</details>
+
+<details>
+<summary>Лазер LDS вреден для глаз и животных?</summary>
+<p>Нет, лазер в роботах-пылесосах относится к классу безопасности 1 или 2. Он абсолютно безопасен для глаз человека и животных. Мощность излучения ничтожно мала и не causaет повреждений даже при прямом взгляде.</p>
+</details>
+
+<details>
+<summary>Как часто нужно чистить башню LDS?</summary>
+<p>Рекомендуется протирать крышку башни раз в 1-2 недели сухой салфеткой. Если в доме есть животные или высокая запыленность, проверку стоит проводить чаще, чтобы избежать ошибок в навигации.</p>
+</details>
+
+<details>
+<summary>Что делать, если карта построена некорректно?</summary>
+<p>Попробуйте очистить датчики от пыли, удалите карту из приложения и запустите режим «Быстрое построение карты» (обычно робот проезжает по периметру). Если ошибка повторяется, проверьте, нет ли в комнате зеркал или черных поверхностей, которые могут сбивать сенсор.</p>
+</details>
+
+<blockquote>
+<p>⚠️ <strong>Внимание:</strong> Технические характеристики и возможности ПО могут обновляться производителем. Всегда сверяйте актуальную информацию о поддержке карт и функций в официальной документации конкретной модели на момент покупки.</p>
+</blockquote></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#принцип-работы-лазерного-дальномера-lds">Принцип работы лазерного дальномера LDS</a></li><li><a href="#отличия-lds-от-vslam-и-гироскопической-навигации">Отличия LDS от VSLAM и гироскопической навигации</a></li><li><a href="#преимущества-использования-лазерной-навигации">Преимущества использования лазерной навигации</a></li><li><a href="#эксплуатация-и-уход-за-лазерным-модулем">Эксплуатация и уход за лазерным модулем</a></li><li><a href="#ограничения-технологии-lds">Ограничения технологии LDS</a></li><li><a href="#выбор-модели-с-lds-для-ваших-задач">Выбор модели с LDS для ваших задач</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kakoj-robot-pylesos-dlya-bassejna-luchshe.html" class="related-card">Какой робот-пылесос для бассейна лучше: Обзор топовых моделей и критерии выбора</a></li><li><a href="/articles/k/ka/kak-peremeshchat-robot-pylesos-mezhdu-komnatami.html" class="related-card">Как перемещать робот-пылесос между комнатами: полные инструкции</a></li><li><a href="/articles/r/ro/robot-pylesos-ajrobot-kakoj-vybrat.html" class="related-card">Робот пылесос iRobot какой выбрать: полное руководство по моделированию</a></li><li><a href="/articles/k/ka/kak-otpravit-pylesos-v-opredelennuyu-komnatu-robot-xiaomi.html" class="related-card">Как отправить робота-пылесоса Xiaomi в конкретную комнату</a></li><li><a href="/articles/z/za/zachem-nuzhen-robot-pylesos-na-samom-dele.html" class="related-card">Зачем нужен робот-пылесос: реальная польза и скрытые функции</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kakoj-robot-pylesos-dlya-bassejna-luchshe.html" class="related-bottom-card"><span class="related-bottom-title">Какой робот-пылесос для бассейна лучше: Обзор топовых моделей и критерии выбора</span><span class="related-bottom-desc">Полный гид по выбору робота-уборщика для бассейна. Сравнение химических и турбощеточных моделей, ана</span></a><a href="/articles/k/ka/kak-peremeshchat-robot-pylesos-mezhdu-komnatami.html" class="related-bottom-card"><span class="related-bottom-title">Как перемещать робот-пылесос между комнатами: полные инструкции</span><span class="related-bottom-desc">Практическое руководство: как правильно поднимать и переносить робот-пылесос, чтобы не сбить карту и</span></a><a href="/articles/r/ro/robot-pylesos-ajrobot-kakoj-vybrat.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос iRobot какой выбрать: полное руководство по моделированию</span><span class="related-bottom-desc">Выбираете робот-пылесос iRobot? Сравните модели Roomba j7, i3+, s9+ и Braava. Инструкция по выбору п</span></a><a href="/articles/k/ka/kak-otpravit-pylesos-v-opredelennuyu-komnatu-robot-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как отправить робота-пылесоса Xiaomi в конкретную комнату</span><span class="related-bottom-desc">Пошаговая инструкция: настройка зон и комнат в приложении Mi Home для моделей Xiaomi Vacuum. Настрой</span></a><a href="/articles/z/za/zachem-nuzhen-robot-pylesos-na-samom-dele.html" class="related-bottom-card"><span class="related-bottom-title">Зачем нужен робот-пылесос: реальная польза и скрытые функции</span><span class="related-bottom-desc">Разбираем, зачем нужен робот-пылесос на самом деле. Экономия времени, здоровье семьи, автоматизация </span></a><a href="/articles/r/re/rejting-robota-pylesosa-xiaomi-kakoj-luchshe.html" class="related-bottom-card"><span class="related-bottom-title">Рейтинг роботов-пылесосов Xiaomi 2026: какой лучше выбрать для дома</span><span class="related-bottom-desc">Авторский рейтинг лучших моделей роботов-пылесосов Xiaomi на 2026 год. Сравнение функций, мощности в</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

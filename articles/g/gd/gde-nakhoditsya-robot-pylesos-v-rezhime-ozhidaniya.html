@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Где находится робот-пылесос в режиме ожидания: база и логика — SOS-Пылесос</title>
+    <meta name="description" content="Узнайте, где именно встает робот-пылесос после уборки. Разбор логики док-станции, сбойные зоны и алгоритмы поиска базы для моделей Xiaomi, Roborock и iRobot.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/g/gd/gde-nakhoditsya-robot-pylesos-v-rezhime-ozhidaniya.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Где находится робот-пылесос в режиме ожидания: база и логика">
+    <meta property="og:description" content="Узнайте, где именно встает робот-пылесос после уборки. Разбор логики док-станции, сбойные зоны и алгоритмы поиска базы для моделей Xiaomi, Roborock и iRobot.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Где находится робот-пылесос в режиме ожидания: база и логика</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Локация робота-пылесоса в режиме ожидания: база или случайная точка</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#стандартная-позиция-на-зарядной-базе">Стандартная позиция на зарядной базе</a></li><li><a href="#ситуации-когда-робот-остается-в-комнате">Ситуации, когда робот остается в комнате</a></li><li><a href="#логика-поиска-базы-при-разряде">Логика поиска базы при разряде</a></li><li><a href="#проблемы-с-док-станцией-и-контактами">Проблемы с док-станцией и контактами</a></li><li><a href="#влияние-мебели-и-препятствий-на-парковку">Влияние мебели и препятствий на парковку</a></li><li><a href="#настройки-и-управление-парковкой-через-приложение">Настройки и управление парковкой через приложение</a></li><li><a href="#таблица-типичных-сценариев-поведения">Таблица типичных сценариев поведения</a></li><li><a href="#как-правильно-переместить-робота-в-режим-ожидания">Как правильно переместить робота в режим ожидания</a></li><li><a href="#особенности-для-разных-брендов-и-моделей">Особенности для разных брендов и моделей</a></li><li><a href="#faq-частые-вопросы-о-местоположении-робота">FAQ: Частые вопросы о местоположении робота</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Многие владельцы устройств задаются вопросом, где именно находится робот-пылесос, когда он не работает. В подавляющем большинстве случаев <strong>робот-пылесос</strong> в режиме ожидания занимает позицию на своей зарядной станции. Это необходимо для поддержания заряда аккумулятора и готовности к новому циклу уборки по расписанию.</p>
+
+<p>Однако существуют ситуации, когда аппарат остается внутри комнаты, в дальнем углу или под мебелью. Такое поведение часто сигнализирует о сбое в навигации или проблемах с контактами на базе. Понимание логики работы <em>автоматической док-станции</em> поможет вам быстро определить, является ли текущее положение гаджета нормой или признаком поломки.</p>
+
+<h2 id="стандартная-позиция-на-зарядной-базе">Стандартная позиция на зарядной базе</h2>
+
+<p>Конструкторы закладывают в алгоритм работы устройства приоритетное возвращение на док-станцию. Как только заряд батареи падает до критического уровня или завершается запланированная уборка, <strong>автономный пылесос</strong> ищет базу. В нормальном режиме ожидания устройство стоит на подложке базы, плотно прижавшись контактами.</p>
+
+<p>В этом состоянии индикаторы на корпусе обычно горят steady (не мигают), указывая на процесс подзарядки. Важно отметить, что для моделей с камерой или лидаром, стоящих на базе, это также является точкой калибровки карт. <em>Робот-пылесос</em> может находиться в спящем режиме, но его система позиционирования активна.</p>
+
+<p>Иногда пользователи замечают, что колонка индикаторов горит красным или оранжевым цветом. Это означает, что пылесос на базе, но <strong>зарядка не идет</strong>. В таком случае устройство формально находится в режиме ожидания на базе, но технически не готово к работе из-за проблем с питанием.</p>
+
+<h2 id="ситуации-когда-робот-остается-в-комнате">Ситуации, когда робот остается в комнате</h2>
+
+<p>Если вы видите пылесос посреди гостиной или коридора, это не всегда ошибка. В некоторых сценариях использования встроенной логики <strong>умный пылесос</strong> намеренно останавливается в произвольном месте. Например, при ручном запуске"точечной уборки" устройство может не возвращаться на базу, пока пользователь не нажмет кнопку возврата.</p>
+
+<p>Существует функция"Парковка в комнате", доступная в прошивках <em>Xiaomi</em> и <em>Roborock</em>. При активации этой опции робот завершает уборку, но остается там, где закончил, чтобы сэкономить время на повторный выезд. Это удобно, если вам нужно быстро убрать небольшую зону без ожидания полного цикла.</p>
+
+<p>Другая причина — критическая ошибка навигации. Если <strong>датчики столкновений</strong> или гироскоп дают сбой, аппарат теряет ориентацию и может остановиться в случайной точке, сообщая о потере карты. В данном случае устройство физически находится в комнате, но технически оно"застряло" в режиме ожидания из-за невозможности найти базу.</p>
+
+<h2 id="логика-поиска-базы-при-разряде">Логика поиска базы при разряде</h2>
+
+<p>Когда заряд батареи падает ниже 20%, <strong>робот-пылесос</strong> переходит в режим поиска док-станции. Он использует инфракрасные лидеры и сигналы станции для triangulation (триангуляции). Если сигнал слабый, аппарат может начать хаотичное перемещение по комнате, пытаясь поймать луч.</p>
+
+<p>В этот период устройство находится в движении, но не в режиме уборки. Оно игнорирует грязь и сосредоточено на навигации. Если <em>ионные контакты</em> на базе загрязнены, робот может несколько раз попытаться заехать на станцию, нено, и в итоге остановиться рядом с ней.</p>
+
+<p>Некоторые модели, например <em>Roborock S7 MaxV</em>, используют камеру для визуального поиска базы. Если в комнате слишком темно, <strong>оптическая система</strong> может не распознать базу, и робот останется в режиме ожидания посреди комнаты, ожидая света или подачи ручного сигнала.</p>
+
+<p>Важно понимать, что в процессе поиска базы <strong>потребление энергии</strong> значительно выше обычного. Если вы заметили, что робот долго бегает и не находит базу, проверьте, не закрыты ли щели на передней панели станции.</p>
+
+<div class="poll-widget" id="poll-507582ac"><div class="poll-widget-question">📊 Где вы чаще всего находите свой робот-пылесос после уборки?</div><div class="poll-widget-option" data-poll="507582ac" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Только на базе</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="507582ac" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Иногда в комнате</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="507582ac" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Часто под мебелью</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="507582ac" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Постоянно в случайных местах</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="проблемы-с-док-станцией-и-контактами">Проблемы с док-станцией и контактами</h2>
+
+<p>Одной из самых частых причин, по которой <strong>робот-пылесос</strong> не становится на базу, является окисление контактов. Металлические щупы на корпусе и штыри на станции покрываются пылью и нагаром, что нарушает передачу сигнала о"парковке".</p>
+
+<p>Визуально робот может выглядеть так, будто он стоит на базе, но на самом деле он просто прижат к ней боком. В этом режиме он <em>не заряжается</em>, и при следующем запуске вы получите сообщение о низком заряде. Проверка чистоты контактов часто решает проблему"потерянного" ожидания.</p>
+
+<p>Также обратите внимание на препятствия перед станцией. <strong>Оптические барьеры</strong> или темные ковры перед базой могут обмануть датчики. Робот может остановиться в метре от базы, считая, что заехать туда невозможно, и перейти в режим ожидания.</p>
+
+<p>Иногда проблема кроется в прошивке. В старых версиях ПО алгоритмы поведения <em>роботов-пылесосов</em> были менее совершенны. Обновление <strong>firmware</strong> через мобильное приложение часто исправляет ошибки позиционирования.</p>
+
+<p>Проверьте также, не перекрывают ли антенну док-станции крупные предметы мебели. <strong>Сигнал 2.4 ГГц</strong>, используемый для связи с базой, может экранироваться металлическими дверцами шкафов, если база стоит внутри закрытого пространства.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка док-станции</h4><label class="check-item"><input type="checkbox"><span>Очистить щупы на базе</span></label><label class="check-item"><input type="checkbox"><span>Очистить контактные площадки на роботе</span></label><label class="check-item"><input type="checkbox"><span>Убрать препятствия перед базой</span></label><label class="check-item"><input type="checkbox"><span>Перепрошить устройство в приложении</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="влияние-мебели-и-препятствий-на-парковку">Влияние мебели и препятствий на парковку</h2>
+
+<p>Мебель играет ключевую роль в том, где находится <strong>робот-пылесос</strong> в режиме ожидания. Если база установлена в нише или под диваном, но расстояние от пола до дивана слишком мало, робот может не заехать внутрь полностью.</p>
+
+<p>В таких случаях <em>робот-пылесос</strong> пытается заехать, натыкается на препятствие и отъезжает назад. Повторив действие несколько раз, он может решить, что зона заблокирована, и остановиться в <strong>зоне безопасной парковки</strong> рядом с базой.</p>
+
+<p>Слишком высокий плинтус или порожек также могут стать проблемой. Если база стоит на возвышении, а робот подъезжает снизу, он может не преодолеть перепад высот. В результате устройство остается стоять на полу, ожидая команды, но не заходя на базу.</p>
+
+<p>Важно учитывать и высоту навеса. Для большинства моделей требуется зазор минимум 120 см над базой. Если над станцией висит люстра или низкая полка, <strong>сенсоры высоты</strong> могут блокировать заезд, считая пространство тесным для маневра.</p>
+
+<details class="faq-item"><summary>Как измерить высоту зазора?Вам понадобится рулетка или строительный уровень. Измерьте расстояние от пола до самого нижнего препятствия над док-станцией. Если оно меньше 120-140 см, переставьте базу в более открытое место, иначе робот не сможет уверенно заезжать и парковаться.-->
+
+<h2 id="настройки-и-управление-парковкой-через-приложение">Настройки и управление парковкой через приложение</h2>
+
+<p>Современные приложения позволяют гибко управлять тем, где находится <strong>робот-пылесос</em> после уборки. В настройках часто доступна опция"Парковка на базе после уборки" или"Оставаться в комнате".</p>
+
+<p>Если вы хотите, чтобы робот всегда возвращался на базу, убедитесь, что в разделе <code>Настройки → Уборка</code> включена функция автоматической парковки. Для некоторых брендов, таких как <em>Dreame</em>, это отдельный переключатель.</p>
+
+<p>Также можно настроить виртуальные стены и запреты. Если вы случайно создали запретную зону вокруг базы, <strong>алгоритм навигации</strong> не позволит роботу заехать на станцию. Это приведет к тому, что он остановится в соседней комнате.</p>
+
+<p>В приложении <em>Roborock</em> можно проверить статус батареи и локации в реальном времени. Если робот показывает, что он на базе, но не заряжается, это указывает на проблему с <strong>силовым контактом</strong>, а не с программным обеспечением.</p>
+
+<!--WIDGET</summary><div class="faq-answer"><p>tip:Если робот не находит базу, попробуйте временно переставить её в центр комнаты и запустить режим"Возврат на базу". Это поможет исключить влияние мебели и стен на поиск сигнала.</p></div></details>
+
+<h2 id="таблица-типичных-сценариев-поведения">Таблица типичных сценариев поведения</h2>
+
+<table>
+<thead>
+<tr>
+<th>Сценарий</th>
+<th>Место нахождения</th>
+<th>Причина</th>
+<th>Действие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Нормальная уборка</td>
+<td>На док-станции</td>
+<td>Закончен цикл или низкий заряд</td>
+<td>Ничего не делать</td>
+</tr>
+<tr>
+<td>Ручная уборка</td>
+<td>В комнате</td>
+<td>Отключена авто-парковка</td>
+<td>Нажать кнопку"Домой"</td>
+</tr>
+<tr>
+<td>Ошибка навигации</td>
+<td>Случайная точка</td>
+<td>Потеря карты или сбой гироскопа</td>
+<td>Перезагрузка устройства</td>
+</tr>
+<tr>
+<td>Грязные контакты</td>
+<td>Рядом с базой</td>
+<td>Нет электрического контакта</td>
+<td>Очистить щупы спиртом</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>
+<p>⚠️ Внимание: Если вы перемещаете базу в другое место, убедитесь, что вы удалили старую карту или перенастроили виртуальные стены. Старые координаты базы могут привести к тому, что робот будет искать её в старом месте, а не в новом.</p>
+</blockquote>
+
+<blockquote>
+<p>⚠️ Внимание: Никогда не вынимайте робот из режима ожидания, если он находится на базе и мигает зеленым светом зарядки. Это может прервать процесс калибровки батареи и снизить её срок службы.</p>
+</blockquote>
+
+<h2 id="как-правильно-переместить-робота-в-режим-ожидания">Как правильно переместить робота в режим ожидания</h2>
+
+<p>Иногда возникает необходимость вручную вернуть <strong>робота-пылесоса</strong> на базу. Это делается через кнопку на корпусе или через приложение. При этом важно учитывать, что робот может не сразу заехать, если путь заблокирован.</p>
+
+<p>Если вы перенесли устройство в другую комнату, запустите функцию поиска базы. <em>Робот-пылесос</strong> начнет движение к источнику сигнала. Если он не может заехать, попробуйте вручную подтолкнуть его, чтобы контакты соприкоснулись.</p>
+
+<p>После успешной парковки индикатор должен сменить цвет на постоянный зеленый или белый (в зависимости от модели). Это подтверждает, что <strong>режим ожидания</em> активирован корректно, и устройство готово к работе.</p>
+
+<p> Если робот постоянно стоит криво, алгоритм может ошибаться в построении карты помещения.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Правильная парковка на базе — это не просто удобство, а гарантия корректной калибровки сенсоров и поддержания здоровья аккумулятора устройства.</p></div>
+
+<blockquote>
+<p>⚠️ Внимание: В некоторых моделях с функцией самоочистки (станции с пылесборником) робот должен быть установлен на базу строго до завершения цикла опорожнения мешка. Преждевременное снятие может привести к сбросу счетчика циклов.</p>
+</blockquote>
+
+<h2 id="особенности-для-разных-брендов-и-моделей">Особенности для разных брендов и моделей</h2>
+
+<p>Поведение в режиме ожидания может отличаться у <em>Xiaomi</em>, <em>Roborock</em>, <em>Eufy</em> и других производителей. У бренда <em>Eufy</em> роботы часто ищут базу"на ощупь", используя бамперы, что увеличивает время поиска.</p>
+
+<p>Модели <em>Roborock</em> с технологией PreciSense используют 3D-сканирование, что позволяет им парковаться точнее, но требует больше времени на инициализацию сенсоров при заезде. <strong>Лазерный дальномер</strong> у таких моделей должен быть свободен от пыли.</p>
+
+<p>У <em>iRobot Roomba</em> логика поиска базы часто зависит от частоты сигнала. Если в доме много помех, робот может начать"танцевать" вокруг базы, пытаясь поймать сигнал. Это нормальное поведение, но оно может затянуться.</p>
+
+<p>Для моющих <strong>роботов-пылесосов</strong> с аппаратом для мытья полов (например, <em>Roborock Dyad</em> или <em>Ecovacs Deebot</em>) парковка критична еще и для работы системы мойки. Если робот не на базе, он не сможет сбросить грязную воду и промыть тряпки.</p>
+
+<p>Проверьте совместимость базы и робота. Использование <strong>сторонних адаптеров</strong> или баз от других моделей может привести к тому, что робот не распознает станцию и будет просто стоять рядом.</p>
+
+<details class="faq-item"><summary>Скрытый нюанс работы аккумуляторов</summary><div class="faq-answer"><p> Даже если робот стоит на базе, он может периодически"просыпаться" для тестирования батареи. Это не сбой, а штатная процедура мониторинга здоровья ячеек аккумулятора.</p></div></details>
+
+<blockquote>
+<p>⚠️ Внимание: Технические характеристики док-станций могут меняться в зависимости от региона продажи. Всегда сверяйте совместимость модели робота и базы в руководстве пользователя перед покупкой дополнительных аксессуаров.</p>
+</blockquote>
+
+<h2 id="faq-частые-вопросы-о-местоположении-робота">FAQ: Частые вопросы о местоположении робота</h2>
+
+<details>
+<summary>Почему робот-пылесос стоит в углу комнаты, а не на базе?</summary>
+<p>Это может быть следствием сбоев навигации или физической преграды на пути к базе. Проверьте, не закрыты ли датчики, и убедитесь, что на полу нет препятствий перед станцией. Также возможно, что в настройках отключена функция автоматического возврата.</p>
+</details>
+
+<details>
+<summary>Можно ли оставить робота в режиме ожидания без базы?</summary>
+<p>Технически можно, но это не рекомендуется. Без базы аккумулятор быстро разрядится до глубокого разряда, что может вывести его из строя. Кроме того, робот не сможет обновлять карту и получать команды через Wi-Fi, если вы используете модель, зависимую от базы для связи.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот на базе, но не заряжается?</summary>
+<p>В первую очередь очистите контактные площадки на обоих устройствах. Проверьте, плотно ли робот прижат к базе. Если проблема не решается, попробуйте перезагрузить базу, выключив её из розетки на минуту.</p>
+</details>
+
+<details>
+<summary>Как заставить робота вернуться на базу принудительно?</summary>
+<p>Нажмите кнопку"Домой" на корпусе устройства или выберите соответствующую команду в мобильном приложении. Если робот не реагирует, проверьте, не заблокированы ли его датчики, и убедитесь, что база включена в розетку.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#стандартная-позиция-на-зарядной-базе">Стандартная позиция на зарядной базе</a></li><li><a href="#ситуации-когда-робот-остается-в-комнате">Ситуации, когда робот остается в комнате</a></li><li><a href="#логика-поиска-базы-при-разряде">Логика поиска базы при разряде</a></li><li><a href="#проблемы-с-док-станцией-и-контактами">Проблемы с док-станцией и контактами</a></li><li><a href="#влияние-мебели-и-препятствий-на-парковку">Влияние мебели и препятствий на парковку</a></li><li><a href="#настройки-и-управление-парковкой-через-приложение">Настройки и управление парковкой через приложение</a></li><li><a href="#таблица-типичных-сценариев-поведения">Таблица типичных сценариев поведения</a></li><li><a href="#как-правильно-переместить-робота-в-режим-ожидания">Как правильно переместить робота в режим ожидания</a></li><li><a href="#особенности-для-разных-брендов-и-моделей">Особенности для разных брендов и моделей</a></li><li><a href="#faq-частые-вопросы-о-местоположении-робота">FAQ: Частые вопросы о местоположении робота</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-sbrosit-kartu-pylesosa-xiaomi-vacuum.html" class="related-card">Как сбросить карту пылесоса Xiaomi: Полная инструкция 2026</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-k-vaj-faj-routeru.html" class="related-card">Как подключить робот-пылесос к Wi-Fi: полная инструкция и проблемы</a></li><li><a href="/articles/k/ka/kak-vyklyuchit-robot-pylesos-distantsionno.html" class="related-card">Как выключить робот-пылесос дистанционно: пошаговое руководство</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-tefal-explorer-series-80-k-wifi.html" class="related-card">Как подключить робот-пылесос Tefal Explorer Series 80 к Wi-Fi: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-k-prilozheniyu-roborock.html" class="related-card">Как подключить робот-пылесос Roborock к приложению: полная инструкция</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-sbrosit-kartu-pylesosa-xiaomi-vacuum.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить карту пылесоса Xiaomi: Полная инструкция 2026</span><span class="related-bottom-desc">Пошаговая инструкция по сбросу карты уборки робота-пылесоса Xiaomi. Удаление зон, сброс до заводских</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-k-vaj-faj-routeru.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос к Wi-Fi: полная инструкция и проблемы</span><span class="related-bottom-desc">Пошаговое руководство: как подключить робот-пылесос к Wi-Fi роутеру. Решаем частые ошибки, настраива</span></a><a href="/articles/k/ka/kak-vyklyuchit-robot-pylesos-distantsionno.html" class="related-bottom-card"><span class="related-bottom-title">Как выключить робот-пылесос дистанционно: пошаговое руководство</span><span class="related-bottom-desc">Узнайте, как остановить работу пылесоса через приложение, голосового помощника или пульт. Решаем про</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-tefal-explorer-series-80-k-wifi.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Tefal Explorer Series 80 к Wi-Fi: пошаговая инструкция</span><span class="related-bottom-desc">Подробное руководство по настройке Wi-Fi для Tefal Explorer Series 80. Решение частых ошибок подключ</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-k-prilozheniyu-roborock.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Roborock к приложению: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство: как настроить Wi-Fi, зарегистрировать аккаунт и подключить робота-пылесос Rob</span></a><a href="/articles/k/ka/kak-proshit-robot-pylesos-xiaomi-mi-robot-vacuum-mop-pro-na-russkij.html" class="related-bottom-card"><span class="related-bottom-title">Как прошить Xiaomi Mi Robot Vacuum Mop Pro на русский язык: Полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по перепрошивке робота-пылесоса Xiaomi Mi Robot Vacuum Mop Pro. Установка руси</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как устроен робот-пылесос: полная схема, устройство и принцип работы — SOS-Пылесос</title>
+    <meta name="description" content="Подробная внутренняя схема робота-пылесоса: датчики, система навигации, моторы и уборка. Разбор конструктивных особенностей и принципов работы.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-ustroen-robot-pylesos-skhema.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как устроен робот-пылесос: полная схема, устройство и принцип работы">
+    <meta property="og:description" content="Подробная внутренняя схема робота-пылесоса: датчики, система навигации, моторы и уборка. Разбор конструктивных особенностей и принципов работы.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как устроен робот-пылесос: полная схема, устройство и принцип работы</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Внутреннее устройство робота-пылесоса: схема и принцип работы</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение-в-мир-автономной-уборки">Введение в мир автономной уборки</a></li><li><a href="#корпусная-компоновка-и-система-защиты">Корпусная компоновка и система защиты</a></li><li><a href="#система-навигации-и-картографирования">Система навигации и картографирования</a></li><li><a href="#механика-уборки-щетки-и-моторы">Механика уборки: щетки и моторы</a></li><li><a href="#электропитание-и-система-управления">Электропитание и система управления</a></li><li><a href="#таблица-сравнения-компонентов">Таблица сравнения компонентов</a></li><li><a href="#обслуживание-и-типичные-неисправности">Обслуживание и типичные неисправности</a></li><li><a href="#faq-частые-вопросы-об-устройстве">FAQ: Частые вопросы об устройстве</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение-в-мир-автономной-уборки">Введение в мир автономной уборки</h2>
+
+<p>Робот-пылесос — это сложное инженерное решение, объединяющее механику, электронику и интеллектуальные алгоритмы в компактном корпусе. Внешне это просто круглый или овальный диск, но внутри скрывается настоящая мини-фабрика по очистке пола, где каждый узел выполняет строго отведенную функцию.</p>
+
+<p>Понимание <strong>внутреннего устройства</strong> помогает не только оценить стоимость техники, но и грамотно проводить обслуживание, а также оперативно устранять мелкие неисправности без вызова мастера. Когда вы знаете, как работают <em>датчики</em> и <strong>навигационные модули</strong>, становится ясно, почему робот иногда застревает или почему он не может пропылесосить темный ковер.</p>
+
+<p>В этой статье мы детально разберем, из каких основных блоков состоит современный автономный уборщик, как они взаимодействуют друг с другом и какие технологии лежат в основе его движения и очистки.</p>
+
+<h2 id="корпусная-компоновка-и-система-защиты">Корпусная компоновка и система защиты</h2>
+
+<p>Основа любого устройства — это его корпус, который не только защищает хрупкие компоненты, но и формирует аэродинамику всасывания. Конструкция обычно состоит из верхней крышки, передней панели и нижней платформы (днища). В верхней части располагается <strong>база управления</strong> и часто — сенсорный интерфейс или дисплей.</p>
+
+<p>Передняя часть корпуса оснащена <em>буферным бампером</em>, который служит механическим амортизатором при столкновениях с мебелью или стенами. Этот элемент не просто смягчает удар, но и скрывает за собой важные датчики удара, которые подают сигнал на остановку двигателя и смену траектории движения.</p>
+
+<p>Нижняя часть, или «шасси», является наиболее уязвимой зоной, так как именно здесь происходит контакт с грязью и пылью. Здесь размещаются <strong>всасывающие патрубки</strong>, <em>щетки</em> и приводные колеса. Герметичность соединения между верхней и нижней частями критически важна для создания необходимого <strong>разрежения</strong> в системе пылеотвода.</p>
+
+<h2 id="система-навигации-и-картографирования">Система навигации и картографирования</h2>
+
+<p>«Мозг» робота-пылесоса базируется на сложной системой сенсоров, которая позволяет ему ориентироваться в пространстве. В зависимости от класса устройства, используется либо случайная навигация с контактными датчиками, либо продвинутая система на базе <strong>LIDAR</strong> или <em>визуальных камер</em>.</p>
+
+<p>Технология LIDAR (лазерный дальномер) представляет собой вращающийся башенный модуль на верхней панели, который сканирует помещение, измеряя расстояние до объектов с высокой точностью. Это позволяет строить точные карты помещений, оптимизировать маршруты уборки и избегать повторных проходов.</p>
+
+<p>Для работы на сложных поверхностях и предотвращения падения с лестниц используется система <strong>датчиков падения</strong> (cliff sensors), расположенных по периметру днища. Они излучают инфракрасный луч, который отражается от пола; если отражение не возвращается (например, над ступенькой), робот мгновенно останавливается.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Стеклянные прозрачные поверхности или зеркальные полы могут обманывать оптические датчики падения, так как луч проходит сквозь стекло или отражается под некорректным углом. В таких случаях рекомендуется использовать специальные барьеры.</p>
+</blockquote>
+
+<h2 id="механика-уборки-щетки-и-моторы">Механика уборки: щетки и моторы</h2>
+
+<p>Сердцем процесса очистки является мощный <strong>вентилятор</strong> (турбина), создающий воздушный поток. Именно он затягивает воздух вместе с пылью и мусором из сопла в пылесборник. Мощность всасывания измеряется в Паскалях (Па) и является ключевым показателем эффективности.</p>
+
+<p>Для сбора мусора с поверхности пола используется комбинация щеток. В большинстве моделей имеется <em>центральная вращающаяся щетка</em> (обычно с резиновыми или щетинистыми элементами), которая поднимает пыль из ворса ковра. Вспомогательные боковые щетки (одна или две) работают как метелки, выметая грязь из-под мебели к центру всасывания.</p>
+
+<p>Привод всех подвижных механизмов осуществляется через систему моторов. Отдельный мотор отвечает за движение колеса, другой — за вращение щетки, а третий — за работу вентилятора. В современных моделях используются бесщеточные <strong>DC-моторы</strong>, которые работают тише и служат дольше своих коллекторных аналогов.</p>
+
+<div class="poll-widget" id="poll-3e36a326"><div class="poll-widget-question">📊 Какая навигация используется в вашем роботе?</div><div class="poll-widget-option" data-poll="3e36a326" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">LIDAR (лазерная)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="3e36a326" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Камераальная (VSLAM)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="3e36a326" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскопическая</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="3e36a326" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Просто случайная навигация</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="электропитание-и-система-управления">Электропитание и система управления</h2>
+
+<p>Автономность работы обеспечивается емкими литий-ионными или литий-полимерными аккумуляторами. Система управления постоянно мониторит уровень заряда и при необходимости отправляет робота на <strong>базу для зарядки</strong>. После дозаправки робот может продолжить уборку с того места, где остановился.</p>
+
+<p>Главная плата управления (PCB) координирует работу всех узлов, обрабатывая данные от сенсоров и отдавая команды двигателям. Именно здесь заложены алгоритмы <em>оптимизации маршрута</em>, позволяющие роботу двигаться «змейкой» или «спиралью» для максимального покрытия площади.</p>
+
+<p>Связь с пользователем осуществляется через модуль Wi-Fi или Bluetooth, что позволяет управлять устройством со смартфона. Через приложение можно задать виртуальные стены, настроить расписание или выбрать режим уборки.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка системы перед уборкой</h4><label class="check-item"><input type="checkbox"><span>Убедитесь в чистоте датчиков падения</span></label><label class="check-item"><input type="checkbox"><span>Очистите щетки от волос</span></label><label class="check-item"><input type="checkbox"><span>Проверьте уровень заряда батареи</span></label><label class="check-item"><input type="checkbox"><span>Уберите провода с пола</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<details class="faq-item"><summary>Как работают виртуальные стены?|Виртуальные стены создаются либо с помощью магнитной ленты, которую кладут на пол и которую робот не может пересечь благодаря датчикам, либо программно через приложение, если у модели есть камера или LIDAR. В последнем случае вы рисуете запретную зону на цифровой карте, и робот просто объезжает этот участок.-->
+
+<h2 id="таблица-сравнения-компонентов">Таблица сравнения компонентов</h2>
+
+<p>Ниже приведена сводная таблица, демонстрирующая различия в компонентах бюджетных и премиальных моделей.</p>
+
+<table>
+<thead>
+<tr>
+<th>Компонент</th>
+<th>Бюджетный сегмент</th>
+<th>Премиум сегмент</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Навигация</td>
+<td>Гироскоп + случайное движение</td>
+<td>LIDAR / Камера VSLAM</td>
+</tr>
+<tr>
+<td>Тип щеток</td>
+<td>Одна щетинистая</td>
+<td>Две резиновые (турбинные)</td>
+</tr>
+<tr>
+<td>Всасывание</td>
+<td>До 2000 Па</td>
+<td>До 6000 Па и выше</td>
+</tr>
+<tr>
+<td>Фильтрация</td>
+<td>Обычный поролоновый фильтр</td>
+<td>HEPA-фильтр (защита от аллергии)</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>
+<p>⚠️ Внимание</summary><div class="faq-answer"><p> При использовании моющих роботов-пылесосов обязательно проверяйте герметичность шлангов и бака для воды, так как попадание влаги на электронные компоненты может привести к полному выходу устройства из строя.</p>
+</blockquote>
+
+<h2 id="обслуживание-и-типичные-неисправности">Обслуживание и типичные неисправности</h2>
+
+<p>Регулярное обслуживание критически важно для долговечности устройства. В первую очередь необходимо очищать <strong>датчики</strong> от пыли, так как слой грязи может исказить данные и привести к «слепоте» робота. Также следует регулярно проверять щетки на наличие намотавшихся волос, которые могут заблокировать мотор.</p>
+
+<p>Одной из частых проблем является падение вакуума. Это может быть вызвано засором в воздуховоде, износом фильтра или повреждением уплотнителей. Если робот стал шумнее и хуже пылесосит, первым делом нужно проверить <em>пылесборник</em> и <strong>HEPA-фильтр</strong>.</p>
+
+<p>Аккумулятор со временем теряет емкость. Если робот стал быстро разряжаться, возможно, потребуется замена батареи. Важно использовать только оригинальные или сертифицированные аккумуляторы, чтобы избежать риска перегрева.</p>
+
+
+
+<details class="faq-item"><summary>Почему робот едет по кругу?|Если робот начинает двигаться по кругу и биться об одну точку, скорее всего, засорился один из датчиков падения или бампера, либо сломался датчик на колесе, из-за чего система некорректно рассчитывает скорость одного из приводов.-->
+
+<blockquote>
+<p>⚠️ Внимание</summary><div class="faq-answer"><p> Не пытайтесь разбирать блок управления или аккумуляторную батарею самостоятельно, так как это может привести к короткому замыканию или повреждению литиевых элементов, что опасно возгоранием.</p>
+</blockquote>
+
+
+
+<h2 id="faq-частые-вопросы-об-устройстве">FAQ: Частые вопросы об устройстве</h2>
+
+<details>
+<summary>Можно ли мыть датчики падения водой?</summary>
+<p>Нет, датчики падения представляют собой оптические модули. Их можно протирать только сухой мягкой тканью или слегка влажной, но без использования химических растворов, чтобы не повредить линзы.</p>
+</details>
+
+<details>
+<summary>Как часто нужно чистить турбину?</summary>
+<p>Рекомендуется проводить полную очистку воздушного канала и турбины раз в 2-3 месяца интенсивной эксплуатации, особенно если у вас есть животные с густой шерстью.</p>
+</details>
+
+<details>
+<summary>Влияет ли тип пола на работу датчиков?</summary>
+<p>Да, на очень темных поверхностях или зеркалах инфракрасные датчики могут работать некорректно, воспринимая их как пропасть. В таких зонах роботу нужно помогать вручную.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот не находит базу?</summary>
+<p>Проверьте, не закрыт ли контакт на базе, и убедитесь, что в радиусе 1 метра нет препятствий. Также очистите контактные группы на самом роботе и базе от окисления.</p>
+</details>
+
+<details>
+<summary>Меняется ли мощность всасывания со временем?</summary>
+<p>Нет, механическая мощность мотора не меняется, но эффективность всасывания падает из-за загрязнения фильтров, щеток и воздуховодов. Регулярная очистка восстанавливает параметры.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение-в-мир-автономной-уборки">Введение в мир автономной уборки</a></li><li><a href="#корпусная-компоновка-и-система-защиты">Корпусная компоновка и система защиты</a></li><li><a href="#система-навигации-и-картографирования">Система навигации и картографирования</a></li><li><a href="#механика-уборки-щетки-и-моторы">Механика уборки: щетки и моторы</a></li><li><a href="#электропитание-и-система-управления">Электропитание и система управления</a></li><li><a href="#таблица-сравнения-компонентов">Таблица сравнения компонентов</a></li><li><a href="#обслуживание-и-типичные-неисправности">Обслуживание и типичные неисправности</a></li><li><a href="#faq-частые-вопросы-об-устройстве">FAQ: Частые вопросы об устройстве</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/i/ib/iboto-roboty-pylesosy-che-proizvodstvo.html" class="related-card">Роботы пылесосы iboto: страна производства, завод и качество сборки</a></li><li><a href="/articles/p/py/pylesos-robot-chto-on-delaet.html" class="related-card">Робот-пылесос: что он делает, как работает и почему нужен</a></li><li><a href="/articles/k/ka/kak-sbrosit-robot-pylesos-tefal-60-do-zavodskikh-nastroek.html" class="related-card">Как сбросить робот-пылесос Tefal 60 до заводских настроек: Полная инструкция</a></li><li><a href="/articles/s/sk/skolko-po-vremeni-zaryazhaetsya-robot-pylesos-mamibot.html" class="related-card">Сколько заряжается робот-пылесос Xiaomi, Roborock, iRobot и Neato</a></li><li><a href="/articles/k/ka/kak-sbrosit-robot-pylesos-xiaomi-k-zavodskim-nastrojkam-g1.html" class="related-card">Как сбросить робот-пылесос Xiaomi G1 к заводским настройкам: Пошаговая инструкция</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/i/ib/iboto-roboty-pylesosy-che-proizvodstvo.html" class="related-bottom-card"><span class="related-bottom-title">Роботы пылесосы iboto: страна производства, завод и качество сборки</span><span class="related-bottom-desc">Узнайте, где производятся роботы-пылесосы iboto, кто реальный завод-изготовитель и из каких комплект</span></a><a href="/articles/p/py/pylesos-robot-chto-on-delaet.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос: что он делает, как работает и почему нужен</span><span class="related-bottom-desc">Подробный разбор функций роботизированного пылесоса: навигация, уборка, обслуживание. Узнайте, как т</span></a><a href="/articles/k/ka/kak-sbrosit-robot-pylesos-tefal-60-do-zavodskikh-nastroek.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить робот-пылесос Tefal 60 до заводских настроек: Полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по перезагрузке и сбросу настроек робота-пылесоса Tefal Clean &amp; Connect 60. Ре</span></a><a href="/articles/s/sk/skolko-po-vremeni-zaryazhaetsya-robot-pylesos-mamibot.html" class="related-bottom-card"><span class="related-bottom-title">Сколько заряжается робот-пылесос Xiaomi, Roborock, iRobot и Neato</span><span class="related-bottom-desc">Время зарядки робот-пылесоса: полные характеристики для популярных моделей. Как сократить цикл, ошиб</span></a><a href="/articles/k/ka/kak-sbrosit-robot-pylesos-xiaomi-k-zavodskim-nastrojkam-g1.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить робот-пылесос Xiaomi G1 к заводским настройкам: Пошаговая инструкция</span><span class="related-bottom-desc">Полное руководство по hard reset и soft reset для Xiaomi Mi Robot Vacuum G1. Устранение ошибок, сбро</span></a><a href="/articles/p/po/po-kakim-kriteriyam-vybirat-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Как выбрать робот-пылесос: 10 главных критериев для идеальной уборки</span><span class="related-bottom-desc">Полный гид по выбору робота-пылесоса: анализ мощности всасывания, навигации, типа щеток и базы самоо</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

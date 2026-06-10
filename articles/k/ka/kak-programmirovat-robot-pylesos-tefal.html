@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как программировать робот-пылесос Tefal: Настройка и управление умной уборкой — SOS-Пылесос</title>
+    <meta name="description" content="Полное руководство по программированию роботов-пылесосов Tefal. Настройка расписания, зон уборки и сценариев через приложение и пульт.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-programmirovat-robot-pylesos-tefal.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как программировать робот-пылесос Tefal: Настройка и управление умной уборкой">
+    <meta property="og:description" content="Полное руководство по программированию роботов-пылесосов Tefal. Настройка расписания, зон уборки и сценариев через приложение и пульт.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как программировать робот-пылесос Tefal: Настройка и управление умной уборкой</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как программировать робот-пылесос Tefal: Настройка и управление умной уборкой</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#подготовка-устройства-и-первоначальная-синхронизация">Подготовка устройства и первоначальная синхронизация</a></li><li><a href="#настройка-базового-расписания-и-таймеров">Настройка базового расписания и таймеров</a></li><li><a href="#создание-виртуальных-зон-и-запретных-участков">Создание виртуальных зон и запретных участков</a></li><li><a href="#управление-через-сценарии-и-интеграция-с-голосовыми-помощниками">Управление через сценарии и интеграция с голосовыми помощниками</a></li><li><a href="#техническое-обслуживание-алгоритмов-и-прошивки">Техническое обслуживание алгоритмов и прошивки</a></li><li><a href="#решение-частых-проблем-с-логикой-движения">Решение частых проблем с логикой движения</a></li><li><a href="#частые-вопросы-пользователей">Частые вопросы пользователей</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2>Введение: Возможности умной уборки от Tefal</br>
+<p>Современные роботы-пылесосы <em>Tefal</em> — это сложные программные устройства, способные не просто ездить по квартире, а выполнять сложные алгоритмы уборки под вашим контролем. Многие пользователи покупают технику, не зная, что за кнопкой «Старт» скрывается целый мир настроек, позволяющий адаптировать работу машины под конкретный график жизни семьи.</p>
+<p>Программирование в данном контексте означает не написание кода вручную, а корректную настройку встроенных сценариев через фирменное приложение или пульт дистанционного управления. Правильная конфигурация позволяет экономить ресурсы аккумулятора и обеспечивать чистоту именно в те часы, когда вас нет дома.</p>
+<p>В этой статье мы разберем пошаговые методы интеграции устройства в умный дом, настройку виртуальных стен и создание индивидуальных маршрутов для моделей серий <em>X-Plorer</em> и <em>Cool Clean</em>.</p>
+
+<h2 id="подготовка-устройства-и-первоначальная-синхронизация">Подготовка устройства и первоначальная синхронизация</h2>
+<p>Перед тем как начать программировать логику работы, необходимо обеспечить стабильное соединение между роботом и вашим смартфоном. Это фундамент, на котором строятся все дальнейшие сценарии. Без успешной синхронизации через Wi-Fi доступ к расширенным функциям будет закрыт.</p>
+<p>Скачайте официальное приложение <code>Tefal Connect</code> (или <code>Smart Life</code> для некоторых старых моделей) из магазина приложений. Убедитесь, что ваш смартфон подключен к сети Wi-Fi <code>2.4 ГГц</code>, так как большинство устройств этого бренда не поддерживают частоту <code>5 ГГц</code> на этапе сопряжения.</p>
+<p>Первый шаг всегда начинается с физического сброса или включения режима сопряжения. Зажмите комбинацию кнопок на корпусе робота, обычно это <code>Питание</code> и <code>Дома</code>, удерживая их до характерного звукового сигнала. В приложении выберите «Добавить устройство» и следуйте инструкциям на экране.</p>
+<blockquote>⚠️ Внимание: Если процесс сопряжения завершается ошибкой, проверьте, не включен ли режим «Авиарежим» на телефоне и не блокирует ли маршрутизатор соединение по MAC-адресу.</blockquote>
+
+<div class="poll-widget" id="poll-96451a0b"><div class="poll-widget-question">📊 Какой тип навигации используется в вашем роботе?</div><div class="poll-widget-option" data-poll="96451a0b" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Лазерная (LDS)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="96451a0b" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Визуальная (vSLAM)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="96451a0b" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскопическая</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="96451a0b" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Случайная траектория</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="настройка-базового-расписания-и-таймеров">Настройка базового расписания и таймеров</h2>
+<p>Одной из самых востребованных функций является возможность задать время автоматического запуска. Вы можете запрограммировать робота на уборку ежедневно в одно и то же время или создать уникальное расписание для разных дней недели.</p>
+<p>Войдите в меню устройства в приложении и найдите раздел <code>Расписание</code> (Schedule). Здесь вы можете установить до нескольких задач на день. Например, утренняя уборка в <code>08:30</code> перед выходом на работу и вечерняя в <code>19:00</code> после возвращения.</p>
+<p>Важно учитывать, что некоторые модели <em>Tefal</em> позволяют настраивать режим уборки для каждого пинка отдельно: «Быстрая уборка» в выходные и «Тщательная уборка» в будни. Это помогает балансировать между чистотой и временем автономной работы.</p>
+<p>Не забывайте про функцию «Не беспокоить». Вы можете указать временные интервалы, когда робот должен игнорировать уведомления или отключать звуковые оповещения, чтобы не будить спящих членов семьи.</p>
+
+<h2 id="создание-виртуальных-зон-и-запретных-участков">Создание виртуальных зон и запретных участков</h2>
+<p>Программирование зон уборки — это ключевой этап, позволяющий разделить пространство квартиры на логические сектора. Для этого используется карта помещения, построенная роботом в процессе первого полного цикла работы. Если модель не имеет камеры, используйте функцию «Виртуальная стена» в приложении.</p>
+<p>Вы можете нарисовать на карте зоны, которые робот должен обходить стороной (например, миски с водой для животных или электрокабеля). Также доступно создание зон, где уборка должна быть максимально тщательной, например, в коридоре или на кухне.</p>
+<p>Для моделей с лазерной навигацией доступен режим <code>Zone Clean</code>. Выберите конкретную комнату на карте, и робот будет убирать только её, игнорируя остальные помещения. Это идеально подходит для ситуаций, когда в одной комнате развели беспорядок.</p>
+<p>В меню настроек карты можно сохранить несколько версий планов этажей, если у вас частный дом или квартира с нестандартной планировкой, где мебель часто переставляется.</p>
+
+<div class="checklist-block"><h4>☑️ Настройка виртуальных стен</h4><label class="check-item"><input type="checkbox"><span>Создать карту помещения</span></label><label class="check-item"><input type="checkbox"><span>Нарисовать запретную зону</span></label><label class="check-item"><input type="checkbox"><span>Сохранить изменения</span></label><label class="check-item"><input type="checkbox"><span>Протестировать обход препятствия</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<blockquote>⚠️ Внимание: Динамические объекты, такие как открытые двери или перемещенная мебель, могут запутать алгоритм навигации. Если робот уходит в «коридор», созданный открытой дверью, временно перекройте проход или создайте виртуальный барьер.</blockquote>
+
+<h2 id="управление-через-сценарии-и-интеграция-с-голосовыми-помощниками">Управление через сценарии и интеграция с голосовыми помощниками</h2>
+<p>Современное программирование подразумевает интеграцию в экосистему умного дома. Роботы <em>Tefal</em> совместимы с платформами Яндекс Алиса, Amazon Alexa и Google Assistant. Это позволяет отдавать голосовые команды без использования смартфона.</p>
+<p>Чтобы активировать голосовое управление, зайдите в настройки приложения, найдите раздел «Сторонние сервисы» и авторизуйтесь в вашей учетной записи голосового ассистента. После привязки вы сможете говорить: «Алиса, попроси робота начать уборку» или «Google, отправь пылесос на базу».</p>
+<p>Более продвинутый уровень программирования — создание автоматизаций. Например, если датчик открытия двери фиксирует приход гостей, а система безопасности сообщает «У меня дома», робот может автоматически отменить уборку, чтобы не шуметь.</p>
+<p>Используйте сценарии «Если... То...» в приложении умного дома (например, IFTTT или встроенные сценарии Яндекса), чтобы связать работу пылесоса с другими устройствами: выключением света или закрытием штор.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Для голосовых помощников на русском языке лучше использовать простые фразы без сложных конструкций, например "Запусти уборку в гостиной", так как сложные команды могут быть не распознаны переводчиком ассистента.</p></div>
+
+<h2 id="техническое-обслуживание-алгоритмов-и-прошивки">Техническое обслуживание алгоритмов и прошивки</h2>
+<p>Работа программных модулей напрямую зависит от актуальности firmware. Производитель регулярно выпускает обновления, которые исправляют ошибки навигации, улучшают алгоритмы объезда препятствий и оптимизируют движение по коврам.</p>
+<p>Проверка обновлений осуществляется автоматически, но вы можете инициировать её вручную. Перейдите в <code>Настройки устройства</code> → <code>О системе</code> → <code>Проверка обновлений</code>. Процесс может занять от 5 до 20 минут, в зависимости от скорости интернета.</p>
+<p>Иногда после обновления прошивки настройки сбрасываются до заводских. Поэтому перед установкой новой версии желательно сделать скриншоты текущих зон и расписания, чтобы быстро восстановить их при необходимости.</p>
+<p>Если робот начал работать некорректно после обновления, попробуйте выполнить «Сброс настроек сети» или полный сброс устройства до заводских параметров в меню приложений.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Модель</th>
+      <th>Тип навигации</th>
+      <th>Поддержка карт</th>
+      <th>Сценарии зон</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Tefal X-Plorer 75</td>
+      <td>Лазерная (LDS)</td>
+      <td>Да, до 3 этажей</td>
+      <td>Полная</td>
+    </tr>
+    <tr>
+      <td>Tefal Cool Clean</td>
+      <td>Гироскопическая</td>
+      <td>Нет (виртуальные стены)</td>
+      <td>Базовая</td>
+    </tr>
+    <tr>
+      <td>Tefal X-Plorer 95</td>
+      <td>VSLAM + LDS</td>
+      <td>Да, с распознаванием объектов</td>
+      <td>Продвинутая</td>
+    </tr>
+    <tr>
+      <td>Tefal Smart 30</td>
+      <td>Случайная</td>
+      <td>Нет</td>
+      <td>Отсутствует</td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="faq-item"><summary>Что делать, если робот потерял карту?</summary><div class="faq-answer"><p>Если робот сбросил карту, его нужно заставить построить её заново. Запустите режим «Полная уборка» на пустой квартире. В процессе движения лазерный сканер или камера будут заново создавать топологическую карту помещения, которую можно сохранить под новым именем.</p></div></details>
+
+<h2 id="решение-частых-проблем-с-логикой-движения">Решение частых проблем с логикой движения</h2>
+<p>Иногда пользователи сталкиваются с ситуацией, когда робот пропускает участки или застревает в одном месте. Это часто связано с неправильной настройкой чувствительности датчиков или загрязнением оптических сенсоров.</p>
+<p>Очистите датчики пыли и гироскопы мягкой безворсовой тканью. Грязь на объективах может привести к тому, что алгоритм интерпретации пространства даст сбой, и робот будет считать стену препятствием там, где её нет.</p>
+<p>Если робот постоянно «забывает», где находится база, проверьте положение зарядной станции. Она должна стоять у стены, на открытой площадке, без препятствий по бокам на расстоянии минимум <code>0.5 метра</code>. Это критично для корректной калибровки.</p>
+<p>В случаях, когда робот игнорирует виртуальные стены, попробуйте обновить приложение или пересоздать зону, так как иногда программные ограничения не обновляются мгновенно на уровне прошивки.</p>
+
+<blockquote>⚠️ Внимание: Если робот начал хаотично ездить и не реагирует на команды, возможно, произошел сбой в гироскопе. В этом случае необходимо выполнить полную калибровку устройства, держа его в горизонтальном положении на ровной поверхности в течение 3-5 минут.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярная очистка сенсоров и своевременное обновление прошивки — главные условия стабильной работы алгоритмов навигации и расписания.</p></div>
+
+<h2 id="частые-вопросы-пользователей">Частые вопросы пользователей</h2>
+<details>
+  <summary>Можно ли программировать робота без смартфона?</summary>
+  <p>Да, базовые функции (старт, пауза, док, расписание) доступны через кнопки на корпусе устройства или через пульт дистанционного управления, входящий в комплект поставки.</p>
+</details>
+<details>
+  <summary>Как быстро робот запоминает новую планировку?</summary>
+  <p>Обычно требуется 2-3 полных цикла уборки. Первая карта может быть схематичной, но после повторного прохождения маршрутов алгоритм уточняет границы и создает точную модель помещения.</p>
+</details>
+<details>
+  <summary>Почему робот не запускается по расписанию?</summary>
+  <p>Проверьте, включено ли расписание в настройках приложения. Убедитесь, что робот находится на зарядной станции и не был переведен в режим «Сон» или отключен от сети.</p>
+</details>
+<details>
+  <summary>Можно ли объединить несколько роботов в одну сеть?</summary>
+  <p>В приложении <em>Tefal Connect</em> можно добавить несколько устройств. Вы сможете управлять ими по отдельности или запускать «Групповую уборку», если у вас несколько этажей или большая квартира.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#подготовка-устройства-и-первоначальная-синхронизация">Подготовка устройства и первоначальная синхронизация</a></li><li><a href="#настройка-базового-расписания-и-таймеров">Настройка базового расписания и таймеров</a></li><li><a href="#создание-виртуальных-зон-и-запретных-участков">Создание виртуальных зон и запретных участков</a></li><li><a href="#управление-через-сценарии-и-интеграция-с-голосовыми-помощниками">Управление через сценарии и интеграция с голосовыми помощниками</a></li><li><a href="#техническое-обслуживание-алгоритмов-и-прошивки">Техническое обслуживание алгоритмов и прошивки</a></li><li><a href="#решение-частых-проблем-с-логикой-движения">Решение частых проблем с логикой движения</a></li><li><a href="#частые-вопросы-пользователей">Частые вопросы пользователей</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/r/ro/robot-pylesos-xiaomi-ne-vidit-telefon-chto-delat.html" class="related-card">Робот-пылесос Xiaomi не видит телефон: лучшие способы решения</a></li><li><a href="/articles/k/ka/kak-izmenit-yazyk-na-robot-pylesos-xiaomi.html" class="related-card">Как изменить язык на робот-пылесосе Xiaomi: Полная инструкция 2026</a></li><li><a href="/articles/c/ch/chto-takoe-marshrutizator-wifi-v-robot-pylesos.html" class="related-card">Что такое маршрутизатор WiFi в робот-пылесосе: роль, настройка и ошибки</a></li><li><a href="/articles/k/ka/kak-zastavit-robota-pylesosa-materitsya.html" class="related-card">Как заставить робота-пылесос материться: мифы, звуки и настройки</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-cherez-telefon.html" class="related-card">Как подключить робот-пылесос к телефону: пошаговая инструкция 2026</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/r/ro/robot-pylesos-xiaomi-ne-vidit-telefon-chto-delat.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос Xiaomi не видит телефон: лучшие способы решения</span><span class="related-bottom-desc">Почему робот-пылесос Xiaomi не видит телефон в приложении Mi Home? Разбираем ошибки Wi-Fi, сброс нас</span></a><a href="/articles/k/ka/kak-izmenit-yazyk-na-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как изменить язык на робот-пылесосе Xiaomi: Полная инструкция 2026</span><span class="related-bottom-desc">Пошаговая инструкция по смене языка на роботах-пылесосах Xiaomi. Решение проблем с китайскими версия</span></a><a href="/articles/c/ch/chto-takoe-marshrutizator-wifi-v-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Что такое маршрутизатор WiFi в робот-пылесосе: роль, настройка и ошибки</span><span class="related-bottom-desc">Разбираем, зачем роботу-пылесосу модуль Wi-Fi, как роутер влияет на управление, почему важен диапазо</span></a><a href="/articles/k/ka/kak-zastavit-robota-pylesosa-materitsya.html" class="related-bottom-card"><span class="related-bottom-title">Как заставить робота-пылесос материться: мифы, звуки и настройки</span><span class="related-bottom-desc">Узнайте, можно ли запрограммировать робота-пылесос на нецензурную лексику. Разбор звуковых модулей, </span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-cherez-telefon.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос к телефону: пошаговая инструкция 2026</span><span class="related-bottom-desc">Полное руководство по настройке Wi-Fi и сопряжению робота-пылесоса со смартфоном. Решаем проблемы с </span></a><a href="/articles/k/ka/kak-dobavit-ozvuchku-v-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить озвучку в робот-пылесос Xiaomi: Настройка и смена голосов</span><span class="related-bottom-desc">Пошаговая инструкция по смене голосовых оповещений в пылесосах Xiaomi. Установка кастомных голосов, </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

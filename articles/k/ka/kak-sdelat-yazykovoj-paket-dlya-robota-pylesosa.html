@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как сделать языковой пакет для робота пылесоса: гайд по смене голоса — SOS-Пылесос</title>
+    <meta name="description" content="Подробная инструкция: как сменить голос и язык на роботе-пылесосе. Методы для Xiaomi, Roborock, iRobot. Риски и тонкости прошивки.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-sdelat-yazykovoj-paket-dlya-robota-pylesosa.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как сделать языковой пакет для робота пылесоса: гайд по смене голоса">
+    <meta property="og:description" content="Подробная инструкция: как сменить голос и язык на роботе-пылесосе. Методы для Xiaomi, Roborock, iRobot. Риски и тонкости прошивки.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как сделать языковой пакет для робота пылесоса: гайд по смене голоса</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Полное руководство по смене языкового пакета робота-пылесоса</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение-в-мир-кастомных-голосов">Введение в мир кастомных голосов</a></li><li><a href="#подготовка-устройства-и-анализ-рисков">Подготовка устройства и анализ рисков</a></li><li><a href="#методы-получения-доступа-к-файловой-системе">Методы получения доступа к файловой системе</a></li><li><a href="#пошаговая-инструкция-установка-кастомного-голоса">Пошаговая инструкция: установка кастомного голоса</a></li><li><a href="#сравнение-методов-и-популярных-решений">Сравнение методов и популярных решений</a></li><li><a href="#устранение-возможных-проблем-и-сбои">Устранение возможных проблем и сбои</a></li><li><a href="#перспективы-и-будущее-кастомизации">Перспективы и будущее кастомизации</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение-в-мир-кастомных-голосов">Введение в мир кастомных голосов</h2>
+
+<p>Многие владельцы умных помощников сталкиваются с ситуацией, когда стандартный голос робота звучит раздражающе или просто не соответствует ожиданиям. Ситуация усугубляется, если устройство куплено на китайском рынке и говорит только на китайском языке, что делает невозможным понимание статусов уборки или ошибок.</p>
+
+<p>К счастью, энтузиасты и разработчики нашли способы обойти ограничения производителей. <strong>Языковой пакет</strong> для робота-пылесоса — это набор аудиофайлов и скриптов, который заменяет стандартные озвучивания на пользовательские. Это не просто смена языка на русский или английский, но и возможность установить голоса любимых персонажей или знаменитостей.</p>
+
+<p>Процесс модификации варьируется в зависимости от бренда и модели устройства. Для некоторых <em>Xiaomi</em> или <em>Roborock</em> это простая процедура через Wi-Fi, тогда как для других требуется прямое вмешательство в файловую систему через USB или UART-кабель. Важно понимать, что вмешательство в прошивку несет определенные риски, но при аккуратном подходе результат того стоит.</p>
+
+<h2 id="подготовка-устройства-и-анализ-рисков">Подготовка устройства и анализ рисков</h2>
+
+<p>Перед тем как приступать к любым манипуляциям, необходимо убедиться в стабильности вашего интернет-соединения и заряде батареи. <strong>Критически важно</strong>, чтобы заряд аккумулятора составлял не менее 80%, так как прерывание процесса записи или замены файлов может привести к «окирпичиванию» устройства.</p>
+
+<p>Вам потребуется компьютер под управлением Windows, macOS или Linux, а также набор утилит для работы с сетью и файлами. Для большинства современных моделей необходим доступ к <code>ADB (Android Debug Bridge)</code>, так как прошивки многих роботов базируются на урезанной версии операционной системы Android.</p>
+
+<p>Необходимо также узнать точную модель вашего робота. <em>Xiaomi Mi Robot Vacuum</em> и <em>Xiaomi S5 Max</em> используют разные методы получения root-прав. Ошибка в определении версии ПО может привести к тому, что новый языковой пакет просто не загрузится или робот перестанет строить карту помещения.</p>
+
+<blockquote>⚠️ Внимание: После установки кастомных языковых пакетов функция автоматического обновления прошивки через официальное приложение может перестать работать корректно. При обновлении системы через официальные каналы кастомные файлы часто перезаписываются на заводские, и ваш голос исчезнет.</blockquote>
+
+<p>Если вы планируете использовать специализированные утилиты для взлома, убедитесь, что они скачаны с проверенных источников. Злоумышленники могут внедрить вредоносный код в инструменты для взлома, который впоследствии передаст данные о вашей домашней сети третьим лицам.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед началом любых действий сделайте полную резервную копию оригинальной прошивки, если ваш инструмент позволяет это сделать. Сохраненный файл прошивки — это ваш единственный шанс вернуть устройство к заводскому состоянию в случае фатальной ошибки.</p></div>
+
+<h2 id="методы-получения-доступа-к-файловой-системе">Методы получения доступа к файловой системе</h2>
+
+<p>Существует два основных пути для доступа к внутренним файлам робота: через <strong>SSH-доступ</strong> (через сеть) и через <strong>UART-подключение</strong> (через контакты на плате). Первый метод является наиболее популярным и безопасным, так как не требует разборки корпуса устройства.</p>
+
+<p>Для активации SSH на многих моделях <em>Xiaomi</em> необходимо использовать эксплойт, который запускается с компьютера. Вам нужно будет ввести IP-адрес роутера и пароль от Wi-Fi в консоль утилиты. После успешной атаки робот откроет порт 22, позволяя вам подключиться к нему как к серверу.</p>
+
+<p>Второй метод, требующий физического доступа к плате, используется, когда программный взлом заблокирован производителем. Вам потребуется разобрать корпус, найти разъем UART на материнской плате и подключить специальный USB-переходник. Это сложный путь, требующий навыков пайки и работы с электроникой.</p>
+
+<p>Если вы выбрали программный метод, вам нужно будет скачать инструмент, соответствующий вашей версии прошивки. Например, для старых версий <code>1.0.8_0014</code> используется один скрипт, а для <code>1.0.8_0022</code> — совершенно другой. Неправильный выбор инструмента приведет к тому, что робот просто перезагрузится и ничего не изменится.</p>
+
+<blockquote>⚠️ Внимание: При использовании метода UART крайне важно не перепутать контакты TX и RX. Неправильное подключение может вызвать короткое замыкание на плате робота, что приведет к необратимому выходу из строя материнской платы.</blockquote>
+
+<details class="faq-item"><summary>Что такое Root-права и зачем они нужны?</summary><div class="faq-answer"><p>Root-права (права суперпользователя) дают вам полный контроль над операционной системой робота. Без них вы не сможете удалить системные файлы, заменить аудиодрайверы или внедрить новые скрипты в процесс загрузки. Это аналог «администратора» в Windows или «суперпользователя» в Linux.</p></div></details>
+
+<div class="poll-widget" id="poll-ef1656fe"><div class="poll-widget-question">📊 Какую модель робота-пылесоса вы планируете модифицировать?</div><div class="poll-widget-option" data-poll="ef1656fe" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Xiaomi / Roborock (Mi Home)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ef1656fe" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">iRobot (Roomba)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ef1656fe" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Ecovacs (Deebot)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ef1656fe" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Dreame</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ef1656fe" data-idx="4" onclick="pbPollVote(this)"><span class="poll-widget-label">Другой бренд</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="пошаговая-инструкция-установка-кастомного-голоса">Пошаговая инструкция: установка кастомного голоса</h2>
+
+<p>Процесс замены языкового пакета обычно начинается с установки кастомного репозитория или запуска скрипта на компьютере. Допустим, вы успешно получили доступ по SSH. Теперь вам нужно загрузить архив с желаемым голосом на компьютер.</p>
+
+<p>Используйте FTP-клиент или команду <code>scp</code> для передачи файлов в директорию робота. Обычно путь к аудиофайлам выглядит как <code>/mnt/udisk/sounds/</code> или <code>/data/voice/</code>. Структура папок может отличаться, поэтому внимательно изучите документацию к вашей конкретной утилите для прошивки.</p>
+
+<p>После загрузки файлов необходимо перезагрузить робота. При запуске новый скрипт должен подхватить измененные файлы и применить их к системе озвучивания. Если вы все сделали правильно, робот приветствует вас на новом языке или новым голосом сразу после старта.</p>
+
+<div class="checklist-block"><h4>☑️ Инструкция по установке языка</h4><label class="check-item"><input type="checkbox"><span>Подключиться к Wi-Fi и узнать IP-адрес</span></label><label class="check-item"><input type="checkbox"><span>Запустить эксплойт для получения Root</span></label><label class="check-item"><input type="checkbox"><span>Загрузить архив с голосом в папку /mnt/udisk/sounds/</span></label><label class="check-item"><input type="checkbox"><span>Перезагрузить устройство и проверить озвучку</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<p>В некоторых случаях требуется ручное изменение конфигурационного файла. Вам нужно будет найти файл <code>config.xml</code> или <code>lang.cfg</code> и заменить в нем строку, отвечающую за текущий язык. Для этого удобно использовать текстовый редактор, поддерживающий работу с удаленными файлами.</p>
+
+<p>Если робот не реагирует на команды после установки, проверьте права доступа к файлам. Система может отказываться читать новые файлы, если они не имеют атрибутов исполняемости. Команда <code>chmod 777 /путь/к/файлу</code> часто решает эту проблему.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Успешная установка языкового пакета подтверждается не только голосовым приветствием, но и корректным озвучиванием всех системных событий, таких как завершение уборки или обнаружение препятствий.</p></div>
+
+<h2 id="сравнение-методов-и-популярных-решений">Сравнение методов и популярных решений</h2>
+
+<p>Разные бренды предлагают разные уровни защиты и возможности для модификации. Ниже приведена таблица, сравнивающая популярные методы для самых распространенных моделей на рынке.</p>
+
+<table>
+<thead>
+<tr>
+<th>Бренд / Модель</th>
+<th>Сложность взлома</th>
+<th>Доступный метод</th>
+<th>Особенности</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xiaomi / Roborock</td>
+<td>Средняя</td>
+<td>SSH через Wi-Fi</td>
+<td>Много готовых голосов в интернете</td>
+</tr>
+<tr>
+<td>iRobot Roomba</td>
+<td>Низкая</td>
+<td>Официальное приложение</td>
+<td>Ограниченный выбор языков в настройках</td>
+</tr>
+<tr>
+<td>Ecovacs Deebot</td>
+<td>Высокая</td>
+<td>UART (пайка)</td>
+<td>Частая смена версий ПО блокирует взлом</td>
+</tr>
+<tr>
+<td>Dreame</td>
+<td>Средняя</td>
+<td>SSH / ADB</td>
+<td>Совместимы с многими пакетами от Xiaomi</td>
+</tr>
+</tbody>
+</table>
+
+<p>Стоит отметить, что <em>Ecovacs</em> часто обновляет свои алгоритмы защиты, что делает процесс получения доступа к файловой системе более трудоемким. В то же время, экосистема <em>Xiaomi</em> имеет огромное сообщество разработчиков, которые постоянно выкладывают новые инструменты.</p>
+
+<p>Для пользователей, не желающих связываться с кодом, существуют упрощенные версии прошивок. Они позволяют менять язык в пару кликов, но могут лишать устройство некоторых функций, таких как построение точной карты или работа с облаком.</p>
+
+<blockquote>⚠️ Внимание: Использование неофициальных утилит может привести к потере гарантии на устройство. Производитель имеет полное право отказать в бесплатном ремонте, если обнаружит следы вмешательства в программное обеспечение.</blockquote>
+
+<h2 id="устранение-возможных-проблем-и-сбои">Устранение возможных проблем и сбои</h2>
+
+<p>Иногда после установки нового пакета робот может начать вести себя непредсказуемо. Например, он может перестать определять режимы уборки или выдавать ошибки при попытке вернуться на базу. Это чаще всего связано с несовместимостью версий файлов.</p>
+
+<p>Если робот «завис» на логотипе, попробуйте загрузить его в режим Recovery. Для этого нужно зажать определенную комбинацию кнопок при включении. В этом режиме можно попытаться переустановить оригинальную прошивку, если у вас есть ее файл.</p>
+
+<p>Другая частая проблема — отсутствие звуков при определенных событиях. Это значит, что в архиве с голосом не хватает конкретного аудиофайла. Вам придется найти оригинальный файл с этого события на интернет-ресурсах и заменить им отсутствующий в вашей папке.</p>
+
+<p>Некоторые модели могут терять связь с приложением после смены языка. В этом случае необходимо полностью сбросить настройки сети в меню робота и подключить его к Wi-Fi заново, как будто это новое устройство. Это часто решает проблемы с синхронизацией.</p>
+
+<p>Если ничего не помогает, всегда есть вариант отката к заводским настройкам. Для этого часто достаточно удерживать кнопку сброса на корпусе в течение нескольких секунд. Однако помните, что это удалит все карты и настройки, включая ваш кастомный голос.</p>
+
+<h2 id="перспективы-и-будущее-кастомизации">Перспективы и будущее кастомизации</h2>
+
+<p>Разработчики роботов-пылесосов постепенно закрывают уязвимости в программном обеспечении. Это делает процесс взлома все более сложным для рядового пользователя. Однако сообщество энтузиастов не отстает и создает новые методы обхода блокировок.</p>
+
+<p>В будущем мы можем ожидать появления официальных инструментов от производителей, позволяющих загружать свои голоса через магазин приложений. Пока этого не произошло, ручная модификация остается единственным способом получить уникальный опыт взаимодействия с устройством.</p>
+
+<p>Технологии голосового синтеза становятся все лучше, и в перспективе роботы могут сами генерировать речь на лету, не требуя загрузки огромных массивов аудиофайлов. Это упростит процесс смены языка и сделает его более гибким.</p>
+
+<details class="faq-item"><summary>Можно ли вернуть заводскую прошивку?</summary><div class="faq-answer"><p>Да, почти всегда можно. Для этого нужно найти оригинальный образ прошивки (firmware) для вашей модели и прошить его через режим восстановления или специальные утилиты, если они поддерживают запись.</p></div></details>
+
+<h2 id="часто-задаваемые-вопросы">Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Сработает ли смена языка, если я просто куплю китайскую версию робота?</summary>
+<p>Нет, само по себе наличие китайской версии не дает возможности смены языка через настройки. Вам придется использовать методы прошивки, описанные в этой статье, так как в официальных меню таких моделей обычно отсутствует выбор других языков.</p>
+</details>
+
+<details>
+<summary>Можно ли поставить голос конкретного человека?</summary>
+<p>Да, это возможно, если вы найдете или создадите набор аудиофайлов с нужными фразами. Главное — сохранить структуру имен файлов и формат (обычно MP3 или WAV), чтобы система их распознала.</p>
+</details>
+
+<details>
+<summary>Потеряю ли я гарантию при установке кастомного голоса?</summary>
+<p>Официально — да. Любое вмешательство в ПО считается нарушением условий гарантии. Если робот сломается по механической причине (например, упал с дивана), сервис может отказать в ремонте, увидев следы вскрытия или измененную прошивку.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот перестал работать после установки пакета?</summary>
+<p>Не паникуйте. Попробуйте выполнить полный сброс до заводских настроек. Если это не помогло, вам потребуется оригинальная прошивка и кабель для перепрошивки через режим Recovery.</p>
+</details>
+
+<details>
+<summary>Нужен ли смартфон для установки языка?</summary>
+<p>Основной процесс установки кастомного языка требует компьютера. Смартфон может понадобиться только для первоначального подключения робота к Wi-Fi и проверки его работоспособности в приложении.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение-в-мир-кастомных-голосов">Введение в мир кастомных голосов</a></li><li><a href="#подготовка-устройства-и-анализ-рисков">Подготовка устройства и анализ рисков</a></li><li><a href="#методы-получения-доступа-к-файловой-системе">Методы получения доступа к файловой системе</a></li><li><a href="#пошаговая-инструкция-установка-кастомного-голоса">Пошаговая инструкция: установка кастомного голоса</a></li><li><a href="#сравнение-методов-и-популярных-решений">Сравнение методов и популярных решений</a></li><li><a href="#устранение-возможных-проблем-и-сбои">Устранение возможных проблем и сбои</a></li><li><a href="#перспективы-и-будущее-кастомизации">Перспективы и будущее кастомизации</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-podklyuchit-alisu-k-robotu-pylesosu-tefal-75.html" class="related-card">Как подключить Яндекс Алису к роботу-пылесосу Tefal 75: Полная инструкция</a></li><li><a href="/articles/k/ka/kak-vklyuchit-robot-pylesos-xiaomi-pervyj-raz-s-knopki-bez-prilozheniya.html" class="related-card">Запуск робота-пылесоса Xiaomi без смартфона: кнопкой и голосом</a></li><li><a href="/articles/k/ka/kak-sdelat-pylesos-gromche-ozvuchku-robot.html" class="related-card">Почему робот-пылесос стал тише и как вернуть стандартную громкость</a></li><li><a href="/articles/k/ka/kak-nauchit-rugatsya-robot-pylesos-xiaomi-vacuum-mop.html" class="related-card">Как заставить робот-пылесос Xiaomi ругаться: гайд по голосовым пакетам</a></li><li><a href="/articles/k/ka/kak-dobavit-pylesos-v-prilozhenie.html" class="related-card">Как добавить пылесос в приложение: полная инструкция по подключению</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-podklyuchit-alisu-k-robotu-pylesosu-tefal-75.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить Яндекс Алису к роботу-пылесосу Tefal 75: Полная инструкция</span><span class="related-bottom-desc">Пошаговая настройка умного дома: привязка модели Tefal 75 к голосовому ассистенту Алиса. Решение час</span></a><a href="/articles/k/ka/kak-vklyuchit-robot-pylesos-xiaomi-pervyj-raz-s-knopki-bez-prilozheniya.html" class="related-bottom-card"><span class="related-bottom-title">Запуск робота-пылесоса Xiaomi без смартфона: кнопкой и голосом</span><span class="related-bottom-desc">Пошаговая инструкция: как включить робот-пылесос Xiaomi Mi Home, Robot Vacuum Mop и другие модели то</span></a><a href="/articles/k/ka/kak-sdelat-pylesos-gromche-ozvuchku-robot.html" class="related-bottom-card"><span class="related-bottom-title">Почему робот-пылесос стал тише и как вернуть стандартную громкость</span><span class="related-bottom-desc">Разбираем причины снижения громкости озвучки у пылесосов и даем рабочие способы настройки звука чере</span></a><a href="/articles/k/ka/kak-nauchit-rugatsya-robot-pylesos-xiaomi-vacuum-mop.html" class="related-bottom-card"><span class="related-bottom-title">Как заставить робот-пылесос Xiaomi ругаться: гайд по голосовым пакетам</span><span class="related-bottom-desc">Инструкция по установке кастомных голосовых пакетов для Xiaomi Robot Vacuum. Меняем стандартные звук</span></a><a href="/articles/k/ka/kak-dobavit-pylesos-v-prilozhenie.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить пылесос в приложение: полная инструкция по подключению</span><span class="related-bottom-desc">Пошаговое руководство: как подключить робот-пылесос к смартфону, настроить Wi-Fi и объединить устрой</span></a><a href="/articles/p/po/pochemu-ne-podklyuchaetsya-pylesos-xiaomi-k-telefonu.html" class="related-bottom-card"><span class="related-bottom-title">Почему не подключается пылесос Xiaomi к телефону: основные причины и решения</span><span class="related-bottom-desc">Пылесос Xiaomi не соединяется с приложением Mi Home? Узнайте реальные причины отказа подключения, на</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

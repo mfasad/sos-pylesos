@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как работает робот-пылесос с влажной уборкой: принцип и алгоритм — SOS-Пылесос</title>
+    <meta name="description" content="Подробный разбор технологий влажной уборки роботами. Принцип работы ультразвуковых дисков, карт и датчиков. Как выбрать модель для идеальной чистоты пола.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/u/um/umnyj-pylesos-robot-s-vlazhnoj-uborkoj-kak-rabotaet.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как работает робот-пылесос с влажной уборкой: принцип и алгоритм">
+    <meta property="og:description" content="Подробный разбор технологий влажной уборки роботами. Принцип работы ультразвуковых дисков, карт и датчиков. Как выбрать модель для идеальной чистоты пола.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как работает робот-пылесос с влажной уборкой: принцип и алгоритм</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Принцип работы робота-пылесоса с функцией влажной уборки</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#механизмы-подачи-воды-и-типы-швабр">Механизмы подачи воды и типы швабр</a></li><li><a href="#навигация-и-алгоритмы-движения-по-помещению">Навигация и алгоритмы движения по помещению</a></li><li><a href="#интеграция-с-функцией-сухой-уборки">Интеграция с функцией сухой уборки</a></li><li><a href="#умные-базы-и-автоматическое-обслуживание">Умные базы и автоматическое обслуживание</a></li><li><a href="#сравнительная-характеристика-технологий-влажной-уборки">Сравнительная характеристика технологий влажной уборки</a></li><li><a href="#типичные-проблемы-и-их-решение">Типичные проблемы и их решение</a></li><li><a href="#перспективы-развития-технологий">Перспективы развития технологий</a></li><li><a href="#итоговые-рекомендации-по-эксплуатации">Итоговые рекомендации по эксплуатации</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Современная клининговая техника перестала быть просто автоматизированным «шваброй» и превратилась в сложного интеллектуального уборщика, способного решать задачи разной сложности. Роботы-пылесосы с функцией влажной уборки теперь являются стандартом для большинства домохозяйств, стремящихся к поддержанию безупречной чистоты без регулярного участия человека. Понимание того, <strong>как именно работает</strong> этот механизм, поможет вам эффективнее эксплуатировать устройство и избежать распространенных ошибок при обслуживании.</p>
+
+<p>В основе работы таких агрегатов лежит комбинация механического воздействия, алгоритмов навигации и точного дозирования жидкостей. Вы можете ожидать, что устройство просто проедет по полу с мокрой тряпкой, но реальность значительно сложнее и технологичнее. Современные <em>умные модели</em> анализируют тип покрытия, уровень загрязнения и даже структуру швов, чтобы адаптировать процесс очистки в реальном времени.</p>
+
+<p>В этой статье мы разберем технические нюансы работы систем подачи воды, алгоритмы построения карт и особенности взаимодействия с различными типами напольных покрытий. Вы узнаете, почему одни устройства эффективнее других и на какие параметры стоит обращать внимание при выборе своего помощника.</p>
+
+<h2 id="механизмы-подачи-воды-и-типы-швабр">Механизмы подачи воды и типы швабр</h2>
+
+<p>Фундаментальное различие между моделями заключается в способе доставки воды к поверхности пола. Ранние устройства использовали примитивную систему: резервуар с водой и пористую ткань, которая медленно отсыревала по мере движения. Сегодня же производители предлагают более совершенные решения, такие как <strong>ультразвуковые вибрирующие диски</strong> или системы с <strong>электронным клапаном</strong>.</p>
+
+<p>Система с вибрацией (виброшвабра) imitate движения ручной швабры, совершая тысячи микроударов в минуту. Это позволяет не просто смачивать, а фактически оттирать засохшие пятна и въевшуюся грязь. В то время как статические модели просто переносят влагу, <em>вибрационные платформы</em> создают активное механическое воздействие, необходимое для качественной уборки сложных загрязнений.</p>
+
+<p>Для контроля количества воды используются <strong>насосы с электронным управлением</strong>, которые подают жидкость строго дозированными порциями. Это критически важно, чтобы избежать размачивания паркета или ковролина. Умная система регулирует интенсивность подачи в зависимости от скорости движения робота и выбранного режима очистки.</p>
+
+<blockquote>
+<p>⚠️ <strong>Внимание:</strong> Никогда не используйте для влажной уборки в роботах-пылесосах воду с добавлением хлора, агрессивных моющих средств или эфирных масел. Это может повредить уплотнители резервуара и электронные компоненты, а также вызвать аллергические реакции. Используйте только специальные моющие растворы, рекомендованные производителем.</p>
+</blockquote>
+
+<div class="poll-widget" id="poll-66489ffc"><div class="poll-widget-question">📊 Какой тип влажной уборки вы используете?</div><div class="poll-widget-option" data-poll="66489ffc" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Статическая тряпка</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="66489ffc" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Виброшвабра</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="66489ffc" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Вращающиеся диски</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="66489ffc" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Только сухая уборка</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="навигация-и-алгоритмы-движения-по-помещению">Навигация и алгоритмы движения по помещению</h2>
+
+<p>Эффективность влажной уборки напрямую зависит от того, насколько точно робот знает геометрию помещения. Современные устройства строят <strong>карты помещений</strong> с помощью лазерных дальномеров (Lidar) или визуальных камер (VSLAM). Эти технологии позволяют роботу расстановку мебели и избегать препятствий, создавая виртуальную модель комнаты.</p>
+
+<p>При переходе к влажной уборке алгоритм меняет траекторию. Вместо хаотичного движения или простого движения «змейкой» от края к краю, робот начинает двигаться по строго заданным <strong>зигзагообразным паттернам</strong> или спиральным линиям. Это обеспечивает отсутствие непройденных зон и двойную обработку самых загрязненных участков.</p>
+
+<p>Система также учитывает <strong>зоны ограничения</strong>, которые пользователь может задать через приложение. Если вы не хотите, чтобы робот намочил ковер, вы можете установить виртуальную стену или запретить вход в определенную зону. В таких случаях устройство автоматически отключает подачу воды при приближении к границе.</p>
+
+<p>Особое внимание уделяется углам и стыкам стен. Продвинутые модели используют сенсоры для обнаружения углов и совершают дополнительные проходы для качественной уборки «мертвых зон», куда обычно сложно добраться вручную.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка навигации перед уборкой</h4><label class="check-item"><input type="checkbox"><span>Очистить пол от проводов</span></label><label class="check-item"><input type="checkbox"><span>Убрать мелкие предметы</span></label><label class="check-item"><input type="checkbox"><span>Проверить заряд батареи</span></label><label class="check-item"><input type="checkbox"><span>Включить режим уборки</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="интеграция-с-функцией-сухой-уборки">Интеграция с функцией сухой уборки</h2>
+
+<p>Большинство современных моделей выполнят комплексную очистку, совмещая сухую и влажную уборку в одном цикле. Сначала робот проходит по помещению, собирая крупный мусор, пыль и шерсть животных с помощью основного щётки и боковых метелок. Это необходимо, чтобы prevent намачивание грязи и образования трудноудаляемых комков.</p>
+
+<p>После завершения этапа сухой уборки робот переходит к влажной фазе. В этот момент он либо перестает использовать основной пылесос (если это отдельный режим), либо снижает мощность всасывания, чтобы не засасывать влагу обратно в контейнер. Некоторые продвинутые <em>роботы-мойщики</em> имеют отдельный резервуар для чистой и грязной воды, что позволяет им мыть пол как шваброй, постоянно обновляя чистящую поверхность.</p>
+
+<p>Критически важным является момент подъема швабры. Если робот с влажной уборкой обнаруживает ковер с высоким ворсом, он должен <strong>автоматически поднять швабру</strong> на несколько миллиметров или сантиметров, чтобы не намочить ворс. Это реализуется через датчики давления или оптические сенсоры высоты.</p>
+
+<blockquote>
+<p>⚠️ <strong>Внимание:</strong> Если ваш робот не оборудован системой автоматического подъема швабры, обязательно снимайте мокрую салфетку перед запуском уборки на коврах. Оставив её включенной, вы рискуете испортить ковер и вызвать образование плесени и неприятного запаха.</p>
+</blockquote>
+
+<details class="faq-item"><summary>Как работает система двойного резервуара?</summary><div class="faq-answer"><p>В продвинутых моделях есть два бака: один для чистой воды с моющим средством, второй для сбора грязной воды. Робот моет пол, а затем всасывает грязную воду, оставляя поверхность сухой и чистой. Это аналогично работе швабры с ведром, но в автоматическом режиме.</p></div></details>
+
+<h2 id="умные-базы-и-автоматическое-обслуживание">Умные базы и автоматическое обслуживание</h2>
+
+<p>Технологический скачок в области роботов-пылесосов связан с появлением станций автоматической очистки. Эти базы позволяют устройству не просто собирать мусор, но и полностью обслуживать себя. В контексте влажной уборки такие станции способны <strong>автоматически промывать швабры</strong> горячей водой, сушить их и заполнять резервуар чистой жидкостью.</p>
+
+<p>Процесс выглядит следующим образом: робот завершает цикл уборки и возвращается на базу. Станция сливает грязную воду и подает чистую, затем вращает диски или швабру, промывая их под напором. После этого включается функция <strong>горячей сушки</strong>, предотвращающая появление плесени и затхлого запаха на салфетках.</p>
+
+<p>Некоторые модели даже автоматически пополняют резервуар для чистой воды и опорожняют контейнер для пыли. Это превращает процесс уборки в полностью автономный, где пользователю нужно лишь раз в несколько дней (или даже недель) менять воду и выливать грязь из бака станции.</p>
+
+<p>Важно отметить, что базы с функцией мойки швабр требуют регулярного ухода: очистки сливных фильтров и дезинфекции баков, чтобы избежать размножения бактерий в застойной воде.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>База автоматической очистки швабр избавляет от необходимости вручную стирать салфетки и снижает риск появления неприятных запахов в доме.</p></div>
+
+<h2 id="сравнительная-характеристика-технологий-влажной-уборки">Сравнительная характеристика технологий влажной уборки</h2>
+
+<p>Для наглядного понимания различий в эффективности различных технологий, рассмотрим их основные характеристики. Выбор зависит от типа ваших напольных покрытий и уровня загрязнения.</p>
+
+<table>
+<thead>
+<tr>
+<th>Технология</th>
+<th>Механизм действия</th>
+<th>Эффективность</th>
+<th>Подходит для</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Статическая тряпка</td>
+<td>Трение о пол при движении</td>
+<td>Низкая (удаление пыли)</td>
+<td>Линолеум, плитка</td>
+</tr>
+<tr>
+<td>Виброшвабра</td>
+<td>Высокочастотная вибрация</td>
+<td>Средняя (удаление пятен)</td>
+<td>Ламинат, керамогранит</td>
+</tr>
+<tr>
+<td>Вращающиеся диски</td>
+<td>Активное трение вращением</td>
+<td>Высокая (глубокая чистка)</td>
+<td>Плитка, камень</td>
+</tr>
+<tr>
+<td>Двойной резервуар</td>
+<td>Подача и всасывание воды</td>
+<td>Максимальная (мытье)</td>
+<td>Все типы твердых полов</td>
+</tr>
+</tbody>
+</table>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед первым запуском влажной уборки обязательно протестируйте скорость подачи воды на незаметном участке пола, чтобы убедиться, что поверхность не размокает слишком сильно.</p></div>
+
+<h2 id="типичные-проблемы-и-их-решение">Типичные проблемы и их решение</h2>
+
+<p>Несмотря на высокую степень автоматизации, пользователи могут сталкиваться с рядом проблем при эксплуатации. Одной из самых частых является <strong>образованние разводов</strong> на полу. Это происходит, если тряпка слишком мокрая или если робот движется слишком медленно, не успевая высыхать. Решение — уменьшить интенсивность подачи воды в настройках приложения.</p>
+
+<p>Другая распространенная проблема — застревание швабры под мебелью. Если робот имеет низкую посадку, он может не пройти под диваном с мокрой тряпкой, так как она упирается в ножку мебели. В таких случаях необходимо либо вручную поднять швабру, либо настроить режим «только сухая уборка» для зон под мебелью.</p>
+
+<p>Также стоит учитывать <strong>износ расходных материалов</strong>. Салфетки и тряпки со временем теряют свои впитывающие свойства и начинают оставлять ворс на полу. Регулярная замена и стирка салфеток обязательны для поддержания качества уборки.</p>
+
+<blockquote>
+<p>⚠️ <strong>Внимание:</strong> Если робот оставляет лужицы воды, немедленно прекратите использование и проверьте герметичность резервуара. Утечка может повредить напольное покрытие, особенно если это дорогой паркет или ламинат.</p>
+</blockquote>
+
+<h2 id="перспективы-развития-технологий">Перспективы развития технологий</h2>
+
+<p>Инженеры постоянно работают над совершенствованием алгоритмов и механики. В ближайшем будущем мы можем ожидать появления роботов с <strong>распознаванием типов пятен</strong> с помощью камер и ИИ. Это позволит устройству определять, где пролита соков, а где просто пыль, и автоматически менять интенсивность уборки и количество моющего средства.</p>
+
+<p>Также развиваются технологии <strong>биоразлагаемых салфеток</strong> и экологичных моющих средств, которые полностью разлагаются без вреда для окружающей среды. Интеграция с системами «умный дом» позволит запускать уборку в зависимости от качества воздуха в помещении, определяемого датчиками.</p>
+
+<p> Модель, выбранная сегодня, может устареть через пару лет, поэтому при покупке стоит обращать внимание на возможность получения обновлений программного обеспечения.</p>
+
+<details class="faq-item"><summary>Что такое ИИ-навигация в пылесосах?</summary><div class="faq-answer"><p>Это система, которая с помощью нейросетей распознает объекты на полу (обувь, кабели, игрушки) и обучается их объезжать, запоминая расположение предметов. Это делает уборку более безопасной и эффективной.</p></div></details>
+
+<h2 id="итоговые-рекомендации-по-эксплуатации">Итоговые рекомендации по эксплуатации</h2>
+
+<p>Для обеспечения долгой службы и эффективной работы вашего робота-пылесоса с влажной уборкой важно соблюдать несколько простых правил. Регулярно очищайте датчики и колеса от пыли и ворса, чтобы устройство не теряло ориентацию в пространстве. Своевременно меняйте фильтры и промывайте резервуары, предотвращая размножение бактерий.</p>
+
+<p>Используйте только качественную воду и специализированные моющие средства. Вода из-под крана может содержать примеси, которые засоряют тонкие каналы подачи жидкости. <strong>Фильтрованная вода</strong> — лучший выбор для продления срока службы насоса.</p>
+
+<p>Наконец, не забывайте про регулярное обновление программного обеспечения. Производители часто выпускают патчи, которые улучшают алгоритмы навигации, оптимизируют расход энергии и исправляют ошибки в системе управления. Следите за обновлениями в приложении вашего устройства.</p>
+
+<details>
+<summary>Как часто нужно мыть резервуар для воды?</summary>
+<p>Резервуар для чистой и грязной воды следует мыть после каждой уборки или, как минимум, раз в 2-3 дня. Застоявшаяся вода может стать источником неприятного запаха и бактерий, которые потом будут разноситься по полу.</p>
+</details>
+
+<details>
+<summary>Можно ли использовать обычную швабру вместо робот-салфетки?</summary>
+<p>Нет, использовать обычную швабру на роботе нельзя. Она не закреплена должным образом, может соскользнуть и привести к поломке механизма или загрязнению ковров. Используйте только официальные салфетки или совместимые моющие комплекты.</p>
+</details>
+
+<details>
+<summary>Почему робот не убирает влагу полностью?</summary>
+<p>Роботы с влажной уборкой предназначены для поддержания чистоты, а не для глубокого мытья пола. Они не могут полностью высушить поверхность, как это делает швабра с выжиманием. После уборки рекомендуется проветрить помещение для полного высыхания.</p>
+</details>
+
+<details>
+<summary>Как защитить датчики от влаги?</summary>
+<p>Избегайте попадания воды на нижнюю часть корпуса робота, где расположены оптические датчики и колеса. При очистке корпуса используйте слегка влажную ткань, но не допускайте прямого контакта с электроникой.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#механизмы-подачи-воды-и-типы-швабр">Механизмы подачи воды и типы швабр</a></li><li><a href="#навигация-и-алгоритмы-движения-по-помещению">Навигация и алгоритмы движения по помещению</a></li><li><a href="#интеграция-с-функцией-сухой-уборки">Интеграция с функцией сухой уборки</a></li><li><a href="#умные-базы-и-автоматическое-обслуживание">Умные базы и автоматическое обслуживание</a></li><li><a href="#сравнительная-характеристика-технологий-влажной-уборки">Сравнительная характеристика технологий влажной уборки</a></li><li><a href="#типичные-проблемы-и-их-решение">Типичные проблемы и их решение</a></li><li><a href="#перспективы-развития-технологий">Перспективы развития технологий</a></li><li><a href="#итоговые-рекомендации-по-эксплуатации">Итоговые рекомендации по эксплуатации</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-nazvat-robot-pylesos-prikolno-otzyvy.html" class="related-card">Как назвать робот-пылесос прикольно: отзывы, идеи и советы владельцев</a></li><li><a href="/articles/o/og/ogranichitel-zony-uborki-u-pylesosa-eto-chto-takoe.html" class="related-card">Ограничитель зоны уборки у пылесоса: что это и как настроить</a></li><li><a href="/articles/u/ub/ubedites-chto-vodnyj-rezervuar-ustanovlen-robot-pylesos-govorit-oshibka-chto.html" class="related-card">Ошибка «Убедитесь, что водный резервуар установлен»: исправление и причины</a></li><li><a href="/articles/k/ka/kakoj-xiaomi-pylesos-kupit.html" class="related-card">Какой пылесос Xiaomi купить в 2026 году: рейтинг и выбор модели</a></li><li><a href="/articles/k/ka/kak-zapustit-robot-pylesos-tefal-explorer-series-20.html" class="related-card">Запуск робота-пылесоса Tefal Explorer Series 20: Пошаговая инструкция</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-nazvat-robot-pylesos-prikolno-otzyvy.html" class="related-bottom-card"><span class="related-bottom-title">Как назвать робот-пылесос прикольно: отзывы, идеи и советы владельцев</span><span class="related-bottom-desc">Ищете креативное имя для своего помощника? Читаем реальные отзывы владельцев, выбираем смешные и умн</span></a><a href="/articles/o/og/ogranichitel-zony-uborki-u-pylesosa-eto-chto-takoe.html" class="related-bottom-card"><span class="related-bottom-title">Ограничитель зоны уборки у пылесоса: что это и как настроить</span><span class="related-bottom-desc">Подробный разбор функции ограничителя зоны уборки в робот-пылесосах. Узнайте, как работают виртуальн</span></a><a href="/articles/u/ub/ubedites-chto-vodnyj-rezervuar-ustanovlen-robot-pylesos-govorit-oshibka-chto.html" class="related-bottom-card"><span class="related-bottom-title">Ошибка «Убедитесь, что водный резервуар установлен»: исправление и причины</span><span class="related-bottom-desc">Почему робот-пылесос выдает ошибку о резервуаре? Полное руководство по диагностике, чистке контактов</span></a><a href="/articles/k/ka/kakoj-xiaomi-pylesos-kupit.html" class="related-bottom-card"><span class="related-bottom-title">Какой пылесос Xiaomi купить в 2026 году: рейтинг и выбор модели</span><span class="related-bottom-desc">Полный гид по выбору робота-пылесоса Xiaomi. Сравнение моделей, анализ мощности всасывания, навигаци</span></a><a href="/articles/k/ka/kak-zapustit-robot-pylesos-tefal-explorer-series-20.html" class="related-bottom-card"><span class="related-bottom-title">Запуск робота-пылесоса Tefal Explorer Series 20: Пошаговая инструкция</span><span class="related-bottom-desc">Подробное руководство по первому запуску и настройке Tefal Explorer Series 20. Подключение к Wi-Fi, </span></a><a href="/articles/k/ka/kakie-roboty-pylesosy-samye-luchshie-otzyvy-pokupatelej-2021.html" class="related-bottom-card"><span class="related-bottom-title">Лучшие роботы-пылесосы 2021: отзывы покупателей и рейтинг</span><span class="related-bottom-desc">Обзор топ моделей роботов-пылесосов 2021 года. Реальные отзывы владельцев, сравнение навигации, мощн</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

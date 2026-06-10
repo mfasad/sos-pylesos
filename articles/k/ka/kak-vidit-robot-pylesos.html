@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как видит робот-пылесос: навигация, сенсоры и картостроение — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем, как робот-пылесос ориентируется в пространстве: лидары, камеры, датчики столкновений и алгоритмы SLAM для идеальной уборки.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-vidit-robot-pylesos.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как видит робот-пылесос: навигация, сенсоры и картостроение">
+    <meta property="og:description" content="Разбираем, как робот-пылесос ориентируется в пространстве: лидары, камеры, датчики столкновений и алгоритмы SLAM для идеальной уборки.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как видит робот-пылесос: навигация, сенсоры и картостроение</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как видит робот-пылесос: от сенсоров до искусственного интеллекта</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#эволюция-навигации-от-случайного-движения-к-искусственному-интеллекту">Эволюция навигации: от случайного движения к искусственному интеллекту</a></li><li><a href="#лазерный-дальномер-lds-глаз-робота-на-крыше">Лазерный дальномер (LDS) — «глаз» робота на крыше</a></li><li><a href="#оптические-камеры-и-распознавание-объектов">Оптические камеры и распознавание объектов</a></li><li><a href="#датчики-высоты-и-умные-колеса">Датчики высоты и «умные» колеса</a></li><li><a href="#таблица-сравнения-технологий-навигации">Таблица сравнения технологий навигации</a></li><li><a href="#проблемы-восприятия-когда-робот-слепнет">Проблемы восприятия: когда робот «слепнет»</a></li><li><a href="#будущее-восприятия-нейросети-и-3d-сканирование">Будущее восприятия: нейросети и 3D-сканирование</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Представьте, что вы просыпаетесь утром, а ваша квартира уже чистая, но вы не знаете, как именно этот процесс происходил. Ваш <em>робот-пылесос</em> бесшумно проехал по комнатам, объехал игрушки ребенка, не застрял под диваном и нашел свою базу для зарядки. За этой магией стоит сложнейшая система восприятия мира, которая кардинально отличается от человеческого зрения. Вместо глаз и мозга устройство использует набор <strong>оптических сенсоров</strong>, лазерных дальномеров и интеллектуальных алгоритмов, чтобы строить карту помещения в реальном времени.</p>
+
+<p>Многие пользователи ошибочно полагают, что робот просто едет туда, куда указывает команда, или реагирует только на столкновения. На самом деле современные модели обладают способностью «видеть» препятствия до физического контакта с ними, распознавать текстуру пола и даже отличать кабели от ковра. Понимание того, как <strong>машинное зрение</strong> обрабатывает данные с датчиков, поможет вам правильно расставить мебель и избежать частых проблем с навигацией.</p>
+
+<h2 id="эволюция-навигации-от-случайного-движения-к-искусственному-интеллекту">Эволюция навигации: от случайного движения к искусственному интеллекту</h2>
+
+<p>В ранних моделях пылесосов не было никакой системы «зрения» в привычном понимании. Они двигались по принципу «случайного блуждания», меняя направление только после удара о стену или препятствие. Такой подход был крайне неэффективным, так как устройство часто пропускало участки пола и тратило время на повторную уборку одних и тех же зон. С появлением <strong>умных систем навигации</strong> всё кардинально изменилось, и роботы научились строить карты.</p>
+
+<p>Сегодня даже бюджетные модели оснащаются базовыми гироскопами и акселерометрами, которые позволяют устройству понимать свое положение в пространстве. Однако для полноценного «зрения» требуются более сложные датчики. Именно они превращают простой механизм в интеллектуального помощника, способного запоминать планировку квартиры и адаптироваться к изменениям в интерьере.</p>
+
+<p>Развитие технологий привело к появлению гибридных систем, объединяющих данные с нескольких типов сенсоров. Это позволяет роботу не просто «видеть» стены, но и понимать объем объектов, их форму и даже материал. Например, система может отличить ножку стула от мягкого дивана и выбрать оптимальную тактику объезда. <strong>Алгоритмы SLAM</strong> (Simultaneous Localization and Mapping) лежат в основе этого процесса, обеспечивая одновременную локализацию и картографирование.</p>
+
+<h2 id="лазерный-дальномер-lds-глаз-робота-на-крыше">Лазерный дальномер (LDS) — «глаз» робота на крыше</h2>
+
+<p>Самым узнаваемым элементом большинства продвинутых моделей является вращающаяся «башня» на верхней панели корпуса. Внутри этого устройства спрятан лазерный дальномер, или <strong>LDS (Laser Distance Sensor)</strong>. Это основной инструмент, с помощью которого робот сканирует окружение, измеряя расстояние до стен и объектов с высокой точностью.</p>
+
+<p>Работа лазерного датчика основана на простой физике: он испускает луч света, который отражается от препятствия и возвращается к приемнику. Измеряя время прохождения луча, вычислительный блок определяет расстояние до объекта. Вращаясь со скоростью до нескольких оборотов в секунду, <em>LDS</em> создает плотное облако точек, формируя детальную карту комнаты. Именно эта технология позволяет строить <strong>точные векторные карты</strong> помещения.</p>
+
+<p>Преимущество лазерного сканирования заключается в его независимости от освещения. Робот с LDS одинаково эффективно работает как в яркий солнечный день, так и в полной темноте. Луч не искажается от теней или бликов, что делает его самым надежным инструментом для построения геометрии помещения. Однако у этой технологии есть свои нюансы, которые стоит учитывать при расстановке мебели.</p>
+
+<blockquote>⚠️ Внимание: Не закрывайте вращающуюся башню LDS декоративными колпаками или тканью. Это полностью нарушит работу навигации, и робот перестанет видеть окружающий мир, превратившись в хаотично движущийся механизм.</blockquote>
+
+<h2 id="оптические-камеры-и-распознавание-объектов">Оптические камеры и распознавание объектов</h2>
+
+<p>В отличие от лазерных датчиков, оптические камеры работают по принципу, схожему с человеческим зрением. Они улавливают свет, отраженный от объектов, и передают изображение на процессор для анализа. Камеры часто используются в тандеме с лазером, дополняя его информацией о текстуре и цвете предметов. Современные <strong>системы компьютерного зрения</strong> способны распознавать не только стены, но и мелкие предметы на полу.</p>
+
+<p>Благодаря обученным нейросетям, робот может идентифицировать кабели, обувь, носки и даже домашние животных. Если обычный лазерный датчик увидит только препятствие и объедет его, то камера может определить, что это кабель, и аккуратно проехать рядом или перепрыгнуть через него (если есть система iAdapt или аналогичная). Это снижает риск застревания и наматывания проводов на щетку.</p>
+
+<p>Однако камеры имеют существенный недостаток — они зависят от освещенности. В темноте без дополнительного инфракрасного освещения их эффективность резко падает. Производители компенсируют это использованием ИК-подсветки, но при отсутствии света или при наличии сильных бликов на полу распознавание может давать сбои. <strong>Обработка изображений</strong> требует значительных вычислительных ресурсов, поэтому такие модели обычно стоят дороже.</p>
+
+<div class="poll-widget" id="poll-9e561ce0"><div class="poll-widget-question">📊 Какой тип навигации установлен в вашем роботе-пылесосе?</div><div class="poll-widget-option" data-poll="9e561ce0" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Лазерный (LDS)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="9e561ce0" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Камера (VSLAM)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="9e561ce0" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскопический</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="9e561ce0" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Случайное движение</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="датчики-высоты-и-умные-колеса">Датчики высоты и «умные» колеса</h2>
+
+<p>Помимо верхних сенсоров, робот оснащен системой датчиков, расположенных внизу корпуса. Эти устройства отвечают за безопасность на вертикальной оси. Датчики высоты, часто называемые <strong>cliff sensors</strong>, буквально «смотрят» вниз, чтобы убедиться, что пол находится под роботом. Они реагируют на резкое изменение расстояния до поверхности.</p>
+
+<p>Основная задача этих сенсоров — предотвратить падение с лестниц или ступенек. Они работают по принципу инфракрасного луча: если луч не отражается от поверхности (потому что поверхность упала), робот получает сигнал об остановке и развороте. Это критически важная функция, так как падение робота со второго этажа может привести к его полному уничтожению.</p>
+
+
+
+<h2 id="таблица-сравнения-технологий-навигации">Таблица сравнения технологий навигации</h2>
+
+<p>Чтобы лучше понять различия в том, как «видят» разные модели, рассмотрим сравнительную таблицу основных технологий. Каждая из них имеет свои преимущества и недостатки, которые влияют на итоговую стоимость и качество уборки.</p>
+
+<table>
+<thead>
+<tr>
+<th>Технология</th>
+<th>Принцип работы</th>
+<th>Плюсы</th>
+<th>Минусы</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LDS (Лазер)</td>
+<td>Измерение времени отражения лазера</td>
+<td>Точность, работа в темноте, быстрое сканирование</td>
+<td>Искажает пространство при низких потолках</td>
+</tr>
+<tr>
+<td>VSLAM (Камера)</td>
+<td>Анализ изображений с камеры</td>
+<td>Отсутствие выступающих элементов, распознавание объектов</td>
+<td>Зависит от освещения, требует темных стен для ориентира</td>
+</tr>
+<tr>
+<td>Гироскоп</td>
+<td>Измерение ускорения и поворота</td>
+<td>Низкая стоимость, компактность</td>
+<td>Низкая точность, отсутствие карты помещения</td>
+</tr>
+<tr>
+<td>Вязкое зрение (ToF)</td>
+<td>Измерение времени пролета фотона</td>
+<td>Высокая скорость, компактность, работа в темноте</td>
+<td>Меньший радиус действия, чем у LDS</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="проблемы-восприятия-когда-робот-слепнет">Проблемы восприятия: когда робот «слепнет»</h2>
+
+<p>Несмотря на сложность систем, роботы-пылесосы все еще могут сталкиваться с ситуациями, когда их «зрение» подводит. Чрезмерно глянцевые полы, зеркальные поверхности или полностью черные ковры могут ввести в заблуждение датчики высоты и навигации. Черный пол может выглядеть как пропасть для инфракрасных сенсоров, а зеркало — как бесконечный коридор для камеры.</p>
+
+<p>Еще одной проблемой является высокая контрастность освещения. Прямые солнечные лучи, падающие на пол, могут ослепить камеру, сделав изображение пересвеченным. В таких условиях система не сможет корректно распознать границы комнаты или препятствия. <strong>Интерферометрия</strong> света также может влиять на работу лазерных дальномеров, если рядом работают другие подобные устройства.</p>
+
+
+<p>Если робот постоянно натыкается на одну и ту же стену или не замечает ее, проверьте, не оклеена ли она светлой бумагой или декоративными элементами с высокой отражающей способностью. Попробуйте временно прикрепить к стене темную полосу из бумаги или ткани, чтобы датчики могли зацепиться за контраст.--></p>
+
+<p>Владельцам темных интерьеров стоит быть особенно внимательными. Если в комнате много черной мебели или темный ламинат, робот может путать мебель с полом. Производители рекомендуют в таких случаях использовать <strong>виртуальные стены</strong> или физические барьеры, чтобы обозначить границы зон, которые робот не должен пересекать или куда он может не добраться.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка сенсоров перед уборкой</h4><label class="check-item"><input type="checkbox"><span>Очистить линзы LDS</span></label><label class="check-item"><input type="checkbox"><span>Протереть датчики высоты</span></label><label class="check-item"><input type="checkbox"><span>Проверить чистоту камеры</span></label><label class="check-item"><input type="checkbox"><span>Убрать мелкие предметы с пола</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="будущее-восприятия-нейросети-и-3d-сканирование">Будущее восприятия: нейросети и 3D-сканирование</h2>
+
+<p>Развитие технологий не стоит на месте. Современные флагманские модели уже оснащаются 3D-датчиками, которые создают объемную карту пространства. Это позволяет роботу отличать ножку стула от лежащего на полу носка, определяя высоту объекта. <strong>Искусственный интеллект</strong> анализирует сцену и выбирает оптимальный маршрут, чтобы избежать беспорядка.</p>
+
+<p>В ближайшем будущем ожидается внедрение технологий, позволяющих роботам распознавать не только объекты, но и контекст. Например, робот сможет понять, что вы находитесь в комнате, и автоматически приостановить уборку или снизить шум. Интеграция с умным домом позволит ему реагировать на голосовые команды и изменять режим работы в зависимости от ситуации.</p>
+
+<blockquote>⚠️ Внимание: Обновление прошивки робота может значительно изменить алгоритмы его «зрения». После обновления убедитесь, что робот заново обучился на вашей планировке, так как старые карты могут стать некорректными.</blockquote>
+
+<p>Важно понимать, что ни одна система не идеальна. Даже самый дорогой робот с лучшим искусственным интеллектом может ошибиться. Регулярная подготовка помещения — уборка проводов, игрушек и мелких предметов — остается залогом идеальной работы. <strong>Синергия</strong> технологий и человеческой подготовки дает наилучший результат.</p>
+
+<details>
+<summary>Почему робот не видит базу для зарядки в темноте?</summary>
+<p>Многие базы используют инфракрасные маячки или визуальные метки для наведения. Если в комнате слишком темно или, наоборот, слишком много источников света, датчики базы могут не корректно считывать сигнал. Попробуйте включить свет в комнате или убедиться, что на базу не падает прямой солнечный свет.</p>
+</details>
+
+<details>
+<summary>Можно ли использовать робота на зеркальном полу?</summary>
+<p>Использование на зеркальном полу возможно, но с осторожностью. Сенсоры высоты могут ошибочно принять отражение пола за реальное дно пропасти, и робот не зайдет на полосу. Лазерные дальномеры могут видеть двойное отражение стен, что исказит карту. Рекомендуется использовать физические барьеры.</p>
+</details>
+
+<details>
+<summary>Как узнать, какой тип датчиков у моего робота?</summary>
+<p>Посмотрите на верхнюю часть корпуса. Если есть вращающаяся башня — это лазер (LDS). Если башни нет, но есть темное стекло — это камера (VSLAM). Если сверху ничего нет, кроме кнопок — скорее всего, используется гироскопическая навигация или случайный метод.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот постоянно застревает?</summary>
+<p>Проверьте работу колес и датчиков высоты. Возможно, датчики загрязнены. Также обратите внимание на текстуру пола: высокий ворс ковра может быть воспринят как препятствие. Очистите щетки и проверьте, не наматываются ли на них волосы.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#эволюция-навигации-от-случайного-движения-к-искусственному-интеллекту">Эволюция навигации: от случайного движения к искусственному интеллекту</a></li><li><a href="#лазерный-дальномер-lds-глаз-робота-на-крыше">Лазерный дальномер (LDS) — «глаз» робота на крыше</a></li><li><a href="#оптические-камеры-и-распознавание-объектов">Оптические камеры и распознавание объектов</a></li><li><a href="#датчики-высоты-и-умные-колеса">Датчики высоты и «умные» колеса</a></li><li><a href="#таблица-сравнения-технологий-навигации">Таблица сравнения технологий навигации</a></li><li><a href="#проблемы-восприятия-когда-робот-слепнет">Проблемы восприятия: когда робот «слепнет»</a></li><li><a href="#будущее-восприятия-нейросети-и-3d-сканирование">Будущее восприятия: нейросети и 3D-сканирование</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-ustanovit-golosovye-pakety-na-robot-pylesos-xiaomi-vacuum-mop.html" class="related-card">Как установить голосовые пакеты на робот-пылесос Xiaomi: полное руководство</a></li><li><a href="/articles/k/ka/kakoj-luchshe-vzyat-pylesos-dlya-bassejna.html" class="related-card">Как выбрать пылесос для бассейна: роботы, гидроподъемники и шланговые системы</a></li><li><a href="/articles/s/sk/skolko-potreblyaet-elektroenergii-robot-pylesos-xiaomi.html" class="related-card">Потребление энергии роботом-пылесосом Xiaomi: реальные цифры и расчет</a></li><li><a href="/articles/k/ka/kakoj-moyushchij-robot-pylesos-xiaomi-luchshe-kupit.html" class="related-card">Какой моющий робот пылесос Xiaomi лучше купить: обзор топовых моделей</a></li><li><a href="/articles/k/ka/kak-vybrat-robot-pylesos-moshchnost.html" class="related-card">Как выбрать робот-пылесос по мощности: всасывание, расход и эффективность</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-ustanovit-golosovye-pakety-na-robot-pylesos-xiaomi-vacuum-mop.html" class="related-bottom-card"><span class="related-bottom-title">Как установить голосовые пакеты на робот-пылесос Xiaomi: полное руководство</span><span class="related-bottom-desc">Подробная инструкция по смене голоса на Xiaomi Robot Vacuum. Методы прошивки, инструменты Mi Home и </span></a><a href="/articles/k/ka/kakoj-luchshe-vzyat-pylesos-dlya-bassejna.html" class="related-bottom-card"><span class="related-bottom-title">Как выбрать пылесос для бассейна: роботы, гидроподъемники и шланговые системы</span><span class="related-bottom-desc">Полный гид по выбору очистителя бассейна. Сравнение автономных роботов, шланговых и переносных модел</span></a><a href="/articles/s/sk/skolko-potreblyaet-elektroenergii-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Потребление энергии роботом-пылесосом Xiaomi: реальные цифры и расчет</span><span class="related-bottom-desc">Узнайте, сколько электроэнергии тратит робот-пылесос Xiaomi. Расчет стоимости уборки, влияние мощнос</span></a><a href="/articles/k/ka/kakoj-moyushchij-robot-pylesos-xiaomi-luchshe-kupit.html" class="related-bottom-card"><span class="related-bottom-title">Какой моющий робот пылесос Xiaomi лучше купить: обзор топовых моделей</span><span class="related-bottom-desc">Подробный разбор линейки роботов Xiaomi. Сравнение Vacuums, S10, S10+, X20+, X30. Как выбрать идеаль</span></a><a href="/articles/k/ka/kak-vybrat-robot-pylesos-moshchnost.html" class="related-bottom-card"><span class="related-bottom-title">Как выбрать робот-пылесос по мощности: всасывание, расход и эффективность</span><span class="related-bottom-desc">Разбираем разницу между мощностью всасывания и потребления. Узнайте, какая сила нужна для ковров, ка</span></a><a href="/articles/r/ro/robot-pylesos-kakie-byvayut.html" class="related-bottom-card"><span class="related-bottom-title">Какие бывают роботы-пылесосы: полный гид по типам и функциям</span><span class="related-bottom-desc">Какие бывают роботы-пылесосы: обзор типов уборки, навигации, функций влажной протирки и станции само</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

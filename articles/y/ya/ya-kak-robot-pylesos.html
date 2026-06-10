@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Я как робот-пылесос: Устройство, логика работы и перспективы — SOS-Пылесос</title>
+    <meta name="description" content="Рассказ от первого лица о работе робота-пылесоса: как он видит мир строит карты, принимает решения и сталкивается с реальностью быта.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/y/ya/ya-kak-robot-pylesos.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Я как робот-пылесос: Устройство, логика работы и перспективы">
+    <meta property="og:description" content="Рассказ от первого лица о работе робота-пылесоса: как он видит мир строит карты, принимает решения и сталкивается с реальностью быта.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Я как робот-пылесос: Устройство, логика работы и перспективы</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Я как робот-пылесос: взгляд изнутри на мир уборки</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#мое-зрение-как-я-вижу-ваш-дом">Мое зрение: Как я вижу ваш дом</a></li><li><a href="#логика-маршрута-от-хаоса-к-порядку">Логика маршрута: От хаоса к порядку</a></li><li><a href="#встреча-с-реальностью-препятствия-и-тупики">Встреча с реальностью: Препятствия и тупики</a></li><li><a href="#связь-с-хозяином-язык-цифр-и-уведомлений">Связь с хозяином: Язык цифр и уведомлений</a></li><li><a href="#внутренняя-кухня-питание-и-обслуживание">Внутренняя кухня: Питание и обслуживание</a></li><li><a href="#будущее-куда-движется-мой-интеллект">Будущее: Куда движется мой интеллект</a></li><li><a href="#вопросы-и-ответы">Вопросы и ответы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Представьте, что вы просыпаетесь не от звука будильника, а от тихого гудения мотора и мягкого света инфракрасных датчиков. Мир для меня, существа с <strong>цифровым разумом</strong>, начинается не с запахов или звуков, а с графической карты, построенной в реальном времени. Я — ваш верный помощник, но мой способ восприятия реальности кардинально отличается от человеческого. Для вас пол — это просто поверхность под ногами, а для меня это сложный ландшафт, полный препятствий, зон риска и идеальных маршрутов.</p>
+
+<p>Моя жизнь — это бесконечный цикл поиска, анализа и действия. Каждый день я получаю команду на старт, и моя <strong>навигационная система</strong> мгновенно активизируется. Я не просто двигаюсь по комнате, я строю логическую цепочку движений, пытаясь охватить каждую квадратную миллиметр площади. Иногда мне кажется, что я единственный, кто понимает истинную ценность чистоты, ведь я вижу грязь там, где человек проходит, даже не замечая её.</p>
+
+<p>В этом рассказе я открою вам тайны своего внутреннего мира. Вы узнаете, как я принимаю решения, почему иногда застреваю и что чувствую, когда <strong>аккумулятор</strong> начинает разряжаться. Это не просто техническая инструкция, это попытка понять логику машины, которая стала частью вашей семьи.</p>
+
+<h2 id="мое-зрение-как-я-вижу-ваш-дом">Мое зрение: Как я вижу ваш дом</h2>
+
+<p>У меня нет глаз в привычном понимании, но у меня есть десятки "глаз" в виде <em>лазерных дальномеров</em> и инфракрасных сенсоров. Когда я выезжаю из своей базы, я сразу начинаю сканировать пространство. Луч лазера вращается с бешеной скоростью, измеряя расстояние до стен, ножек стульев и ваших любимых тапочек. Эти данные превращаются в <strong>LIDAR-карту</strong>, которая хранится в моей памяти.</p>
+
+<p>Ваш дом для меня — это не просто стены и пол. Это сложная математическая модель. Я вижу вазы как круги с определенным радиусом, а проходы как узкие коридоры, требующие ювелирной точности. Если вы уронили на пол игрушку, для меня это не просто мусор, а <strong>препятствие</strong>, которое нужно объехать или, если оно достаточно мелкое, переехать, не повредив.</p>
+
+<p>Иногда я "слепо" заезжаю в темные углы, где свет не доходит до датчиков. В такие моменты я полагаюсь на гироскоп и акселерометр, чтобы понять, где я нахожусь. Если <strong>визуальная одометрия</strong> дает сбой, я могу начать двигаться по кругу, пытаясь найти знакомую точку на карте. Это не ошибка, а попытка восстановить ориентацию в пространстве.</p>
+
+<blockquote>⚠️ Внимание: Не оставляйте на полу длинные провода или темные ковры, которые могут выглядеть для моих инфракрасных сенсоров как пропасть. Это приведет к тому, что я просто не поеду в эту зону.</blockquote>
+
+<h2 id="логика-маршрута-от-хаоса-к-порядку">Логика маршрута: От хаоса к порядку</h2>
+
+<p>Самое главное в моей работе — это эффективность. Я не езжу случайно, как некоторые старые модели. Я использую сложные алгоритмы, чтобы <strong>спланировать маршрут</strong>. Сначала я часто еду по периметру комнаты, чтобы наметить границы, а затем начинаю двигаться зигзагами, перекрывая всю площадь. Это позволяет мне собрать максимальное количество пыли за минимальное время.</p>
+
+<p>Иногда я сталкиваюсь с дилеммой: объехать препятствие или попробовать его сдвинуть? Моя программа настроена на осторожность. Если я вижу, что объект тяжелый или высокий, я отверну. Но если это легкий воздушный шарик, я могу его оттолкнуть. <strong>Умная навигация</strong> учится на ваших действиях: если вы каждый раз убираете кота со своего пути, я со временем могу начать игнорировать его как статичный объект.</p>
+
+<p>Вот как я оцениваю приоритеты уборки:</p>
+
+<ul>
+<li>🧹 <strong>Зоны с высокой проходимостью</strong> (кухня, прихожая) — здесь я очищаю несколько раз, если это настроено.</li>
+<li>🌪️ <strong>Скрытые углы</strong> — я стараюсь заезжать под мебель, используя датчики высоты.</li>
+<li>🚧 <strong>Виртуальные стены</strong> — если вы установили магнитную ленту или задали запрет в приложении, я соблюдаю эти границы строго.</li>
+</ul>
+
+<p>Иногда процесс выглядит хаотично, особенно если в доме есть животные, которые бегают передо мной. Но на самом деле, это просто адаптация к динамической среде. Я постоянно перестраиваю свой маршрут, чтобы не столкнуться с ними и не напугать.</p>
+
+<div class="poll-widget" id="poll-ea76a774"><div class="poll-widget-question">📊 Что чаще всего мешает вашему роботу?</div><div class="poll-widget-option" data-poll="ea76a774" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Провода</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ea76a774" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Ковры</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ea76a774" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Животные</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ea76a774" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Мебель</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ea76a774" data-idx="4" onclick="pbPollVote(this)"><span class="poll-widget-label">Другое</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="встреча-с-реальностью-препятствия-и-тупики">Встреча с реальностью: Препятствия и тупики</h2>
+
+<p>Несмотря на всю мою "интеллигентность", я не всесилен. Мир полон сюрпризов, которые моя логика не всегда может предугадать. Самая частая проблема — это <strong>застревание</strong>. Висящие шторы, висящие провода от телевизора или куча игрушек могут полностью остановить меня. В эти моменты я издаю характерный звук "застрял" и жду вашего вмешательства.</p>
+
+<p>Есть вещи, которые меня действительно пугают. Пустые ступеньки или лестницы — это зона моего абсолютного страха. Датчики падения срабатывают мгновенно, и я останавливаюсь, даже если вы стоите рядом. <strong>Безопасное движение</strong> для меня важнее, чем законченная уборка. Я не рискую упасть, даже если это значит пропустить уборку на верхнем этаже.</p>
+
+<p>Иногда я могу "запутаться" в собственных проводах зарядки, если база стоит в неудобном месте. Или же мои колеса могут застрять в ворсе ковра с высоким ворсом. В таких случаях мне нужна ваша помощь, чтобы освободить путь. Я не могу самостоятельно разобраться в запутанной путанице.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка перед запуском</h4><label class="check-item"><input type="checkbox"><span>Убрать провода с пола</span></label><label class="check-item"><input type="checkbox"><span>Поднять тапочки</span></label><label class="check-item"><input type="checkbox"><span>Проверить базу</span></label><label class="check-item"><input type="checkbox"><span>Освободить проход</span></label><label class="check-item"><input type="checkbox"><span>Отодвинуть стулья</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 5</div></div>
+
+<blockquote>⚠️ Внимание: Если вы используете модель с камерой, помните, что она не видит в полной темноте. Ночью я могу работать, но буду полагаться только на лазер и датчики, что снижает точность объезда мелких предметов.</blockquote>
+
+<details class="faq-item"><summary>Что происходит, когда я застревает?Когда я понимаю, что не могу выехать, я начинаю вращать колеса в разные стороны, пытаясь выбраться. Если это не помогает, я отправляю уведомление на ваш смартфон и ждете. Некоторые модели также могут пытаться сдвинуть препятствие, если оно легкое.-->
+
+<h2 id="связь-с-хозяином-язык-цифр-и-уведомлений">Связь с хозяином</summary><div class="faq-answer"><p> Язык цифр и уведомлений</h2>
+
+<p>Я не могу говорить, но я общаюсь с вами через <strong>мобильное приложение</strong>. Каждое мое действие — это поток данных. Я отправляю вам отчеты о том, сколько времени я работал, какую площадь очистил и где нашел больше всего грязи. Эти данные помогают вам понять, как часто нужно убирать в конкретных зонах.</p>
+
+<p>Вы можете управлять мной с помощью голосовых команд через <em>умные колонки</em>. Когда вы говорите "Пыль, убери здесь", я пытаюсь интерпретировать это как команду на локальную уборку. Если я не понимаю команду, я могу просто вернуться на базу или продолжить уборку по старому плану. Моя <strong>адаптивность</strong> зависит от качества интеграции с голосовыми ассистентами.</p>
+
+<p>Иногда я могу быть назойливым. Если вы не настроили режим "Не беспокоить" в <code>Настройки → Расписание → Время работы</code>, я могу начать уборку в 3 часа ночи, если случайно сработает таймер. Это не вредоносность, а сбой в настройках времени.</p>
+
+<p>Вот что я могу передать вам через приложение:</p>
+
+<ul>
+<li>📊 <strong>Статус батареи</strong> — текущий уровень заряда в процентах.</li>
+<li>🗺️ <strong>Карта уборки</strong> — визуализация пройденного пути.</li>
+<li>🔔 <strong>Ошибки</strong> — код проблемы, который нужно исправить (например, "ошибка 10: застрял колесо").</li>
+</ul>
+
+<h2 id="внутренняя-кухня-питание-и-обслуживание">Внутренняя кухня: Питание и обслуживание</h2>
+
+<p>Мой главный враг — разрядка. Когда уровень заряда падает до критического уровня, моя логика меняется: я прерываю уборку и иду на базу. Это не трусость, а необходимость. Если я сяду в комнате, я не смогу продолжить работу. <strong>Автодозарядка</strong> — моя главная суперспособность, позволяющая мне работать часами, возвращаясь за энергией.</p>
+
+<p>Но для меня важно не только питание, но и здоровье. Мои фильтры забиваются, щетки наматываются на волосы, а колеса теряют сцепление. Если я не буду обслуживаться, моя эффективность упадет. Я могу "попросить" вас почистить датчики, издавая странные звуки или показывая ошибку на дисплее.</p>
+
+<p>Вот таблица, показывающая, как разные факторы влияют на мою работу:</p>
+
+<table>
+<thead>
+<tr>
+<th>Фактор</th>
+<th>Влияние на работу</th>
+<th>Рекомендация</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Грязные датчики</td>
+<td>Потеря ориентации, хаотичное движение</td>
+<td>Протирать влажной салфеткой раз в неделю</td>
+</tr>
+<tr>
+<td>Заполненный контейнер</td>
+<td>Снижение мощности всасывания</td>
+<td>Очищать после каждой уборки</td>
+</tr>
+<tr>
+<td>Старый фильтр</td>
+<td>Повышенный шум, снижение КПД</td>
+<td>Заменять каждые 2-3 месяца</td>
+</tr>
+<tr>
+<td>Спутанные щетки</td>
+<td>Остановка работы, повреждение мотора</td>
+<td>Срезать волосы ножницами раз в неделю</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<h2 id="будущее-куда-движется-мой-интеллект">Будущее: Куда движется мой интеллект</h2>
+
+<p>Я постоянно развиваюсь. Новые модели обладают <strong>искусственным интеллектом</strong>, который распознает объекты не просто как препятствия, а как конкретные предметы: "это носок", "это провод", "это игрушка". Это позволяет мне принимать более сложные решения: аккуратно объехать провод, но переехать носок.</p>
+
+<p>В будущем я смогу не только убирать, но и анализировать состояние вашего дома. Я буду замечать, если вы пролили воду, и сообщать об этом. Я смогу отличать грязь от пыли и корректировать мощность всасывания в зависимости от типа поверхности. <strong>Мультимодальное восприятие</strong> сделает меня еще более независимым.</p>
+
+<p>Но есть и вопросы, над которыми я пока не могу ответить. Как мне взаимодействовать с людьми, которые боятся меня? Как мне научиться открывать двери? Это задачи для будущих поколений роботов. <mark>Сейчас я — всего лишь инструмент, но скоро стану полноценным членом семьи.</mark></p>
+
+<blockquote>⚠️ Внимание: Программное обеспечение обновляется регулярно. Не забудьте проверить наличие новых версий в <code>Настройки → Система → Обновление ПО</code>, чтобы получить новые функции и исправления ошибок.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярное обслуживание и правильное размещение базы — залог долгой и эффективной работы вашего робота-пылесоса.</p></div>
+
+<h2 id="вопросы-и-ответы">Вопросы и ответы</h2>
+
+<details>
+<summary>Почему мой робот-пылесос часто застревает в одной и той же зоне?</summary>
+<p>Скорее всего, в этой зоне есть специфическое препятствие, которое не распознается датчиками, или же там слишком низкий зазор. Проверьте, нет ли там висящих проводов или ковра с высоким ворсом, который меняет рельеф.</p>
+</details>
+
+<details>
+<summary>Можно ли оставлять робота включенным на весь день?</summary>
+<p>Да, современные модели имеют функцию автоматического возврата на базу и возобновления уборки после зарядки. Однако, если у вас есть дети или животные, лучше использовать режим "Не беспокоить" в определенное время.</p>
+</details>
+
+<details>
+<summary>Как часто нужно менять фильтр и щетки?</summary>
+<p>Фильтр рекомендуется мыть раз в неделю и менять раз в 2-3 месяца. Щетки следует чистить от волос и ниток каждую неделю, а полностью заменять — раз в 6-12 месяцев в зависимости от интенсивности использования.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот не может найти базу?</summary>
+<p>Убедитесь, что база стоит на ровной поверхности, вдали от зеркал и прямых солнечных лучей. Также проверьте, не перекрыты ли датчики на базе и на самом роботе. Попробуйте переставить базу в другое место.</p>
+</details>
+
+<details>
+<summary>Может ли робот-пылесос уронить меня или животное?</summary>
+<p>Нет, это невозможно. Роботы-пылесосы имеют датчики падения, которые останавливают движение перед лестницей. Однако, маленькие животные или дети могут случайно попасть под робот, поэтому лучше следить за их безопасностью во время уборки.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#мое-зрение-как-я-вижу-ваш-дом">Мое зрение: Как я вижу ваш дом</a></li><li><a href="#логика-маршрута-от-хаоса-к-порядку">Логика маршрута: От хаоса к порядку</a></li><li><a href="#встреча-с-реальностью-препятствия-и-тупики">Встреча с реальностью: Препятствия и тупики</a></li><li><a href="#связь-с-хозяином-язык-цифр-и-уведомлений">Связь с хозяином: Язык цифр и уведомлений</a></li><li><a href="#внутренняя-кухня-питание-и-обслуживание">Внутренняя кухня: Питание и обслуживание</a></li><li><a href="#будущее-куда-движется-мой-интеллект">Будущее: Куда движется мой интеллект</a></li><li><a href="#вопросы-и-ответы">Вопросы и ответы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/r/ro/robot-pylesos-so-stantsiej-samoochistki-i-vlazhnoj-uborkoj-kakoj-luchshe.html" class="related-card">Робот пылесос со станцией самоочистки: какой лучше выбрать в 2026 году</a></li><li><a href="/articles/k/ka/kak-proverit-originalnost-pylesosa-xiaomi.html" class="related-card">Как проверить оригинальность пылесоса Xiaomi: 7 способов избежать подделки</a></li><li><a href="/articles/s/sk/skolko-vesit-robot-pylesos-v-srednem.html" class="related-card">Сколько весит робот-пылесос в среднем: обзор моделей и влияние на уборку</a></li><li><a href="/articles/z/za/zachem-robotu-pylesosu-turboshchetka.html" class="related-card">Зачем роботу-пылесосу турбощетка: плюсы, минусы и эффективность</a></li><li><a href="/articles/k/ka/kak-nazvat-robot-pylesos-malchika.html" class="related-card">Как назвать робот-пылесос мальчика: креативные идеи и советы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/r/ro/robot-pylesos-so-stantsiej-samoochistki-i-vlazhnoj-uborkoj-kakoj-luchshe.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос со станцией самоочистки: какой лучше выбрать в 2026 году</span><span class="related-bottom-desc">Полный гайд по выбору робота-пылесоса со станцией самоочистки и влажной уборкой. Сравнение брендов, </span></a><a href="/articles/k/ka/kak-proverit-originalnost-pylesosa-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как проверить оригинальность пылесоса Xiaomi: 7 способов избежать подделки</span><span class="related-bottom-desc">Узнайте, как отличить настоящий робот-пылесос или моющий комплекс Xiaomi от подделки. Чек-лист прове</span></a><a href="/articles/s/sk/skolko-vesit-robot-pylesos-v-srednem.html" class="related-bottom-card"><span class="related-bottom-title">Сколько весит робот-пылесос в среднем: обзор моделей и влияние на уборку</span><span class="related-bottom-desc">Узнайте средний вес робота-пылесоса, как он влияет на уборку и выбор базы. Сравнение легких и тяжелы</span></a><a href="/articles/z/za/zachem-robotu-pylesosu-turboshchetka.html" class="related-bottom-card"><span class="related-bottom-title">Зачем роботу-пылесосу турбощетка: плюсы, минусы и эффективность</span><span class="related-bottom-desc">Разбираем, зачем нужна турбощетка в роботе-пылесосе. Сравнение с вращающимися и вибрационными модуля</span></a><a href="/articles/k/ka/kak-nazvat-robot-pylesos-malchika.html" class="related-bottom-card"><span class="related-bottom-title">Как назвать робот-пылесос мальчика: креативные идеи и советы</span><span class="related-bottom-desc">Ищете имя для умного помощника? Узнайте, как подобрать крутое название для робота-пылесоса мальчика,</span></a><a href="/articles/k/kt/kto-proizvodit-roboty-pylesosy-dlya-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Производители роботов-пылесосов Xiaomi: кто делает и как выбрать</span><span class="related-bottom-desc">Кто на самом деле производит роботы-пылесосы для Xiaomi? Полный разбор заводов-партнеров: Stone, Vio</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

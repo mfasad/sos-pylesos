@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Робот-пылесос игнорирует черный ковер: причины и пошаговое решение — SOS-Пылесос</title>
+    <meta name="description" content="Почему робот-пылесос не едет по темным поверхностям? Разбор работы датчиков падения, калибровка LiDAR и методы обмана сенсоров для уборки черного ковра.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/r/ro/robot-pylesos-ne-pylesosit-chernyj-kover-chto-delat.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Робот-пылесос игнорирует черный ковер: причины и пошаговое решение">
+    <meta property="og:description" content="Почему робот-пылесос не едет по темным поверхностям? Разбор работы датчиков падения, калибровка LiDAR и методы обмана сенсоров для уборки черного ковра.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/problemy-i-resheniya/">Проблемы и решения</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Робот-пылесос игнорирует черный ковер: причины и пошаговое решение</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Робот-пылесос не пылесосит черный ковер: почему это происходит и как исправить</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#принцип-работы-сенсоров-падения-и-оптических-датчиков">Принцип работы сенсоров падения и оптических датчиков</a></li><li><a href="#методы-физического-обмана-сенсоров">Методы физического обмана сенсоров</a></li><li><a href="#программная-настройка-и-использование-карт">Программная настройка и использование карт</a></li><li><a href="#ручная-калибровка-и-режим-обучения">Ручная калибровка и режим обучения</a></li><li><a href="#сравнение-моделей-и-их-чувствительность">Сравнение моделей и их чувствительность</a></li><li><a href="#альтернативные-решения-и-модификации">Альтернативные решения и модификации</a></li><li><a href="#профилактика-и-уход-за-датчиками">Профилактика и уход за датчиками</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Столкновение с тем фактом, что ваш умный помощник отказывается убирать определенные участки пола, может сильно расстроить. Особенно обидно, когда проблема кроется не в поломке, а в специфическом восприятии среды. Многие владельцы сталкиваются с ситуацией, когда <strong>робот-пылесос</strong> объезжает темные или черные коврики, воспринимая их как пропасть, и отказывается заезжать на них.</p>
+
+<p>Это поведение обусловлено особенностями работы оптических и лазерных сенсоров, которые используются в современных моделях. Пытаясь предотвратить падение со ступенек, устройство интерпретирует темную поверхность как отсутствие пола. Как восстановить полноценную уборку и заставить <em>Xiaomi</em>, <em>Roborock</em> или <em>Dreame</em> игнорировать ложные сигналы сенсоров?</p>
+
+<h2 id="принцип-работы-сенсоров-падения-и-оптических-датчиков">Принцип работы сенсоров падения и оптических датчиков</h2>
+
+<p>В основе проблемы лежит физика света, а не программная ошибка. Большинство роботов оснащены датчиками падения (cliff sensors), которые направляют инфракрасный луч вниз и измеряют время его возврата. Светлый пол отражает луч быстро, а черный ковер поглощает его, создавая иллюзию глубокой ямы.</p>
+
+<p>Инженеры закладывают в алгоритм <strong>датчик отрыва</strong> критический порог. Если отражение слишком слабое, <strong>система навигации</strong> блокирует движение вперед, чтобы избежать катастрофического падения с лестницы. Это безопасная стратегия, но она становится неудобной при наличии темных покрытий в интерьере.</p>
+
+<p>Некоторые модели используют лидары или камеры для построения карты, которые также могут терять ориентацию на темных поверхностях из-за недостаточного контраста или поглощения лазерного луча. <em>оптический сенсор</em> просто "слепнет", когда луч не возвращается в приемник в ожидаемое время.</p>
+
+<h2 id="методы-физического-обмана-сенсоров">Методы физического обмана сенсоров</h2>
+
+<p>Самый надежный способ заставить пылесос убирать черный ковер — изменить его отражающую способность. Вам не нужно менять мебель или ковры, достаточно провести небольшую модификацию самого покрытия. Можно наклеить светлую полосу по периметру или на проблемных участках.</p>
+
+<p>Используйте <strong>белый малярный скотч</strong> или светлую изоленту. Наклейте их в виде узкой полоски вдоль края ковра или поверх темных узоров. Это создаст визуальный якорь для сенсоров, заставляя их считать поверхность безопасной. Главное, чтобы лента была достаточно светлой и не имела рельефа.</p>
+
+<p>Альтернативный вариант — использование специальных <strong>карт зон</strong> в приложении. Вы можете программно запретить роботу заезжать на ковер, если он всегда вызывает ошибку, или, наоборот, создать виртуальную стену, которая не является запретом, а просто корректирует маршрут обхода.</p>
+
+<blockquote>⚠️ Внимание: Не пытайтесь попытаться "замаскировать" ковер темной пленкой. Это только усугубит проблему поглощения света и приведет к полному отказу устройства от работы на этой зоне.</blockquote>
+
+<div class="poll-widget" id="poll-2a660c0a"><div class="poll-widget-question">📊 Встречалась ли вам проблема с игнорированием темных ковров?</div><div class="poll-widget-option" data-poll="2a660c0a" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Да, постоянно</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2a660c0a" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Да, иногда</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2a660c0a" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Нет, все работает</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2a660c0a" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не знаю, у меня светлый пол</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="программная-настройка-и-использование-карт">Программная настройка и использование карт</h2>
+
+<p>Современные приложения позволяют настраивать поведение робота более гибко. В разделе <code>Настройки → Карта → Зоны уборки</code> можно вручную скорректировать маршрут. Если ковер имеет сложный рисунок, система может путаться, считая его препятствием.</p>
+
+<p>Попробуйте создать <strong>виртуальную стену</strong> или "запретную зону" вокруг ковра, но в режиме "Только запрет на заезд" (если функция доступна). Однако для решения проблемы с черным ковром часто требуется наоборот — указать роботу, что это зона уборки, несмотря на сенсоры.</p>
+
+<p>В некоторых моделях <em>Dreame</em> и <em>Roborock</em> есть функция "Усиление тяги" или "Режим ковра", которая меняет алгоритм работы колес. Это не отключает датчики падения, но меняет интерпретацию данных при медленном движении. Проверьте <code>Настройки → Очистка</code> на наличие подобных опций.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка настройки карты</h4><label class="check-item"><input type="checkbox"><span>Открыть приложение</span></label><label class="check-item"><input type="checkbox"><span>Перейти в раздел карт</span></label><label class="check-item"><input type="checkbox"><span>Найти проблемную зону</span></label><label class="check-item"><input type="checkbox"><span>Проверить настройки обхода</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<p>Иногда помогает полное перестроение карты. Удалите старую карту и запустите <strong>полную калибровку</strong> в режиме "Быстрая уборка" без ковра, а затем положите его и дайте роботу пройти по нему в ручном режиме для обучения.</p>
+
+<h2 id="ручная-калибровка-и-режим-обучения">Ручная калибровка и режим обучения</h2>
+
+<p>Если автоматическая калибровка не срабатывает, можно попробовать принудительный режим. Поместите робота с включенным пылесосом непосредственно на черный ковер. В некоторых моделях это активирует режим принудительной уборки, игнорируя датчики падения на короткое время.</p>
+
+<p>Для этого часто требуется использовать кнопку на корпусе или специальную комбинацию в приложении. Например, удерживание кнопки "Домой" и "Пуск" одновременно может сбросить текущее состояние сенсоров. Изучите <strong>инструкцию к вашей модели</strong> на предмет скрытых функций.</p>
+
+<p>Некоторые продвинутые пользователи используют "обучение" робота, заставляя его медленно проезжать по ковролину несколько раз. Со временем алгоритм может адаптироваться и начать считать темную поверхность нормой, если она не меняла свои характеристики в течение сессии.</p>
+
+<details class="faq-item"><summary>Как сбросить сенсоры вручную?</summary><div class="faq-answer"><p>Возьмите робота в руки, переверните его и зажмите кнопку сброса на дне (если есть). Затем положите на пол и нажмите "Старт". Это может перезагрузить логику сенсоров падения.</p></div></details>
+
+<p> Если вы переместите ковер на другой пол, настройка может слететь. Поэтому калибровка должна проводиться в условиях реальной эксплуатации.</p>
+
+<blockquote>⚠️ Внимание: При ручной калибровке на ковре велик риск падения робота с лестницы, если вы не контролируете его движение. Будьте предельно осторожны и держите устройство под рукой.</blockquote>
+
+<h2 id="сравнение-моделей-и-их-чувствительность">Сравнение моделей и их чувствительность</h2>
+
+<p>Разные бренды используют различные алгоритмы обработки сигнала от сенсоров. Одни модели более чувствительны к темным поверхностям, другие имеют встроенную защиту от ложных срабатываний. Ниже приведена таблица сравнения популярных брендов.</p>
+
+<table>
+<thead>
+<tr>
+<th>Бренд / Серия</th>
+<th>Чувствительность к черному ковролину</th>
+<th>Возможность настройки</th>
+<th>Рекомендуемое решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Roborock S7/S8</td>
+<td>Средняя</td>
+<td>Высокая (виртуальные стены)</td>
+<td>Скотч на край ковра</td>
+</tr>
+<tr>
+<td>Xiaomi Mi Robot</td>
+<td>Высокая</td>
+<td>Низкая</td>
+<td>Светлая подложка</td>
+</tr>
+<tr>
+<td>Dreame L10/L20</td>
+<td>Низкая</td>
+<td>Средняя</td>
+<td>Настройка в приложении</td>
+</tr>
+<tr>
+<td>iRobot Roomba</td>
+<td>Средняя</td>
+<td>Высокая (виртуальные барьеры)</td>
+<td>Активная зона</td>
+</tr>
+<tr>
+<td>Eufy G30</td>
+<td>Высокая</td>
+<td>Низкая</td>
+<td>Физическая маскировка</td>
+</tr>
+</tbody>
+</table>
+
+<p>Как видно из таблицы, <em>Roborock</em> и <em>Dreame</em> часто имеют более продвинутые алгоритмы, но и они не застрахованы от проблем с очень темными материалами. <strong>Инфракрасные датчики</strong> в бюджетных моделях работают по принципу "есть отражение — есть пол", что делает их уязвимыми.</p>
+
+<p>Если ваш робот не попадает в список или имеет специфические настройки, попробуйте найти <strong>форум поддержки</strong> производителя. Часто пользователи делятся уникальными хитростями для конкретных прошивок.</p>
+
+<h2 id="альтернативные-решения-и-модификации">Альтернативные решения и модификации</h2>
+
+<p>Если программные методы не помогают, а скотч портит вид ковра, можно рассмотреть замену чувствительных элементов. Это сложный путь, требующий навыков пайки, но он позволяет полностью изменить логику работы сенсоров.</p>
+
+<p>Вместо замены деталей, проще использовать <strong>светящуюся ленту</strong> (LED strip) под краем ковра. Она будет давать постоянное отражение для сенсоров, делая ковер "видимым" для робота. Это выглядит эстетично и решает проблему навсегда.</p>
+
+<p>Еще один вариант — использование <strong>специальных накладок</strong> на датчики. Некоторые энтузиасты клеят на сами датчики на дне робота светоотражающие элементы, которые меняют угол падения луча, но это может снизить эффективность защиты от падения.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед началом любых манипуляций с датчиками обязательно отключите робот от зарядной станции и извлеките аккумулятор, если это возможно, чтобы избежать короткого замыкания.</p></div>
+
+<p>Не забывайте, что <strong>чистота сенсоров</strong> также влияет на работу. Грязь на датчиках может усиливать эффект поглощения света, заставляя робота думать, что поверхность еще темнее, чем есть на самом деле.</p>
+
+<h2 id="профилактика-и-уход-за-датчиками">Профилактика и уход за датчиками</h2>
+
+<p>Регулярная очистка <strong>датчиков падения</strong> — залог стабильной работы. Протирайте их мягкой сухой тканью раз в неделю, особенно если у вас есть животные или много пыли. Грязь может создавать ложный эффект темной поверхности.</p>
+
+<p>Проверяйте состояние <strong>колес</strong> и <strong>щетки</strong>. Если робот буксует на ковре, это может быть ошибочно воспринято как падение. Убедитесь, что колеса вращаются свободно и не забиты волосами.</p>
+
+<p>Также стоит следить за состоянием <strong>батареи</strong>. Слабый аккумулятор может приводить к сбоям в работе электроники, что иногда проявляется в некорректной работе сенсоров.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярная очистка датчиков и проверка колес — это простая профилактика, которая может решить до 50% проблем с навигацией на сложных поверхностях.</p></div>
+
+<p>Если вы планируете покупать новый робот, учитывайте наличие <strong>камерной навигации</strong> (VSLAM). Камеры лучше справляются с темными поверхностями, так как они анализируют визуальный контекст, а не только отражение луча.</p>
+
+<p>В заключение, проблема с черным ковром решаема. Это не брак, а особенность физики. Подойдите к вопросу комплексно: от простой наклейки скотча до настройки карты в приложении.</p>
+
+<h2 id="часто-задаваемые-вопросы">Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Почему робот объезжает только часть черного ковра?</summary>
+<p>Это может быть связано с узором ковра. Если на черном фоне есть мелкие светлые вкрапления, робот может воспринимать их как "островки" безопасной поверхности и объезжать темные участки. Попробуйте закрыть светлые узоры скотчем.</p>
+</details>
+
+<details>
+<summary>Можно ли отключить датчики падения полностью?</summary>
+<p>В большинстве потребительских моделей это невозможно из соображений безопасности. Однако в некоторых профессиональных или кастомных прошивках есть такой режим. Использование этого режима категорически не рекомендуется, так как робот может упасть с лестницы.</p>
+</details>
+
+<details>
+<summary>Помогают ли специальные подложки под ковер?</summary>
+<p>Да, если подложка светлая и имеет определенную текстуру, она может помочь сенсору "увидеть" пол. Но это работает только для тонких ковриков, которые не скрывают подложку полностью.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот застрял на черном ковре?</summary>
+<p>Если робот застрял, попробуйте вручную переместить его на светлый пол, выключить и включить снова. Если проблема повторяется, используйте метод со скотчем или настройте виртуальную стену.</p>
+</details>
+
+<blockquote>⚠️ Внимание: При работе с роботом на темных коврах всегда следите за его местоположением, особенно если в доме есть лестницы или перепады высот. Автоматика может не сработать.</blockquote></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#принцип-работы-сенсоров-падения-и-оптических-датчиков">Принцип работы сенсоров падения и оптических датчиков</a></li><li><a href="#методы-физического-обмана-сенсоров">Методы физического обмана сенсоров</a></li><li><a href="#программная-настройка-и-использование-карт">Программная настройка и использование карт</a></li><li><a href="#ручная-калибровка-и-режим-обучения">Ручная калибровка и режим обучения</a></li><li><a href="#сравнение-моделей-и-их-чувствительность">Сравнение моделей и их чувствительность</a></li><li><a href="#альтернативные-решения-и-модификации">Альтернативные решения и модификации</a></li><li><a href="#профилактика-и-уход-за-датчиками">Профилактика и уход за датчиками</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-ochistit-pylesos-ot-rtuti-iz-gradusnika-v-domashnikh-usloviyakh.html" class="related-card">Как очистить пылесос от ртути: полная инструкция и опасные ошибки</a></li><li><a href="/articles/p/po/pochemu-robot-pylesos-ne-vozvrashchaetsya-na-bazu-xiaomi-mi.html" class="related-card">Робот-пылесос Xiaomi не возвращается на базу: причины и способы решения</a></li><li><a href="/articles/p/py/pylesos-lg-ne-vsasyvaet-pyl-chto-delat.html" class="related-card">Пылесос LG не всасывает пыль: причины и пошаговое решение</a></li><li><a href="/articles/p/py/pylesos-silno-prisasyvaetsya-k-polu-chto-delat.html" class="related-card">Пылесос сильно присасывается к полу: причины и способы решения</a></li><li><a href="/articles/k/ka/kak-vzryvayut-pylesosy-posmotret.html" class="related-card">Как посмотреть, как взрываются пылесосы: опасности и мифы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-ochistit-pylesos-ot-rtuti-iz-gradusnika-v-domashnikh-usloviyakh.html" class="related-bottom-card"><span class="related-bottom-title">Как очистить пылесос от ртути: полная инструкция и опасные ошибки</span><span class="related-bottom-desc">Очищать ли пылесос после сбора ртути или выбросить? Разбираем риски загрязнения мотора, фильтров и м</span></a><a href="/articles/p/po/pochemu-robot-pylesos-ne-vozvrashchaetsya-na-bazu-xiaomi-mi.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос Xiaomi не возвращается на базу: причины и способы решения</span><span class="related-bottom-desc">Почему робот-пылесос Xiaomi Mi не находит базу? Основные ошибки навигации, проблемы с контактами и W</span></a><a href="/articles/p/py/pylesos-lg-ne-vsasyvaet-pyl-chto-delat.html" class="related-bottom-card"><span class="related-bottom-title">Пылесос LG не всасывает пыль: причины и пошаговое решение</span><span class="related-bottom-desc">Пылесос LG потерял тягу? Узнайте, как починить слабо всасывающий аппарат своими руками. Диагностика </span></a><a href="/articles/p/py/pylesos-silno-prisasyvaetsya-k-polu-chto-delat.html" class="related-bottom-card"><span class="related-bottom-title">Пылесос сильно присасывается к полу: причины и способы решения</span><span class="related-bottom-desc">Пылесос прилипает к полу? Узнайте основные причины и проверенные методы борьбы с чрезмерной всасываю</span></a><a href="/articles/k/ka/kak-vzryvayut-pylesosy-posmotret.html" class="related-bottom-card"><span class="related-bottom-title">Как посмотреть, как взрываются пылесосы: опасности и мифы</span><span class="related-bottom-desc">Обзор видео с разрушением пылесосов, причины взрывов литиевых батарей и меры безопасности. Почему не</span></a><a href="/articles/k/ka/kak-sobrat-pesok-bez-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Как собрать песок без пылесоса: 5 способов уборки в домашних условиях</span><span class="related-bottom-desc">Эффективные методы удаления песка с ковров, полок и одежды без использования пылесоса. Проверенные л</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

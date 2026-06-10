@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Робот-пылесос в двухэтажном доме: как настроить работу между этажами — SOS-Пылесос</title>
+    <meta name="description" content="Полное руководство по организации уборки на двух этажах: виртуальные стены, датчики основания, выбор моделей с LiDAR и альтернативные решения.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/r/ro/robot-pylesos-v-dvukhetazhnom-dome-kak-sdelat.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Робот-пылесос в двухэтажном доме: как настроить работу между этажами">
+    <meta property="og:description" content="Полное руководство по организации уборки на двух этажах: виртуальные стены, датчики основания, выбор моделей с LiDAR и альтернативные решения.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Робот-пылесос в двухэтажном доме: как настроить работу между этажами</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Эффективная работа робота-пылесоса в двухэтажном доме: полная инструкция</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#особенности-навигации-на-разных-уровнях">Особенности навигации на разных уровнях</a></li><li><a href="#использование-виртуальных-стен-и-базовых-станций">Использование виртуальных стен и базовых станций</a></li><li><a href="#метод-ручного-переноса-и-сохранение-карт">Метод ручного переноса и сохранение карт</a></li><li><a href="#автоматические-лифты-для-роботов-пылесосов">Автоматические лифты для роботов-пылесосов</a></li><li><a href="#решение-проблемы-с-двумя-устройствами">Решение проблемы с двумя устройствами</a></li><li><a href="#особенности-работы-с-коврами-и-переходными-зонами">Особенности работы с коврами и переходными зонами</a></li><li><a href="#сравнение-брендов-и-их-подходов-к-этажности">Сравнение брендов и их подходов к этажности</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Уборка двухэтажного дома роботом-пылесосом — это специфическая задача, которая требует не просто покупки мощной техники, но и грамотной организации пространства. Большинство современных моделей оснащены датчиками падения, которые не позволяют роботу упасть вниз, но не умеют автоматически переносить базу или карту между уровнями здания.</p>
+<p>Вам предстоит решить, будете ли вы перемещать робот самостоятельно после каждой уборки или ищете решение, минимизирующее ваше участие. Не существует волшебной кнопки "переместить на этаж", но правильный выбор <strong>навигационной системы</strong> и аксессуаров может сделать процесс почти автоматическим.</p>
+<p>Сложность заключается в том, что <em>LiDAR</em> (лазерный дальномер) строит карту относительно точки отсчета, а <em>камерные системы</em> ориентируются по визуальным меткам. Если вы просто поднимете робот наверх, он может "потерять" себя в пространстве, если не использовать специальные функции сохранения карт.</p>
+
+<h2 id="особенности-навигации-на-разных-уровнях">Особенности навигации на разных уровнях</h2>
+<p>Основная проблема двухэтажных домов — это отсутствие физической связи между этажами для робота. В отличие от плоской квартиры, здесь робот не может переехать сам. Ему нужна помощь человека для смены локации. Однако современные алгоритмы <strong>SLAM</strong> позволяют сохранять несколько карт или один план с разделением на этажи.</p>
+<p>Если ваш робот поддерживает функцию <em>Multi-floor mapping</em> (мульти-картирование), вы можете создать карту первого этажа, сохранить её, перенести устройство и построить карту второго. Сложность возникает при необходимости частой смены уборки: если робот забудет, где он находится, он может начать хаотичное движение или потребовать ручного запуска.</p>
+<p>Важно понимать разницу между моделями с камерой и лазером. <code>LDS</code> (лазерный дальномер) лучше справляется с темнотой и узкими проходами, но требует стабильной высоты установки. Камерные системы, такие как у <em>Roborock</em> или <em>Dreame</em>, могут ошибаться при изменении освещения, что критично для второго этажа, если там другие шторы или время суток.</p>
+<p>Иногда пользователям кажется, что робот "глупеет" при переходе на другой этаж, но на самом деле это конфликт карт. Вам необходимо убедиться, что в приложении созданы отдельные профили для каждого уровня, чтобы избежать наложения геометрии комнат.</p>
+
+<blockquote>⚠️ Внимание: Если вы используете бюджетную модель без функции мульти-картирования, каждый перенос робота на новый этаж потребует полной перенастройки уборки и, возможно, повторного создания карты с нуля.</blockquote>
+
+<div class="poll-widget" id="poll-e746a594"><div class="poll-widget-question">📊 Владеете ли вы двухэтажным домом?</div><div class="poll-widget-option" data-poll="e746a594" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Да, частный дом</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e746a594" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Да, дача с вторым этажом</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e746a594" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Собираюсь купить</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e746a594" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Арендую</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="использование-виртуальных-стен-и-базовых-станций">Использование виртуальных стен и базовых станций</h2>
+<p>Ключевой элемент организации уборки — это правильное размещение <strong>виртуальных границ</strong> (No-Go Zones). Вы должны запретить роботу подъезжать к краю лестничного пролета, так как датчики падения не всегда срабатывают мгновенно на сложных ступенях.</p>
+<p>Для этого в приложении создайте зону запрета шириной минимум 50 сантиметров от края лестницы. Если у вас есть модель с функцией <em>Virtual Wall</em> через базу (как у <em>Dreame L10s</em> или <em>Xiaomi Robot Vacuum</em>), настройте её так, чтобы она блокировала проход к лестнице, но не мешала объезду других препятствий.</p>
+<p>Некоторые пользователи пытаются обмануть систему, закрывая вход на лестницу физической преградой. Это допустимо, но помните, что робот не должен ударяться о барьер постоянно, иначе это ускорит износ бампера и корпуса. Идеальный вариант — использование <strong>датчиков высоты</strong> в сочетании с виртуальными стенами.</p>
+<p>Особое внимание уделите базовой станции. Ставить её нужно так, чтобы робот мог спокойно вернуться на зарядку, но при этом не запутался в проводах, которые могут свисать с лестницы или проходить в коридоре.</p>
+
+<div class="checklist-block"><h4>☑️ Настройка безопасности на лестнице</h4><label class="check-item"><input type="checkbox"><span>Создать виртуальную стену у края лестницы</span></label><label class="check-item"><input type="checkbox"><span>Проверить работу датчиков падения</span></label><label class="check-item"><input type="checkbox"><span>Убрать провода и ковры у пролета</span></label><label class="check-item"><input type="checkbox"><span>Настроить запрет на заход в зону лестницы в приложении</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="метод-ручного-переноса-и-сохранение-карт">Метод ручного переноса и сохранение карт</h2>
+<p>Самый надежный способ уборки двухэтажного дома на сегодня — это ручной перенос робота. Вам нужно закончить уборку на первом этаже, поднять устройство наверх, поставить его на базу (если база переносима) или просто на пол, и запустить продолжение уборки.</p>
+<p>Здесь критически важно использовать функцию <em>Auto-Resuming</em> (автоматическое продолжение) и <strong>сохранение карт</strong>. В настройках приложения выберите "Сохранить текущую карту" перед тем, как поднять робот. Это позволит ему вернуться к этому плану, когда вы снова поместите его на первом этаже.</p>
+<p>Процесс выглядит так: уборка первого этажа -> перенос на второй -> сохранение новой карты -> запуск. Не пытайтесь заставить робота помнить все этажи одновременно, если он этого не поддерживает программно. Это создаст "слоеный пирог" из данных, который приведет к ошибкам навигации.</p>
+<p>Для удобства можно использовать <strong>умные розетки</strong> или таймеры, чтобы робот включался на втором этаже в ваше отсутствие. Но помните, что без физического присутствия человека робот не сможет переехать сам. Вам придется либо переносить его, либо использовать альтернативные методы.</p>
+
+<blockquote>⚠️ Внимание: При переносе базы зарядки на другой этаж убедитесь, что там есть доступ к электросети и достаточно места для разворота робота, иначе он не сможет вернуться на док-станцию.</blockquote>
+
+<details class="faq-item"><summary>Что делать, если робот потерялся при переносе?</summary><div class="faq-answer"><p>Если робот не может найти себя на новом этаже, выполните "калибровку" или "точную локализацию" в приложении. Иногда помогает перемещение его в центр комнаты и запуск режима "Точная навигация".</p></div></details>
+
+<h2 id="автоматические-лифты-для-роботов-пылесосов">Автоматические лифты для роботов-пылесосов</h2>
+<p>Существует экзотическое, но работающее решение — установка специального лифта для робот-пылесоса. Это не бытовой лифт, а компактная платформа, которая перемещает устройство между этажами. Такие системы часто устанавливаются в современных коттеджах на этапе ремонта.</p>
+<p>Для корректной работы лифта необходимо, чтобы робот мог самостоятельно заезжать на платформу и выезжать с неё. Это требует точной настройки <strong>датчиков препятствий</strong> и создания виртуального пути, который совпадает с положением лифта. Модель должна иметь функцию <em>Auto-Return</em> при низком заряде, чтобы не застрять на платформе.</p>
+<p>Интеграция с умным домом позволяет запрограммировать последовательность: робот закончил уборку 1-го этажа -> передал сигнал на лифт -> лифт прибыл -> робот заехал -> лифт поднялся -> робот выехал на 2-й этаж. Это требует сложной настройки и стабильного Wi-Fi сигнала на всех уровнях.</p>
+<p>Минусом такого решения является высокая стоимость оборудования и сложность установки. Кроме того, не все модели <em>Roborock</em> или <em>Xiaomi</em> имеют совместимые протоколы для связи с сторонними механическими устройствами.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед покупкой лифта для робота проверьте габариты платформы. Стандартные модели занимают площадь около 35x35 см, но с учетом разворота и заезда лучше предусмотреть запас в 10-15 см с каждой стороны.</p></div>
+
+<table>
+<thead>
+<tr>
+<th>Тип решения</th>
+<th>Уровень автоматизации</th>
+<th>Сложность настройки</th>
+<th>Примерная стоимость</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ручной перенос</td>
+<td>Низкий</td>
+<td>Низкая</td>
+<td>0 руб.</td>
+</tr>
+<tr>
+<td>Виртуальные стены</td>
+<td>Средний (безопасность)</td>
+<td>Средняя</td>
+<td>1 500 - 5 000 руб.</td>
+</tr>
+<tr>
+<td>Лифт для робота</td>
+<td>Высокий</td>
+<td>Высокая</td>
+<td>150 000+ руб.</td>
+</tr>
+<tr>
+<td>Два отдельных робота</td>
+<td>Максимальный</td>
+<td>Низкая</td>
+<td>Цена 2-х моделей</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="решение-проблемы-с-двумя-устройствами">Решение проблемы с двумя устройствами</h2>
+<p>Самый эффективный и беспроблемный способ — использование двух роботов-пылесосов, одного для каждого этажа. Это исключает необходимость переноса, потери карт и ожидания. Вы просто запускаете уборку на обоих этажах одновременно.</p>
+<p>Современные экосистемы позволяют управлять несколькими устройствами из одного приложения. Вы можете настроить расписание так, чтобы роботы работали по очереди или одновременно. Главное преимущество — <strong>независимость</strong> работы устройств.</p>
+<p>Если бюджет ограничен, можно купить один флагманский <em>Roborock S8 Pro</em> для первого этажа и более простую модель для второго. Главное, чтобы оба устройства поддерживали <code>Wi-Fi</code> и имели возможность создания карт, чтобы вы могли контролировать процесс с телефона.</p>
+<p>Однако, это решение требует покупки дополнительного оборудования и места для базы зарядки на обоих этажах. Вам потребуется две розетки и два места для хранения робота, что не всегда удобно в малогабаритных прихожих.</p>
+
+<blockquote>⚠️ Внимание: Если вы покупаете два робота, убедитесь, что их базы зарядки не конфликтуют по частотам сигналов, хотя современные модели обычно используют разные каналы связи и не мешают друг другу.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Использование двух отдельных роботов-пылесосов — это единственное решение для полной автоматизации уборки двухэтажного дома без необходимости в специальных инженерных сооружениях типа лифтов.</p></div>
+
+<h2 id="особенности-работы-с-коврами-и-переходными-зонами">Особенности работы с коврами и переходными зонами</h2>
+<p>В двухэтажных домах часто встречаются ковры, покрытые ворсом, или порожки у лестниц. Робот может застрять на стыке этажа и лестницы, если датчики не распознают поверхность. Важно настроить <strong>силу всасывания</strong> и высоту уборки для каждого этажа.</p>
+<p>Если на втором этаже много ковров, а на первом плитка, используйте функцию <em>Auto-Boost</em> (автоматическое усиление). Это позволит роботу менять мощность в зависимости от типа покрытия, не требуя ручного переключения режимов.</p>
+<p>Не забывайте чистить датчики падения (маленькие "глазки" на дне корпуса). Пыль или шерсть животных могут заблокировать их работу, что приведет к тому, что робот будет бояться заехать даже на безопасный порог или, наоборот, упадет.</p>
+<p>Проверяйте работу робота в ночное время. Если освещение на втором этаже отличается от первого, камерные системы могут ошибаться. В таких случаях лучше использовать роботы с <em>LiDAR</em>, так как они не зависят от света.</p>
+
+<details class="faq-item"><summary>Как часто нужно чистить датчики?</summary><div class="faq-answer"><p>Рекомендуется протирать датчики падения и бампера влажной салфеткой раз в неделю, особенно если в доме есть животные, чтобы избежать ложных срабатываний.</p></div></details>
+
+<h2 id="сравнение-брендов-и-их-подходов-к-этажности">Сравнение брендов и их подходов к этажности</h2>
+<p>Разные производители предлагают разные подходы к решению проблемы этажности. <em>Roborock</em> и <em>Dreame</em> делают упор на программное сохранение карт, позволяя создавать до 4-х уровней. Это позволяет переключаться между этажами в приложении без потери данных.</p>
+<p>Модели <em>Xiaomi</em> среднего сегмента часто имеют упрощенную логику: либо одна карта, либо полное обнуление при смене локации. Это требует от пользователя более внимательного отношения к процессу переноса. Бренд <em>Ecovacs</em> предлагает функцию <em>TrueDetect</em>, которая помогает избегать падения, но также требует ручной смены карты.</p>
+<p>Выбирая устройство, обращайте внимание на наличие функции <strong>Multi-floor map saving</strong>. Если её нет, вы будете вынуждены каждый раз заново сканировать этаж, что занимает много времени и нервов. Также проверьте, поддерживает ли робот <em>Виртуальные стены</em> через приложение или требует покупки отдельного модуля.</p>
+<p>Важно учитывать, что даже с продвинутыми функциями робот не сможет сам подняться по лестнице. Любое решение, обещающее полную автоматизацию без переноса, скорее всего, связано с установкой лифта или покупкой двух устройств.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Для комфортной уборки двухэтажного дома выбирайте модель с поддержкой Multi-floor mapping и возможностью сохранения до 4 карт, так как это сэкономит время на повторную настройку.</p></div>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Может ли робот-пылесос сам подняться по лестнице?</summary>
+<p>Нет, ни одна современная модель робота-пылесоса не способна самостоятельно преодолеть лестничный пролет или ступеньки из-за риска падения и отсутствия гусеничного хода.</p>
+</details>
+
+<details>
+<summary>Как сохранить карту первого этажа, чтобы не строить её заново?</summary>
+<p>В большинстве приложений (Roborock, Dreame, Ecovacs) есть кнопка "Сохранить карту" или "Создать новую карту". Перед переносом робота наверх обязательно сохраните текущую карту, затем перенесите робот и создайте вторую карту для второго этажа.</p>
+</details>
+
+<details>
+<summary>Нужно ли покупать два робота для двух этажей?</summary>
+<p>Это не обязательно, но желательно для полной автоматизации. Если вы готовы переносить робота вручную, одной мощной модели с поддержкой мульти-карт будет достаточно. Если хотите, чтобы они убирали одновременно, нужны два устройства.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот не может найти базу на втором этаже?</summary>
+<p>Убедитесь, что база стоит на ровной поверхности, вдали от зеркал и прямых солнечных лучей. Проверьте, что датчики на базе чистые. Иногда помогает перемещение базы в другое место или повторная калибровка.</p>
+</details>
+
+<details>
+<summary>Можно ли использовать виртуальные стены для защиты лестницы?</summary>
+<p>Да, виртуальные стены (No-Go Zones) — это лучший способ запретить роботу приближаться к краю лестницы. Создайте зону шириной около 50 см, и робот будет обходить её.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#особенности-навигации-на-разных-уровнях">Особенности навигации на разных уровнях</a></li><li><a href="#использование-виртуальных-стен-и-базовых-станций">Использование виртуальных стен и базовых станций</a></li><li><a href="#метод-ручного-переноса-и-сохранение-карт">Метод ручного переноса и сохранение карт</a></li><li><a href="#автоматические-лифты-для-роботов-пылесосов">Автоматические лифты для роботов-пылесосов</a></li><li><a href="#решение-проблемы-с-двумя-устройствами">Решение проблемы с двумя устройствами</a></li><li><a href="#особенности-работы-с-коврами-и-переходными-зонами">Особенности работы с коврами и переходными зонами</a></li><li><a href="#сравнение-брендов-и-их-подходов-к-этажности">Сравнение брендов и их подходов к этажности</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/r/ro/robot-pylesos-xiaomi-s-vlazhnoj-uborkoj-kuda-zalivat-vodu.html" class="related-card">Куда заливать воду в робот-пылесос Xiaomi: инструкция и ошибки</a></li><li><a href="/articles/r/ro/robot-pylesos-xiaomi-kak-polzovatsya-pervyj-raz.html" class="related-card">Робот пылесос Xiaomi: как пользоваться первый раз — полная инструкция</a></li><li><a href="/articles/k/ka/kak-pravilno-ispolzovat-robot-pylesos-xiaomi.html" class="related-card">Как правильно использовать робот-пылесос Xiaomi: Полная инструкция</a></li><li><a href="/articles/k/ka/kak-vybrat-robot-pylesos-dlya-kvartiry-s-zhivotnymi-i-kovrami-2020-god-byudzhetnyj-variant.html" class="related-card">Бюджетный робот-пылесос с животными и коврами: выбор 2020</a></li><li><a href="/articles/k/ka/kak-ustroen-robot-pylesos-vnutri.html" class="related-card">Как устроен робот-пылесос внутри: устройство, комплектующие и принцип работы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/r/ro/robot-pylesos-xiaomi-s-vlazhnoj-uborkoj-kuda-zalivat-vodu.html" class="related-bottom-card"><span class="related-bottom-title">Куда заливать воду в робот-пылесос Xiaomi: инструкция и ошибки</span><span class="related-bottom-desc">Подробное руководство по работе с баком для воды в Xiaomi. Узнайте, куда заливать воду, как правильн</span></a><a href="/articles/r/ro/robot-pylesos-xiaomi-kak-polzovatsya-pervyj-raz.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос Xiaomi: как пользоваться первый раз — полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по настройке, зарядке и запуску робот-пылесоса Xiaomi. Установка приложения, м</span></a><a href="/articles/k/ka/kak-pravilno-ispolzovat-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как правильно использовать робот-пылесос Xiaomi: Полная инструкция</span><span class="related-bottom-desc">Узнайте, как настроить, использовать и обслуживать робот-пылесос Xiaomi. Советы по навигации, уходу </span></a><a href="/articles/k/ka/kak-vybrat-robot-pylesos-dlya-kvartiry-s-zhivotnymi-i-kovrami-2020-god-byudzhetnyj-variant.html" class="related-bottom-card"><span class="related-bottom-title">Бюджетный робот-пылесос с животными и коврами: выбор 2020</span><span class="related-bottom-desc">Как выбрать недорогой робот-пылесос для квартиры с животными и коврами в 2020 году? Обзор бюджетных </span></a><a href="/articles/k/ka/kak-ustroen-robot-pylesos-vnutri.html" class="related-bottom-card"><span class="related-bottom-title">Как устроен робот-пылесос внутри: устройство, комплектующие и принцип работы</span><span class="related-bottom-desc">Подробный разбор внутреннего устройства робота-пылесоса. Изучите работу навигации, системы уборки, б</span></a><a href="/articles/k/ka/kakoj-luchshe-brat-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Какой робот-пылесос Xiaomi выбрать: Топ-10 моделей 2026 года</span><span class="related-bottom-desc">Сравниваем модели Xiaomi и Mi Robot. Узнайте, какой пылесос лучше для дома, ковров и животных. Полно</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

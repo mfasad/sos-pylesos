@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как добавить пылесос в Home Assistant: Полное руководство по интеграции — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговая инструкция по подключению робота-пылесоса к Home Assistant. Обзор интеграций Xiaomi, Roborock, iRobot и настройка автоматизаций.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-dobavit-pylesos-v-home-assistant.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как добавить пылесос в Home Assistant: Полное руководство по интеграции">
+    <meta property="og:description" content="Пошаговая инструкция по подключению робота-пылесоса к Home Assistant. Обзор интеграций Xiaomi, Roborock, iRobot и настройка автоматизаций.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как добавить пылесос в Home Assistant: Полное руководство по интеграции</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Полное руководство: Как добавить пылесос в Home Assistant</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение-в-умную-уборку">Введение в умную уборку</a></li><li><a href="#подготовка-сети-и-discovery-устройств">Подготовка сети и discovery устройств</a></li><li><a href="#интеграция-через-официальное-хранилище">Интеграция через официальное хранилище</a></li><li><a href="#получение-токена-для-протокола-miio">Получение токена для протокола MiIO</a></li><li><a href="#настройка-карт-и-зон-уборки">Настройка карт и зон уборки</a></li><li><a href="#таблица-совместимости-и-протоколов">Таблица совместимости и протоколов</a></li><li><a href="#создание-автоматизаций-и-сценариев">Создание автоматизаций и сценариев</a></li><li><a href="#решение-частых-проблем-подключения">Решение частых проблем подключения</a></li><li><a href="#заключение">Заключение</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение-в-умную-уборку">Введение в умную уборку</h2>
+<p>Интеграция робот-пылесоса в экосистему <strong>Home Assistant</strong> открывает перед пользователем принципиально новые возможности управления домашней чистотой. Вместо того чтобы зависеть от приложений конкретных производителей, вы получаете единый центр управления, где уборка становится частью сложных сценариев жизни дома.</p>
+<p>Добавление устройства позволяет не просто запускать уборку по таймеру, но и синхронизировать её с другими датчиками: например, запускать всасывание только когда в комнате никого нет или отменять режим "Тихая уборка", если в помещении кто-то появился. <strong>Локальное управление</strong> обеспечивает мгновенную реакцию на команды без задержек, свойственных облачным сервисам.</p>
+<p>Процесс подключения варьируется в зависимости от бренда и модели устройства, но общий принцип остается неизменным: обнаружение на сети, авторизация и настройка сущностей. В этой статье мы разберем методы для самых популярных производителей, а также затронем нюансы настройки карт и зон.</p>
+
+<h2 id="подготовка-сети-и-discovery-устройств">Подготовка сети и discovery устройств</h2>
+<p>Прежде чем пытаться добавить интеграцию, необходимо убедиться, что ваш <strong>Home Assistant</strong> и робот-пылесос находятся в одной локальной сети. Это критически важно для большинства протоколов, особенно для тех, что не используют облачные шлюзы. Устройства должны быть видны друг другу через маршрутизатор.</p>
+<p>Если у вас гостевая сеть или настроена изоляция клиентов (Client Isolation), автоматическое обнаружение не сработает. Вам потребуется перевести устройство в основную сеть Wi-Fi или настроить правила межсоединения в роутере, разрешив запросу на порт 54321 или 80 (в зависимости от модели).</p>
+<p>Для диагностики готовности сети откройте <code>Developer Tools</code> в интерфейсе <strong>Home Assistant</strong> и проверьте вкладку <code>Services</code>. Попробуйте выполнить простой запрос к IP-адресу устройства, чтобы убедиться в доступности портов. Если пинг проходит, можно переходить к следующему этапу.</p>
+
+<h2 id="интеграция-через-официальное-хранилище">Интеграция через официальное хранилище</h2>
+<p>Большинство современных пылесосов поддерживаются официальными интеграциями, которые устанавливаются в пару кликов через интерфейс администратора. Зайдите в <code>Settings</code> → <code>Devices & Services</code> и нажмите кнопку <code>Add Integration</code>. В поисковой строке введите название бренда вашего устройства.</p>
+<p>Для брендов <em>Xiaomi</em> и <em>Roborock</em> часто используется официальная интеграция <strong>Xiaomi Miio</strong> или <strong>Valetudo</strong>, если вы не хотите получать root-доступ для получения токена. Процесс установки прост: выберите тип устройства из списка и введите IP-адрес, если автообнаружение не сработало.</p>
+<p>Однако, если вы видите несколько вариантов интеграции для одного бренда, внимательно изучите описание. Официальная поддержка может быть ограничена определенными регионами или моделями. В таком случае лучше использовать проверенные пользовательские интеграции из HACS, которые часто работают стабильнее и быстрее.</p>
+
+<blockquote>⚠️ <strong>Внимание:</strong> Интеграции, использующие облачные API (например, официальные интеграции iRobot или некоторых версий Roborock), могут иметь задержки в выполнении команд до 10-15 секунд. Локальные протоколы реагируют мгновенно.</blockquote>
+
+<div class="poll-widget" id="poll-752fba47"><div class="poll-widget-question">📊 Какой бренд пылесоса вы планируете подключить?</div><div class="poll-widget-option" data-poll="752fba47" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Xiaomi/Roborock</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="752fba47" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">iRobot/Neato</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="752fba47" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Ecovacs</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="752fba47" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Samsung/LG</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="752fba47" data-idx="4" onclick="pbPollVote(this)"><span class="poll-widget-label">Другой</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="получение-токена-для-протокола-miio">Получение токена для протокола MiIO</h2>
+<p>Для тонкой настройки пылесосов <em>Xiaomi</em> и <em>Roborock</em> часто требуется получение уникального <strong>токена</strong>. Это ключ шифрования, который позволяет системе отправлять прямые команды на устройство, минуя серверы производителя. Без токена вы сможете лишь видеть статус батареи, но не сможете управлять уборкой.</p>
+<p>Процесс извлечения токена зависит от операционной системы вашего смартфона и версии прошивки. Для iOS проще всего использовать утилиту <code>Xiaomi Cloud Token Extractor</code>, а для Android часто требуется включить режим разработчика и использовать <code>adb</code> для извлечения данных из установленных приложений.</p>
+<p>Полученный токен — это длинная строка из букв и цифр. Сохраните её в надежном месте, так как при переустановке прошивки или сбросе настроек устройства токен изменится, и интеграцию придется настраивать заново. <strong>Никогда не передавайте этот токен третьим лицам</strong>, так как он дает полный контроль над устройством.</p>
+
+<div class="checklist-block"><h4>☑️ Получение токена</h4><label class="check-item"><input type="checkbox"><span>Включить режим разработчика</span></label><label class="check-item"><input type="checkbox"><span>Установить adb/терминал</span></label><label class="check-item"><input type="checkbox"><span>Подключить устройство к ПК</span></label><label class="check-item"><input type="checkbox"><span>Извлечь токен из реестра</span></label><label class="check-item"><input type="checkbox"><span>Ввести токен в Home Assistant</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 5</div></div>
+
+<details class="faq-item"><summary>Проблемы с токен-экстракторами</summary><div class="faq-answer"><p>Если утилита не может найти токен, попробуйте обновить приложение Mi Home до последней версии или, наоборот, откатить до более старой стабильной версии, так как алгоритмы шифрования часто меняются.</p></div></details>
+
+<p>После получения токена введите его в соответствующее поле при настройке интеграции. Если вы используете <em>Home Assistant OS</em>, убедитесь, что у вас установлен нужный <code>add-on</code> для работы с протоколом, если требуется.</p>
+
+<h2 id="настройка-карт-и-зон-уборки">Настройка карт и зон уборки</h2>
+<p>Одной из самых сильных сторон интеграции является возможность управления картами. В отличие от мобильных приложений, где карта часто статична или требует премиум-подписки, в <strong>Home Assistant</strong> вы можете видеть карту в реальном времени на любой панели управления.</p>
+<p>Для этого используется сущность <code>camera</code>, которая транслирует изображение карты с пылесоса. Вы можете использовать её в видеосигналах, на дашбордах или даже выводить на экраны умных колонок. <strong>Облачные карты</strong> могут обновляться с задержкой, поэтому для динамического отслеживания лучше использовать локальные снимки.</p>
+<p>Если ваш пылесос поддерживает создание виртуальных стен и зон (No-Go Zones), вы можете управлять ими прямо из интерфейса. Это удобно для сценариев: "Если я нажал кнопку 'Уборка кухни', очистись только в этой зоне и не заходи в ванную".</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Для отображения карты пылесоса на дашборде используйте компонент 'Picture Entities' или 'Map' в карточке, указав ID сущности камеры карты вашего робота.</p></div>
+
+<p>Некоторые продвинутые пользователи настраивают автоматическое сохранение карт на внешний диск. Это позволяет анализировать траектории уборки за месяц или год. <strong>Статистика движения</strong> помогает выявить проблемные зоны, где робот застревает чаще всего.</p>
+
+<h2 id="таблица-совместимости-и-протоколов">Таблица совместимости и протоколов</h2>
+<p>Ниже приведена сводная таблица популярных моделей и требуемых методов подключения для обеспечения стабильной работы.</p>
+
+<table>
+<thead>
+<tr>
+<th>Бренд / Модель</th>
+<th>Тип интеграции</th>
+<th>Требует токен?</th>
+<th>Локальное управление</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xiaomi Robot Vacuum</td>
+<td>Xiaomi Miio / HACS</td>
+<td>Да</td>
+<td>Полное</td>
+</tr>
+<tr>
+<td>Roborock S7 / S8</td>
+<td>Roborock / Valetudo</td>
+<td>Да (через Mi Home)</td>
+<td>Полное</td>
+</tr>
+<tr>
+<td>iRobot Roomba (900+)</td>
+<td>iRobot / Local</td>
+<td>Нет (API)</td>
+<td>Ограниченное</td>
+</tr>
+<tr>
+<td>Ecovacs Deebot</td>
+<td>Ecovacs / HACS</td>
+<td>Да</td>
+<td>Полное (часто)</td>
+</tr>
+<tr>
+<td>Neato Botvac</td>
+<td>Neato</td>
+<td>Нет</td>
+<td>Облачное</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>⚠️ <strong>Внимание:</strong> Модели iRobot с новыми протоколами безопасности могут требовать подтверждения доступа в приложении iRobot Home при каждом новом подключении к сторонним сервисам.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Локальное управление обеспечивает мгновенный отклик и работает даже при отключении интернета, что критично для стабильности сценариев.</p></div>
+
+<h2 id="создание-автоматизаций-и-сценариев">Создание автоматизаций и сценариев</h2>
+<p>После того как устройство успешно добавлено и сущности отображаются в системе, начинается самое интересное — создание логики. <strong>Автоматизации</strong> позволяют пылесосу работать автономно, реагируя на события в доме.</p>
+<p>Вы можете настроить запуск уборки, когда все члены семьи покидают дом. Для этого используйте триггеры на основе геолокации смартфонов или состояния датчиков движения. Например: <code>Если все устройства в сети 'Дом' покинули зону 'Дом' → Запустить уборку всей квартиры</code>.</p>
+<p>Другой популярный сценарий — "Тихая уборка" ночью или когда кто-то спит. Это реализуется через проверку состояния датчиков шума или просто по расписанию. <strong>Важно</strong> настроить паузу при обнаружении препятствия, чтобы робот не мешал игре детей или работе питомцев.</p>
+
+<details class="faq-item"><summary>Сложная логика с паузами</summary><div class="faq-answer"><p>Для создания сценария "Пауза при обнаружении человека" вам понадобятся датчики движения и условие в автоматизации: Если датчик движения активен → Отправить команду 'Pause' на робота.</p></div></details>
+
+<p>Можно также интегрировать пылесос с другими устройствами умного дома. Например, перед началом уборки автоматически выключить вентиляторы, чтобы не всасывать пыль, или включить свет в коридоре, если робот должен проехать по темному участку.</p>
+
+<h2 id="решение-частых-проблем-подключения">Решение частых проблем подключения</h2>
+<p>Иногда процесс добавления может сопровождаться ошибками. Самая частая проблема — "<strong>Connection Refused</strong>" или таймауты. Это обычно означает, что IP-адрес устройства изменился, или фаервол блокирует порт.</p>
+<p>Решением является фиксация <strong>IP-адреса</strong> (DHCP Reservation) в настройках роутера для MAC-адреса пылесоса. Так устройство всегда будет обращаться по одному и тому же адресу, что стабилизирует работу интеграции.</p>
+<p>Если интеграция перестала отвечать, попробуйте удалить устройство и добавить его заново, тщательно проверив токен. В некоторых случаях помогает перезагрузка модуля <code>core</code> в <strong>Home Assistant</strong> или обновление самой интеграции через HACS.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Фиксация IP-адреса через DHCP Reservation — это первое, что нужно сделать после настройки сети, чтобы избежать потери связи с устройствами.</p></div>
+
+<blockquote>⚠️ <strong>Внимание:</strong> При смене прошивки робота-пылесоса через официальное приложение производители иногда меняют алгоритмы шифрования токена, что требует повторного извлечения ключа доступа.</blockquote>
+
+<h2 id="заключение">Заключение</h2>
+<p>Добавление пылесоса в <strong>Home Assistant</strong> превращает его из простого бытового прибора в полноценный элемент умного дома. Вы получаете контроль над каждым аспектом работы устройства, от выбора зоны уборки до создания сложных логических цепочек.</p>
+<p>Хотя процесс настройки может показаться сложным на первый шаг, особенно с получением токенов, результат оправдывает затраченное время. Стабильная работа, отсутствие зависимости от облачных серверов и возможность глубокой кастомизации — главные преимущества такой интеграции.</p>
+<p>Экспериментируйте с автоматизациями, создавайте свои уникальные сценарии и наслаждайтесь чистотой в доме, управляемой умной логикой. Помните, что сообщество постоянно обновляет интеграции, поддерживая даже старые модели устройств.</p>
+
+<h2 id="часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</h2>
+
+<details>
+<summary>Можно ли подключить пылесос без токена?</summary>
+<p>Для некоторых брендов (например, iRobot или старые модели) да, но функционал будет ограничен. Для большинства Xiaomi и Roborock токен обязателен для локального управления и получения детальной информации о карте.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот не видит карту в Home Assistant?</summary>
+<p>Проверьте, включена ли передача карты в приложении производителя. Также убедитесь, что интеграция поддерживает загрузку изображений карты для вашей конкретной модели и что у вас есть права на чтение локального хранилища.</p>
+</details>
+
+<details>
+<summary>Работает ли интеграция без интернета?</summary>
+<p>Да, если вы настроили локальное подключение (Local Control) и зафиксировали IP-адрес, Home Assistant будет управлять роботом даже при полном отсутствии доступа к глобальной сети.</p>
+</details>
+
+<details>
+<summary>Как обновить интеграцию пылесоса?</summary>
+<p>Если вы используете HACS, обновите интеграцию через интерфейс HACS. Если это официальная интеграция, дождитесь обновления ядра Home Assistant или обновите её вручную через файлы конфигурации.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение-в-умную-уборку">Введение в умную уборку</a></li><li><a href="#подготовка-сети-и-discovery-устройств">Подготовка сети и discovery устройств</a></li><li><a href="#интеграция-через-официальное-хранилище">Интеграция через официальное хранилище</a></li><li><a href="#получение-токена-для-протокола-miio">Получение токена для протокола MiIO</a></li><li><a href="#настройка-карт-и-зон-уборки">Настройка карт и зон уборки</a></li><li><a href="#таблица-совместимости-и-протоколов">Таблица совместимости и протоколов</a></li><li><a href="#создание-автоматизаций-и-сценариев">Создание автоматизаций и сценариев</a></li><li><a href="#решение-частых-проблем-подключения">Решение частых проблем подключения</a></li><li><a href="#заключение">Заключение</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/r/ro/robot-pylesos-kotoryj-mozhet-rabotat-bez-interneta.html" class="related-card">Робот-пылесос без интернета: полная инструкция и модели</a></li><li><a href="/articles/k/ka/kak-izmenit-golos-na-robote-pylesose-xiaomi-robot-vacuum-mop.html" class="related-card">Как изменить голос робота-пылесоса Xiaomi: 3 рабочих способа</a></li><li><a href="/articles/r/ro/robot-pylesos-xiaomi-ustrojstvo-ne-v-seti-pochemu.html" class="related-card">Робот пылесос Xiaomi устройство не в сети: причины и решения</a></li><li><a href="/articles/n/na/nastrojka-urovnya-vody-xiaomi-robot-pylesos-s-vlazhnoj-uborkoj-chto-eto.html" class="related-card">Как настроить уровень воды в робот-пылесосе Xiaomi: полная инструкция</a></li><li><a href="/articles/i/in/inteks-pylesos-dlya-bassejna-kak-podklyuchit.html" class="related-card">Как подключить пылесос для бассейна Intex: пошаговая инструкция</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/r/ro/robot-pylesos-kotoryj-mozhet-rabotat-bez-interneta.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос без интернета: полная инструкция и модели</span><span class="related-bottom-desc">Как выбрать и настроить робот-пылесос для работы без Wi-Fi. Обзор моделей, управление с пульта и лок</span></a><a href="/articles/k/ka/kak-izmenit-golos-na-robote-pylesose-xiaomi-robot-vacuum-mop.html" class="related-bottom-card"><span class="related-bottom-title">Как изменить голос робота-пылесоса Xiaomi: 3 рабочих способа</span><span class="related-bottom-desc">Пошаговая инструкция: как сменить язык озвучки и звуковые эффекты на робот-пылесос Xiaomi Smart Robo</span></a><a href="/articles/r/ro/robot-pylesos-xiaomi-ustrojstvo-ne-v-seti-pochemu.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос Xiaomi устройство не в сети: причины и решения</span><span class="related-bottom-desc">Узкополосный робот-пылесос Xiaomi отключился от сети? Узнайте основные причины ошибки &#x27;Устройство не</span></a><a href="/articles/n/na/nastrojka-urovnya-vody-xiaomi-robot-pylesos-s-vlazhnoj-uborkoj-chto-eto.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить уровень воды в робот-пылесосе Xiaomi: полная инструкция</span><span class="related-bottom-desc">Разбираемся, что такое настройка уровня воды в Xiaomi робот-пылесосе с влажной уборкой. Пошаговая ин</span></a><a href="/articles/i/in/inteks-pylesos-dlya-bassejna-kak-podklyuchit.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить пылесос для бассейна Intex: пошаговая инструкция</span><span class="related-bottom-desc">Подробное руководство: как правильно подключить и настроить пылесос Intex для бассейна. Инструкция п</span></a><a href="/articles/k/ka/kak-nastroit-mi-khoum-dlya-robota-pylesosa-xiaomi-vacuum.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить Mi Home для робота-пылесоса Xiaomi: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по привязке робота-пылесоса Xiaomi к приложению Mi Home. Настройка Wi-Fi, выбор</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

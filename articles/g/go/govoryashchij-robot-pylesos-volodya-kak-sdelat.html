@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Говорящий робот-пылесос «Володя»: как сделать своими руками — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговая инструкция по созданию уникального голосового робота-уборщика. Обзор компонентов, запись фраз и подключение к базе.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/g/go/govoryashchij-robot-pylesos-volodya-kak-sdelat.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Говорящий робот-пылесос «Володя»: как сделать своими руками">
+    <meta property="og:description" content="Пошаговая инструкция по созданию уникального голосового робота-уборщика. Обзор компонентов, запись фраз и подключение к базе.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/drugoe/">Другое</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Говорящий робот-пылесос «Володя»: как сделать своими руками</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Говорящий робот-пылесос «Володя»: как сделать своими руками</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#выбор-платформы-и-аппаратной-базы">Выбор платформы и аппаратной базы</a></li><li><a href="#модуль-озвучки-и-синтез-речи">Модуль озвучки и синтез речи</a></li><li><a href="#программирование-логики-общения">Программирование логики общения</a></li><li><a href="#алгоритм-сборки-и-подключения">Алгоритм сборки и подключения</a></li><li><a href="#настройка-и-калибровка">Настройка и калибровка</a></li><li><a href="#решение-проблем-с-интеграцией">Решение проблем с интеграцией</a></li><li><a href="#оптимизация-и-финальные-штрихи">Оптимизация и финальные штрихи</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Многие владельцы автоматических уборщиков мечтают, чтобы их помощник не просто перемещался по комнате, но и сообщал о статусе уборки живым человеческим голосом. Запрос «говорящий робот пылесос Володя» часто возникает у энтузиастов, желающих персонализировать технику. Имя «Володя» в данном контексте является собирательным образом для создания робота с уникальным голосовым модулем, который может шутить, предупреждать или просто комментировать свои действия.</p>
+
+<p>Существует два основных пути реализации этой идеи: программная модификация существующих моделей с открытым ПО и полная сборка кастомного устройства с нуля. В первом случае вы меняете голосовые файлы в памяти устройства, во втором — создаете новое изделие, полностью контролирующее свои звуки.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Модификация заводского оборудования может привести к потере гарантийного обслуживания. Перед началом работ оцените риски и убедитесь, что у вас есть резервная копия заводской прошивки.</p>
+</blockquote>
+
+<h2 id="выбор-платформы-и-аппаратной-базы">Выбор платформы и аппаратной базы</h2>
+
+<p>Первым шагом является решение, на какой основе будет строиться ваш проект. Если вы хотите сохранить функционал заводского пылесоса, но добавить голос, вам потребуется робот с возможностью root-прав или доступом к файловой системе. Для таких моделей часто используются платы на базе <strong>ARM</strong> архитектуры с модулями <strong>Wi-Fi</strong> и <strong>Bluetooth</strong>.</p>
+
+<p>Если же вы собираете устройство с нуля, то идеальным вариантом станет связка одноплатного компьютера и специализированного мотора. Платформа <em>Raspberry Pi</em> или <em>ESP32</em> отлично справится с задачей обработки звука и управления двигателем. Важно выбрать модель с достаточным количеством свободных <strong>GPIO</strong> портов для подключения датчиков и динамиков.</p>
+
+<p>Для механической части можно использовать готовые шасси от старых роботов или собрать каркас из пластиковых деталей, напечатанных на 3D-принтере. Главное условие — стабильное снабжение всей электроники энергией.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Использование мощных динамиков в замкнутом пространстве корпуса пылесоса может вызвать резонанс, который нарушит работу чувствительных гироскопов и датчиков падения.</p>
+</blockquote>
+
+<h2 id="модуль-озвучки-и-синтез-речи">Модуль озвучки и синтез речи</h2>
+
+<p>Сердцем проекта «Володя» является система воспроизведения звука. Самый простой способ — записать заранее подготовленные фразы на русском языке и сохранить их в формате <code>WAV</code> или <code>MP3</code> с высоким битрейтом. Это обеспечит чистое звучание, но ограничит гибкость: робот будет говорить только заученные фразы.</p>
+
+<p>Более продвинутый вариант — внедрение модуля <strong>TTS</strong> (Text-to-Speech). Для этого потребуется установить программное обеспечение, способное конвертировать текст в речь в реальном времени. На базе <em>Raspberry Pi</em> успешно работают библиотеки <em>eSpeak</em> или <em>Google Speech API</em>, которые позволяют роботу генерировать ответы на любое событие.</p>
+
+<blockquote>
+<p>⚠️ Внимание: При использовании онлайн-синтеза речи задержка ответа может достигать нескольких секунд из-за времени передачи данных через интернет, что делает диалог неестественным.</p>
+</blockquote>
+
+<h2 id="программирование-логики-общения">Программирование логики общения</h2>
+
+<p>Чтобы «Володя» был не просто проигрывателем, а собеседником, необходимо запрограммировать его логику. Вам нужно создать скрипт, который отслеживает события: столкновение со стеной, низкий заряд батареи или успешное завершение уборки. На каждое событие должна быть привязана определенная реплика.</p>
+
+<p>Для управления логикой часто используется язык <strong>Python</strong>. Он позволяет легко работать с файловой системой и внешними периферийными устройствами. Например, при срабатывании датчика столкновения скрипт проверяет статус и выбирает фразу: «Ой, опять застрял» или «Нужно сменить направление».</p>
+
+<blockquote>
+<p>⚠️ Внимание: Сложная логика может потребовать значительных вычислительных ресурсов, что приведет к быстрому разряду аккумуляторов даже в режиме ожидания.</p>
+</blockquote>
+
+<div class="poll-widget" id="poll-4749157e"><div class="poll-widget-question">📊 Какой вариант озвучки вам ближе?</div><div class="poll-widget-option" data-poll="4749157e" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Записанные фразы</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="4749157e" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Синтез речи</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="4749157e" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Голосовые команды</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="4749157e" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не использую звук</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="алгоритм-сборки-и-подключения">Алгоритм сборки и подключения</h2>
+
+<p>Процесс сборки требует внимательности и последовательности действий. Сначала монтируется основной контроллер, затем подключаются датчики навигации и моторы. Особое внимание уделите звуковому модулю — динамик должен быть надежно закреплен, чтобы не создавать вибраций.</p>
+
+<p>После аппаратного подключения необходимо настроить программное обеспечение. Загрузите драйверы для <strong>USB</strong> или <strong>UART</strong> портов, если используете внешние модули. Настройте громкость и частоту дискретизации, чтобы звук был разборчивым, но не раздражающим.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка узлов перед включением</h4><label class="check-item"><input type="checkbox"><span>Проверка питания</span></label><label class="check-item"><input type="checkbox"><span>Тест динамиков</span></label><label class="check-item"><input type="checkbox"><span>Калибровка датчиков</span></label><label class="check-item"><input type="checkbox"><span>Проверка Wi-Fi</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<details class="faq-item"><summary>Что делать, если звук искажается?
+<p>Если вы слышите посторонние шумы или хрипы при воспроизведении, проверьте качество изоляции проводов питания и сигнальных кабелей. Часто помехи возникают из-за наводок от мощных электродвигателей. Попробуйте установить ферритовые кольца на кабели или использовать экранированные провода.--></p>
+
+<h2 id="настройка-и-калибровка">Настройка и калибровка</h2>
+
+<p>После первой сборки обязательно проведите тестовую уборку. Наблюдайте за тем, как робот реагирует на препятствия и насколько четко звучат его сообщения. Если реплики перебивают звук мотора, возможно, потребуется программное подавление шума или физическое разделение акустических камер.</p>
+
+<p>Важно настроить чувствительность микрофона, если вы планируете использовать голосовые команды. Робот не должен реагировать на случайные звуки в комнате или собственную работу, но должен четко улавливать команды владельца.</p>
+
+<!--WIDGET</summary><div class="faq-answer"><p>tip:Для улучшения звучания динамиков внутри пластикового корпуса используйте небольшие поролоновые прокладки, чтобы предотвратить вибрацию стенок и улучшить акустику.</p></div></details>
+
+<table>
+<thead>
+<tr>
+<th>Компонент</th>
+<th>Рекомендуемая модель</th>
+<th>Функция</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Микроконтроллер</td>
+<td><em>Raspberry Pi 4</em> / <em>ESP32</em></td>
+<td>Обработка данных и управление</td>
+</tr>
+<tr>
+<td>Звуковой модуль</td>
+<td><strong>PAM8403</strong> + 3W динамик</td>
+<td>Усиление и воспроизведение звука</td>
+</tr>
+<tr>
+<td>Модуль памяти</td>
+<td>SD-карта <code>32 ГБ</code></td>
+<td>Хранение фраз и логических скриптов</td>
+</tr>
+<tr>
+<td>Блоки питания</td>
+<td>Li-Ion аккумуляторы <code>18650</code></td>
+<td>Энергообеспечение системы</td>
+</tr>
+<tr>
+<td>Датчики</td>
+<td>Ультразвуковые / Лазерные</td>
+<td>Определение препятствий</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="решение-проблем-с-интеграцией">Решение проблем с интеграцией</h2>
+
+<p>Частой проблемой при создании таких устройств является конфликт драйверов или некорректная работа библиотек. Если робот перестает реагировать на команды после обновления, проверьте права доступа к файлам и целостность системных библиотек.</p>
+
+<p>Иногда звук может прерываться из-за нестабильного напряжения. В этом случае поможет установка конденсаторов параллельно линиям питания звукового модуля. Это сгладит скачки напряжения, возникающие при старте двигателя.</p>
+
+<blockquote>
+<p>⚠️ Внимание: При работе с высоковольтными блоками питания обязательно используйте изолированные инструменты и соблюдайте технику безопасности, чтобы избежать короткого замыкания.</p>
+</blockquote>
+
+<h2 id="оптимизация-и-финальные-штрихи">Оптимизация и финальные штрихи</h2>
+
+<p>Когда «Володя» функционирует стабильно, можно заняться оптимизацией. Сжатие аудиофайлов, настройка уровней громкости для разных режимов и добавление новых фраз сделают робота более интересным. Не забудьте про внешний вид: наклейки или 3D-печатные элементы помогут персонализировать устройство.</p>
+
+<p>В конечном итоге, создание говорящего робота — это не только техническая задача, но и творческий процесс. Вы можете настроить характер «Володи», сделав его добрым помощником или, наоборот, ворчливым стариком, который ругает за беспорядок.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Успешная интеграция голосового модуля зависит от правильного баланса между мощностью оборудования и эффективностью программного кода.</p></div>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Можно ли сделать «Володю» на базе обычного Xiaomi?</summary>
+<p>Да, если модель поддерживает разблокировку и сторонние прошивки. Вам потребуется найти ROM с открытым доступом к файловой системе и заменить файлы звуковых уведомлений на свои собственные или подключить внешний модуль через <code>GPIO</code>.</p>
+</details>
+
+<details>
+<summary>Какой язык программирования лучше выбрать?</summary>
+<p>Для начинающих подойдет <strong>Python</strong> благодаря обширным библиотекам для работы со звуком и железом. Для более сложных задач и оптимизации ресурсов можно использовать C++ или скрипты на Lua, если контроллер это поддерживает.</p>
+</details>
+
+<details>
+<summary>Какой микрофон нужен для голосовых команд?</summary>
+<p>Рекомендуется использовать MEMS-микрофон с массивом из нескольких элементов для шумоподавления. Это позволит роботу отличать команду от шума двигателей и работы пылесоса.</p>
+</details>
+
+<details>
+<summary>Как записать свой голос в память робота?</summary>
+<p>Нужно записать фразы в формате <code>WAV</code> (моно, 8-16 кГц), переименовать их согласно инструкции прошивки и скопировать в соответствующую папку на карте памяти или во внутреннее хранилище устройства.</p>
+</details>
+
+<details>
+<summary>Сколько времени занимает создание такого робота?</summary>
+<p>В зависимости от ваших навыков, процесс может занять от двух недель до нескольких месяцев. Подготовка оборудования, написание кода и отладка требуют времени и терпения.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#выбор-платформы-и-аппаратной-базы">Выбор платформы и аппаратной базы</a></li><li><a href="#модуль-озвучки-и-синтез-речи">Модуль озвучки и синтез речи</a></li><li><a href="#программирование-логики-общения">Программирование логики общения</a></li><li><a href="#алгоритм-сборки-и-подключения">Алгоритм сборки и подключения</a></li><li><a href="#настройка-и-калибровка">Настройка и калибровка</a></li><li><a href="#решение-проблем-с-интеграцией">Решение проблем с интеграцией</a></li><li><a href="#оптимизация-и-финальные-штрихи">Оптимизация и финальные штрихи</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/p/py/pylesos-kholodilnik-chto-eto-takoe.html" class="related-card">Пылесос-холодильник: миф, шутка или реальная технология?</a></li><li><a href="/articles/p/py/pylesosit-kvartiru-vo-sne-k-chemu-snitsya.html" class="related-card">Пылесосить во сне: к чему снится уборка, значение по сонникам</a></li><li><a href="/articles/k/ka/kak-sdelat-khvost-pylesosom.html" class="related-card">Как сделать хвост пылесосом: технические возможности и мифы</a></li><li><a href="/articles/k/ka/kak-budet-pylesos-na-ukrainskom-yazyke.html" class="related-card">Как будет пылесос на украинском языке: перевод и терминология</a></li><li><a href="/articles/k/ka/kak-narisovat-cheloveka-s-pylesosom.html" class="related-card">Как нарисовать человека с пылесосом: пошаговый урок для начинающих</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/p/py/pylesos-kholodilnik-chto-eto-takoe.html" class="related-bottom-card"><span class="related-bottom-title">Пылесос-холодильник: миф, шутка или реальная технология?</span><span class="related-bottom-desc">Разбираем термин «пылесос-холодильник». Что это на самом деле: шуточный мем, ошибка перевода или нов</span></a><a href="/articles/p/py/pylesosit-kvartiru-vo-sne-k-chemu-snitsya.html" class="related-bottom-card"><span class="related-bottom-title">Пылесосить во сне: к чему снится уборка, значение по сонникам</span><span class="related-bottom-desc">Узнайте, к чему снится пылесосить квартиру во сне. Толкование сна про уборку пыли, грязи и чистоту в</span></a><a href="/articles/k/ka/kak-sdelat-khvost-pylesosom.html" class="related-bottom-card"><span class="related-bottom-title">Как сделать хвост пылесосом: технические возможности и мифы</span><span class="related-bottom-desc">Разбираем, можно ли использовать шланг пылесоса для создания хвоста. Технические нюансы, методы креп</span></a><a href="/articles/k/ka/kak-budet-pylesos-na-ukrainskom-yazyke.html" class="related-bottom-card"><span class="related-bottom-title">Как будет пылесос на украинском языке: перевод и терминология</span><span class="related-bottom-desc">Узнайте, как правильно перевести слово пылесос на украинский. Разбор терминов пилосос, пилосмоктальн</span></a><a href="/articles/k/ka/kak-narisovat-cheloveka-s-pylesosom.html" class="related-bottom-card"><span class="related-bottom-title">Как нарисовать человека с пылесосом: пошаговый урок для начинающих</span><span class="related-bottom-desc">Узнайте, как нарисовать человека с пылесосом правильно. Пошаговая инструкция рисования позы, техники</span></a><a href="/articles/p/py/pylesos-skolko-slogov.html" class="related-bottom-card"><span class="related-bottom-title">Сколько слогов в слове «пылесос»: разбор и правила переноса</span><span class="related-bottom-desc">Узнайте, сколько слогов в слове пылесос, как правильно переносить его на новую строку и какие правил</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

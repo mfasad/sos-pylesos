@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как подключить робот-пылесос Xiaomi к Apple HomeKit: полная инструкция — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговое руководство по интеграции пылесосов Xiaomi в экосистему Apple HomeKit. Узнайте про мосты, совместимые модели и настройку автоматизации Siri.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-dobavit-pylesos-xiaomi-v-apple-homekit.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как подключить робот-пылесос Xiaomi к Apple HomeKit: полная инструкция">
+    <meta property="og:description" content="Пошаговое руководство по интеграции пылесосов Xiaomi в экосистему Apple HomeKit. Узнайте про мосты, совместимые модели и настройку автоматизации Siri.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как подключить робот-пылесос Xiaomi к Apple HomeKit: полная инструкция</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Интеграция робота-пылесоса Xiaomi в Apple HomeKit: Полное руководство</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#понимание-совместимости-и-экосистем">Понимание совместимости и экосистем</a></li><li><a href="#аппаратные-решения-использование-умных-шлюзов">Аппаратные решения: использование умных шлюзов</a></li><li><a href="#программная-интеграция-через-homebridge">Программная интеграция через Homebridge</a></li><li><a href="#сравнение-методов-интеграции">Сравнение методов интеграции</a></li><li><a href="#настройка-сценариев-автоматизации">Настройка сценариев автоматизации</a></li><li><a href="#типичные-проблемы-и-способы-их-устранения">Типичные проблемы и способы их устранения</a></li><li><a href="#будущее-интеграции-и-альтернативы">Будущее интеграции и альтернативы</a></li><li><a href="#заключение">Заключение</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Использование робота-пылесоса <em>Xiaomi</em> в связке с экосистемой Apple дает значительные преимущества в плане централизованного управления. Однако, в отличие от устройств с нативной поддержкой, большинство моделей <em>Xiaomi</em> требуют использования специальных промежуточных решений для работы через <strong>Apple HomeKit</strong>.</p>
+
+<p>Прямое подключение к приложению «Дом» доступно не для всех устройств, что часто вызывает недоумение у пользователей. К счастью, современные способы интеграции позволяют обходить это ограничение, используя специализированные шлюзы или программные мосты. В этом материале мы разберем все доступные методы, от покупки дополнительного оборудования до настройки продвинутых сценариев.</p>
+
+<h2 id="понимание-совместимости-и-экосистем">Понимание совместимости и экосистем</h2>
+<p>Перед началом настройки необходимо четко понимать архитектурные различия между экосистемами. <em>Xiaomi</em> использует свой собственный протокол и облачные сервисы, которые изначально не «дружат» с закрытой платформой Apple. <strong>Apple HomeKit</strong> требует наличия сертификата MFi или использования специфических протоколов шифрования, что создает барьер для прямого взаимодействия.</p>
+
+<p>Большинство популярных моделей, таких как <em>Xiaomi Robot Vacuum S10</em> или <em>Mi Robot Vacuum-Mop 2</em>, не имеют встроенной поддержки HomeKit. Это не означает, что вы не сможете управлять ими с iPhone. Вам потребуется использовать <strong>шлюз-мост</strong> или стороннее приложение, которое будет транслировать команды из iOS на язык, понятный роботу.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Убедитесь, что ваш роутер поддерживает режим 2.4 ГГц. Большинство роботов-пылесосов Xiaomi не видят сети 5 ГГц, что является частой причиной ошибок при первичной привязке устройства.</p>
+</blockquote>
+
+<p>Существует два основных пути решения этой проблемы: использование аппаратных мостов (например, от Tuya или специализированных шлюзов) или использование домашних серверов типа Homebridge. Выбор зависит от ваших технических навыков и бюджета.</p>
+
+<h2 id="аппаратные-решения-использование-умных-шлюзов">Аппаратные решения: использование умных шлюзов</h2>
+<p>Самый простой способ для неподготовленного пользователя — приобрести аппаратный шлюз, который эмулирует устройство HomeKit. Такие устройства часто работают через облако <em>Tuya</em> или <em>Smart Life</em>. Вы подключаете пылесос к своему приложению, а шлюз транслирует это управление в Apple Home.</p>
+
+<p>Вам потребуется убедиться, что выбранный вами шлюз поддерживает конкретную модель робота. Не все мосты могут корректно обрабатывать сложные функции, такие как построение карты или выбор зоны влажной уборки. Обычно базовые команды (старт, стоп, возврат на базу) работают безотказно.</p>
+
+<ul>
+<li>✅ Установите приложение <em>Smart Life</em> или <em>Tuya Smart</em> на ваш iPhone.</li>
+<li>✅ Создайте учетную запись и добавьте устройство, следуя инструкциям производителя шлюза.</li>
+<li>✅ В настройках шлюза найдите пункт интеграции с <strong>Apple HomeKit</strong> и отсканируйте QR-код.</li>
+</ul>
+
+<p>После добавления устройства в приложение «Дом» вы сможете управлять им голосом через <strong>Siri</strong>. Однако функционал может быть ограничен по сравнению с нативным приложением <em>Xiaomi Home</em>.</p>
+
+<div class="poll-widget" id="poll-b22ad532"><div class="poll-widget-question">📊 Какой способ подключения вам ближе?</div><div class="poll-widget-option" data-poll="b22ad532" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Через шлюз Tuya</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b22ad532" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Через сервер Homebridge</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b22ad532" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Покупка модели с нативной поддержкой</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b22ad532" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Пока не пробовал</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="программная-интеграция-через-homebridge">Программная интеграция через Homebridge</h2>
+<p>Для продвинутых пользователей, имеющих дома <em>NAS</em> или <em>Raspberry Pi</em>, идеальным решением станет использование сервера <strong>Homebridge</strong>. Это программный мост, который позволяет подключить тысячи устройств, не поддерживающих HomeKit, к экосистеме Apple. <em>Xiaomi Mi Home</em> имеет множество плагинов для этой платформы.</p>
+
+<p>Процесс настройки требует базовых знаний работы с командной строкой и терминалом. Вам нужно будет установить Node.js, затем сам Homebridge, и после этого найти и настроить плагин для роботов-пылесосов <em>Xiaomi</em>. Это решение дает максимальную гибкость и контроль.</p>
+
+<pre><code>npm install -g homebridge
+<p>npm install -g homebridge-mi-vacuum</code></pre></p>
+
+<p>В конфигурационном файле <code>config.json</code> вам необходимо будет вставить токен вашего устройства. Токен — это уникальный ключ доступа, который позволяет серверу Homebridge управлять роботом. </p>
+
+<details class="faq-item"><summary>Как получить токен устройства Xiaomi?
+<p>Для получения токена необходимо использовать специальные утилиты на Android или скрипты на ПК. Самый простой способ — установить приложение "Xiaomi Cloud Token Extractor" из Google Play или F-Droid, залогиниться в своем аккаунте Mi и выбрать устройство. Токен скопируется в буфер обмена. Этот ключ конфиденциален, не передавайте его третьим лицам.--></p>
+
+<blockquote>
+<p>⚠️ Внимание</summary><div class="faq-answer"><p> Получение токена может нарушать пользовательское соглашение <em>Xiaomi</em>. Используйте эту информацию только для личного использования в рамках домашней автоматизации.</p>
+</blockquote>
+
+<div class="checklist-block"><h4>☑️ Подготовка к настройке Homebridge</h4><label class="check-item"><input type="checkbox"><span>Установить Node.js</span></label><label class="check-item"><input type="checkbox"><span>Настроить Raspberry Pi или NAS</span></label><label class="check-item"><input type="checkbox"><span>Получить токен устройства</span></label><label class="check-item"><input type="checkbox"><span>Установить плагин mi-vacuum</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="сравнение-методов-интеграции">Сравнение методов интеграции</h2>
+<p>Чтобы выбрать оптимальный вариант, стоит сравнить доступные способы по ключевым параметрам. Аппаратные шлюзы проще в настройке, но могут стоить дороже и иметь задержку в работе. Программные серверы требуют времени на настройку, но работают быстрее и локально.</p>
+
+<table>
+<thead>
+<tr>
+<th>Метод</th>
+<th>Сложность</th>
+<th>Стоимость</th>
+<th>Функционал</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Шлюз Tuya/Smart Life</td>
+<td>Низкая</td>
+<td>Средняя</td>
+<td>Базовый (старт/стоп)</td>
+</tr>
+<tr>
+<td>Сервер Homebridge</td>
+<td>Высокая</td>
+<td>Низкая</td>
+<td>Полный доступ ко всем функциям</td>
+</tr>
+<tr>
+<td>Нативная поддержка</td>
+<td>Отсутствует</td>
+<td>Высокая (модель)</td>
+<td>Полный контроль</td>
+</tr>
+<tr>
+<td>Приложение Mi Home</td>
+<td>Низкая</td>
+<td>Бесплатно</td>
+<td>Полный, но без Siri</td>
+</tr>
+</tbody>
+</table>
+
+<p>Как видно из таблицы, если вам критична работа <strong>Siri</strong>, то шлюз или Homebridge — единственные варианты. Если же вы готовы обойтись без голосового управления, родное приложение <em>Xiaomi Home</em> предлагает самый богатый набор функций, включая детальное картирование и настройку расписаний.</p>
+
+
+
+<h2 id="настройка-сценариев-автоматизации">Настройка сценариев автоматизации</h2>
+<p>После успешного добавления робота в <em>Apple Home</em> открывается доступ к мощным возможностям автоматизации. Вы можете создавать сценарии, которые запускаются не только по расписанию, но и в зависимости от состояния других устройств в доме.</p>
+
+<p>Например, можно настроить запуск уборки сразу после того, как вы покинете дом. Для этого в приложении «Дом» создайте автоматизацию: «Когда я покидаю дом» — «Запустить робота-пылесос». Также возможен запуск уборки при открытии «умной» двери или включении определенной сцены освещения.</p>
+
+<ul>
+<li>🏠 Создайте сцену «Я дома», которая включает пылесос в режиме «Точечная уборка».</li>
+<li>⏰ Настройте расписание на работу только в ночное время, чтобы избежать шума.</li>
+<li>🔋 Сделайте автоматизацию остановки уборки, если заряд батареи падает ниже 15%.</li>
+</ul>
+
+<p>Важно учитывать, что для корректной работы геолокационных сценариев (привязка к местоположению) приложение «Дом» должно иметь соответствующие разрешения. Проверьте настройки конфиденциальности на вашем iPhone.</p>
+
+<h2 id="типичные-проблемы-и-способы-их-устранения">Типичные проблемы и способы их устранения</h2>
+<p>Несмотря на отлаженные алгоритмы, пользователи могут столкнуться с ошибками при синхронизации. Самая частая проблема — потеря связи между сервером <strong>Homebridge</strong> и роботом <em>Xiaomi</em>. Это часто происходит после обновления прошивки робота или смены пароля Wi-Fi.</p>
+
+<p>Если робот не отвечает на команды Siri, первым делом проверьте статус подключения в приложении Homebridge UI. Убедитесь, что токен устройства не устарел. В некоторых случаях требуется полный сброс сети на самом роботе и повторное получение токена.</p>
+
+<blockquote>
+<p>⚠️ Внимание: После обновления прошивки пылесоса токен доступа может смениться. Обязательно обновите конфигурационный файл Homebridge новым ключом.</p>
+</blockquote>
+
+<p>Также стоит обратить внимание на стабильность Wi-Fi сети. Роботы-пылесосы имеют слабые антенны и могут терять связь в дальней комнате. Использование повторителей сигнала может существенно улучшить стабильность работы интеграции.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если Siri не видит устройство, попробуйте удалить его из приложения «Дом» и добавить заново, используя новый код доступа из Homebridge.</p></div>
+
+<h2 id="будущее-интеграции-и-альтернативы">Будущее интеграции и альтернативы</h2>
+<p>Компания <em>Xiaomi</em> постепенно расширяет поддержку сторонних экосистем, однако нативная поддержка HomeKit пока доступна только для ограниченного числа премиальных моделей. Следите за новинками в линейке <em>Xiaomi Robot Vacuum</em>, так как новые версии часто получают сертификаты совместимости.</p>
+
+<p>В качестве альтернативы можно рассмотреть использование голосовых ассистентов, которые поддерживают оба протокола. Например, <em>Google Assistant</em> или <em>Alexa</em> имеют более широкую поддержку устройств <em>Xiaomi</em> без использования сторонних мостов, хотя они и не интегрируются напрямую в приложение «Дом» Apple.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Пока нативная поддержка ограничена, использование моста Homebridge остается самым надежным способом получить полный контроль над Xiaomi в экосистеме Apple.</p></div>
+
+<h2 id="заключение">Заключение</h2>
+<p>Добавление робота-пылесоса <em>Xiaomi</em> в <strong>Apple HomeKit</strong> — задача выполнимая, требующая выбора правильного инструмента. Аппаратные шлюзы подойдут тем, кто ценит простоту, а программные серверы — энтузиастам, желающим полного контроля. </p>
+
+<p>Независимо от выбранного метода, вы получаете возможность управлять уборкой голосом и создавать удобные сценарии жизни. Правильная настройка превратит обычный робот в полноценный элемент умного дома, работающий в единой связке с вашими устройствами.</p>
+
+<div class="poll-widget" id="poll-151dbcad"><div class="poll-widget-question">📊 Как вы планируете управлять пылесосом?</div><div class="poll-widget-option" data-poll="151dbcad" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Через Siri и Home</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="151dbcad" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Через приложение Mi Home</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="151dbcad" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Через Telegram-бота</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="151dbcad" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Комплексно через все методы</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<details>
+<summary>Можно ли подключить любой робот Xiaomi к HomeKit?</summary>
+<p>Нет, не все модели поддерживают прямое подключение. Большинство требуют использования внешнего шлюза (Tuya) или сервера Homebridge для эмуляции устройства, совместимого с Apple.</p>
+</details>
+
+<details>
+<summary>Нужно ли покупать новый пылесос для работы с Apple HomeKit?</summary>
+<p>Нет, покупать новый пылесос не обязательно. Вы можете использовать существующую модель <em>Xiaomi</em> с помощью программного моста Homebridge или аппаратного шлюза Smart Life.</p>
+</details>
+
+<details>
+<summary>Как работает голосовое управление через Siri?</summary>
+<p>С помощью Siri вы можете отдавать базовые команды: «Запусти уборку», «Верни его на базу», «Останови уборку». Точные функции зависят от того, какой мост или шлюз вы настроили.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот потерял связь с HomeKit?</summary>
+<p>Проверьте подключение к Wi-Fi. Если используется Homebridge, убедитесь, что сервер запущен, и токен устройства актуален. Возможно, потребуется заново получить токен после обновления прошивки робота.</p>
+</details>
+
+<details>
+<summary>Какие модели Xiaomi имеют нативную поддержку HomeKit?</summary>
+<p>На данный момент нативная поддержка встречается крайне редко. В основном это новые или специфические модели, выпущенные для определенных рынков. Всегда проверяйте характеристики на коробке или официальном сайте перед покупкой.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#понимание-совместимости-и-экосистем">Понимание совместимости и экосистем</a></li><li><a href="#аппаратные-решения-использование-умных-шлюзов">Аппаратные решения: использование умных шлюзов</a></li><li><a href="#программная-интеграция-через-homebridge">Программная интеграция через Homebridge</a></li><li><a href="#сравнение-методов-интеграции">Сравнение методов интеграции</a></li><li><a href="#настройка-сценариев-автоматизации">Настройка сценариев автоматизации</a></li><li><a href="#типичные-проблемы-и-способы-их-устранения">Типичные проблемы и способы их устранения</a></li><li><a href="#будущее-интеграции-и-альтернативы">Будущее интеграции и альтернативы</a></li><li><a href="#заключение">Заключение</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-podklyuchit-pylesos-tefal-k-telefonu.html" class="related-card">Как подключить пылесос Tefal к телефону: полная инструкция</a></li><li><a href="/articles/k/ka/kak-najti-ajpi-adres-robota-pylesosa-xiaomi.html" class="related-card">Как найти IP-адрес робота-пылесоса Xiaomi: точные способы настройки</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-tefal-60-k-telefonu-cherez-vaj.html" class="related-card">Настройка робот-пылесоса Tefal X-Force Flex 60: подключение к Wi-Fi и смартфону</a></li><li><a href="/articles/k/ka/kak-podklyuchit-pylesos-xiaomi-k-wi-fi.html" class="related-card">Как подключить пылесос Xiaomi к Wi-Fi: полная инструкция</a></li><li><a href="/articles/k/ka/kak-podklyuchit-prilozhenie-k-robotu-pylesosu-xiaomi.html" class="related-card">Как подключить приложение к роботу-пылесосу Xiaomi: Полное руководство</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-podklyuchit-pylesos-tefal-k-telefonu.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить пылесос Tefal к телефону: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по подключению робота-пылесоса Tefal к смартфону через приложение. Настройка W</span></a><a href="/articles/k/ka/kak-najti-ajpi-adres-robota-pylesosa-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как найти IP-адрес робота-пылесоса Xiaomi: точные способы настройки</span><span class="related-bottom-desc">Инструкция по поиску IP-адреса роботов Xiaomi Mi Robot, Roborock и Dreame. Методы через роутер, прил</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-tefal-60-k-telefonu-cherez-vaj.html" class="related-bottom-card"><span class="related-bottom-title">Настройка робот-пылесоса Tefal X-Force Flex 60: подключение к Wi-Fi и смартфону</span><span class="related-bottom-desc">Пошаговая инструкция: как подключить робот-пылесос Tefal к телефону через Wi-Fi. Решение ошибок, нас</span></a><a href="/articles/k/ka/kak-podklyuchit-pylesos-xiaomi-k-wi-fi.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить пылесос Xiaomi к Wi-Fi: полная инструкция</span><span class="related-bottom-desc">Пошаговая инструкция: как настроить робот-пылесос Xiaomi и Mi Home на Wi-Fi 2.4 ГГц. Решение проблем</span></a><a href="/articles/k/ka/kak-podklyuchit-prilozhenie-k-robotu-pylesosu-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить приложение к роботу-пылесосу Xiaomi: Полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по подключению пылесоса Xiaomi к Mi Home. Решение проблем с поиском устройств, </span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-k-mi-home-na-android-video-s-telefona-samsung.html" class="related-bottom-card"><span class="related-bottom-title">Подключение робот-пылесоса Xiaomi к Mi Home на Samsung: пошаговая инструкция</span><span class="related-bottom-desc">Подробный гайд по настройке робот-пылесоса Xiaomi на Android (Samsung). Рабочие методы, сброс Wi-Fi,</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как выстроить маршрут для робота-пылесоса Xiaomi: полное руководство — SOS-Пылесос</title>
+    <meta name="description" content="Узнайте, как настроить карту, создать виртуальные стены и оптимизировать зону уборки для роботов-пылесосов Xiaomi и Mi Home. Подробная инструкция с примерами.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-vystroit-marshrut-dlya-robota-pylesosa-xiaomi.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как выстроить маршрут для робота-пылесоса Xiaomi: полное руководство">
+    <meta property="og:description" content="Узнайте, как настроить карту, создать виртуальные стены и оптимизировать зону уборки для роботов-пылесосов Xiaomi и Mi Home. Подробная инструкция с примерами.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как выстроить маршрут для робота-пылесоса Xiaomi: полное руководство</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как выстроить маршрут для робота пылесоса Xiaomi</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#первичная-калибровка-и-создание-карты-помещения">Первичная калибровка и создание карты помещения</a></li><li><a href="#настройка-виртуальных-стен-и-запретных-зон">Настройка виртуальных стен и запретных зон</a></li><li><a href="#оптимизация-зон-уборки-и-последовательности">Оптимизация зон уборки и последовательности</a></li><li><a href="#решение-проблем-с-навигацией-и-застреванием">Решение проблем с навигацией и застреванием</a></li><li><a href="#сравнение-режимов-движения-и-их-влияние-на-маршрут">Сравнение режимов движения и их влияние на маршрут</a></li><li><a href="#интеграция-с-умным-домом-и-автоматизация">Интеграция с умным домом и автоматизация</a></li><li><a href="#частые-вопросы-пользователей-о-маршрутизации">Частые вопросы пользователей о маршрутизации</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Роботы-пылесосы <em>Xiaomi</em> и их суббренды, такие как <em>Roborock</em> или <em>Viomi</em>, давно перестали быть просто «умными метлами», которые хаотично скачут по комнате. Современные модели оснащены продвинутыми системами навигации на базе <strong>LDS</strong> (лазерного дальномера) или <strong>VSLAM</strong> (визуальной навигации), которые позволяют строить точные карты помещения. Однако, даже самая совершенная техника требует правильной настройки, чтобы превратить процесс уборки из случайного набора движений в систематический и эффективный алгоритм.</p>
+
+<p>Неправильно выстроенный маршрут может привести к тому, что робот будет пропускать углы, застревать в одних и тех же местах или тратить заряд батареи на преодоление незначительных препятствий. Понимание логики работы приложения <code>Mi Home</code> или специализированного софта <code>Roborock</code> — это ключ к тому, чтобы устройство работало автономно и бесперебойно. В этой статье мы разберем, как заставить робота двигаться именно так, как вам нужно, используя инструменты виртуальных стен, зон уборки и настройки навигации.</p>
+
+<h2 id="первичная-калибровка-и-создание-карты-помещения">Первичная калибровка и создание карты помещения</h2>
+
+<p>Перед тем как говорить о тонкой настройке маршрута, необходимо пройти этап первичного обучения. Робот-пылесос <em>Xiaomi</em> не знает геометрию вашей квартиры, пока вы не дадите ему возможность её изучить. Этот процесс называется <strong>быстрым сканированием</strong>. Включите устройство и запустите режим «Быстрая уборка» или «Карта», чтобы робот проехал по периметру и ключевым зонам, собирая данные о расстояниях до стен и крупных предметов мебели. Это создаст базовый слой карты, на котором будут строиться все дальнейшие алгоритмы.</p>
+
+<p>Убедитесь, что датчики <code>LDS</code> или камеры чистые и ничто не мешает их вращению или обзору. Если робот не может построить карту с первого раза, проверьте, нет ли на полу слишком темных ковров или зеркал, которые могут сбить сенсоры с толку. В некоторых случаях, особенно при работе с<em> VSLAM</em> моделями, требуется хорошее освещение в помещении для корректного определения ориентиров. Если карта получилась фрагментированной, попробуйте запустить режим «Доосмотр» в приложении, чтобы робот добрался до неисследованных зон.</p>
+
+<p><strong>Важно:</strong> во время первого сканирования робот должен иметь возможность беспрепятственно перемещаться по всей площади. Не ставьте его на зарядку до завершения процесса, иначе карта будет сохранена только частично. <mark>Полная завершенная карта позволяет роботу запомнить расположение комнаты и возвращаться на базу точно из любой точки, экономя до 30% времени на повторную локализацию.</mark></p>
+
+<blockquote>⚠️ Внимание: Проверяйте актуальность функций в приложении, так как различные модели <em>Xiaomi</em> могут иметь разные версии прошивок, где названия разделов меню могут отличаться. Всегда сверяйтесь с актуальной версией ПО в настройках устройства.</blockquote>
+
+<h2 id="настройка-виртуальных-стен-и-запретных-зон">Настройка виртуальных стен и запретных зон</h2>
+
+<p>Механические ограничители в виде лент с инфракрасным излучением уходят в прошлое. Современные приложения позволяют рисовать <strong>виртуальные стены</strong> прямо на цифровой карте. Это самый эффективный способ управлять маршрутом. Вы можете запретить роботу заходить в детскую комнату во время сна, избежать уборки вокруг домашнего аквариума или отодвинуть зону работы от кучи игрушек на полу. Просто выберите инструмент «Виртуальная стена» и проведите линию там, где робот не должен проходить.</p>
+
+<p>Помимо линейных ограничений, существуют <strong>запретные зоны</strong> (No-Go Zones) и <strong>запретные зоны с мытьем</strong> (No-Mop Zones). Первые полностью блокируют проезд робота, а вторые запрещают включение системы мытья пола. Это критически важно, если у вас есть напольные покрытия, которые боится влаги, например, паркет или ламинат старого образца. Нанесите такие зоны поверх карты, и алгоритм перестроит маршрут так, чтобы огибать их с безопасным расстоянием.</p>
+
+<p>Для максимальной точности настройки используйте функцию «Электронная стена» в сочетании с <strong>режимом точечной уборки</strong>. Это позволяет создать сложные лабиринты препятствий в масштабе, недоступном для физических барьеров. Если вы часто переставляете мебель, помните, что виртуальные стены не всегда идеально учитывают временные препятствия, поэтому их лучше использовать для стационарных зон ограничения.</p>
+
+<div class="poll-widget" id="poll-ceed81d8"><div class="poll-widget-question">📊 Как часто вы переставляете мебель в квартире?</div><div class="poll-widget-option" data-poll="ceed81d8" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Никогда, всё на своих местах</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ceed81d8" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Реже раза в месяц</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ceed81d8" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Часто, для экспериментов</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="ceed81d8" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Ежедневно, меняю планировку</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="оптимизация-зон-уборки-и-последовательности">Оптимизация зон уборки и последовательности</h2>
+
+<p>Одним из самых мощных инструментов управления маршрутом является функция <strong>разделения карты</strong> (Split Map). Если ваш робот объединил коридор, кухню и гостиную в одну общую площадь, вы можете разделить их на отдельные комнаты. Это дает возможность задавать конкретный порядок уборки. Например, вы можете настроить сценарий, при котором робот сначала моет плитку на кухне, затем чистит ковер в гостиной и только потом убирает труднодоступный коридор.</p>
+
+<p>В приложении <code>Mi Home</code> или <code>Roborock</code> вы можете вручную отредактировать границы комнат, если алгоритм ошибся. Иногда стены выглядят как двойные линии, а проходы слишком узкие. Используйте инструмент «Соединить комнаты» или «Разделить комнату», чтобы исправить геометрию. Правильно разделенные зоны позволяют использовать функцию <strong>многоступенчатой уборки</strong>, где робот запоминает порядок и повторяет его автоматически при каждом запуске.</p>
+
+<p>Создавайте <strong>избранные зоны</strong> для оперативной уборки. Если пролилось молоко на кухне, не нужно запускать полную уборку всей квартиры. Выберите на карте только этот квадрат и запустите «Уборку в зоне». Робот построит маршрут именно вокруг этой области, пропустив остальные пространства. Это экономит время и заряд аккумулятора, продлевая жизнь батарее устройства.</p>
+
+<div class="checklist-block"><h4>☑️ Подготовка зоны для точной уборки</h4><label class="check-item"><input type="checkbox"><span>Убрать мелкие предметы с пола</span></label><label class="check-item"><input type="checkbox"><span>Открыть двери в комнату</span></label><label class="check-item"><input type="checkbox"><span>Проверить заряд батареи > 50%</span></label><label class="check-item"><input type="checkbox"><span>Выбрать режим интенсивности</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="решение-проблем-с-навигацией-и-застреванием">Решение проблем с навигацией и застреванием</h2>
+
+<p>Даже при идеальной карте робот может иногда теряться или застревать. Это часто связано с динамическими изменениями в помещении: перемещенным стулом, оставленной игрушкой или изменившимся освещением. Если робот постоянно застревает в одном и том же месте, попробуйте добавить туда <strong>дополнительную запретную зону</strong> или временно поместить физический барьер. Также проверьте, не перекрывает ли мебель лазерный датчик, что может привести к потере ориентации в пространстве.</p>
+
+<p>Проблема «потерянной карты» часто возникает, если робот заезжает в темное помещение или квартиру с очень темным полом. В таких случаях алгоритм <strong>VSLAM</strong> может не найти достаточное количество визуальных ориентиров. Решение — включить дополнительные источники света или использовать вспомогательные маячки, если они поддерживаются моделью. Для лазерных моделей (LDS) проблема может быть в зеркальных поверхностях, которые искажают отражение луча.</p>
+
+<p>Если робот вернулся на базу не в том месте, где он начал уборку, или начал строить новую карту вместо продолжения старой, попробуйте сделать <strong>калибровку</strong> или сбросить карту и начать заново. Иногда накопление ошибок в памяти навигации требует полного перезапуска процесса обучения. Это может показаться долгой процедурой, но она гарантирует стабильность работы на длительном промежутке времени.</p>
+
+<blockquote>⚠️ Внимание: Если робот постоянно теряет карту в темных комнатах, это может быть связано с особенностями модели <em>дешевых версий</em> с камерой, а не с поломкой. Попробуйте добавить искусственное освещение в зону уборки.</blockquote>
+
+<h2 id="сравнение-режимов-движения-и-их-влияние-на-маршрут">Сравнение режимов движения и их влияние на маршрут</h2>
+
+<p>Выбор режима уборки напрямую влияет на то, как робот прокладывает путь. Режим <strong>Z-образной уборки</strong> (или «вправо-влево») наиболее эффективен для чистки ковров и крупных открытых пространств, так как минимизирует количество поворотов и пробелов. В то же время, режим <strong>спиральной уборки</strong> предназначен для локальной очистки сильно загрязненных участков и не подходит для общей уборки всей квартиры.</p>
+
+<p>Таблица ниже демонстрирует различия в подходах к маршрутизации в зависимости от выбранного режима:</p>
+
+<table>
+<thead>
+<tr>
+<th>Режим движения</th>
+<th>Принцип работы</th>
+<th>Идеально для</th>
+<th>Экономия заряда</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Стандартный (Z-образный)</td>
+<td>Движение параллельными линиями</td>
+<td>Паркет, плитка, ковролин</td>
+<td>Высокая</td>
+</tr>
+<tr>
+<td>Точечный</td>
+<td>Спираль или круги вокруг точки</td>
+<td>Локальные загрязнения</td>
+<td>Средняя</td>
+</tr>
+<tr>
+<td>Вдоль стен</td>
+<td>Огибание периметра комнаты</td>
+<td>Уборка по краям</td>
+<td>Низкая</td>
+</tr>
+<tr>
+<td>Случайный</td>
+<td>Хаотичное движение</td>
+<td>Маленькие помещения</td>
+<td>Низкая</td>
+</tr>
+</tbody>
+</table>
+
+<p>Некоторые продвинутые модели позволяют настраивать <strong>поведение при встрече с препятствием</strong>. Вы можете настроить робота так, чтобы он аккуратно обходил мебель, слегка толкая её, или сразу менял направление. Это влияет на то, насколько плотно робот будет прижиматься к стенам и как тщательно он будет прометать углы. Экспериментируйте с этими настройками, чтобы найти баланс между качеством уборки и безопасностью мебели.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если у вас есть питомец, который оставляет шерсть в одном месте, настройте «Точечную уборку» именно в этой зоне дважды за один цикл, это вычистит шерсть эффективнее стандартного прохода.</p></div>
+
+<h2 id="интеграция-с-умным-домом-и-автоматизация">Интеграция с умным домом и автоматизация</h2>
+
+<p>Выстроенный маршрут можно автоматизировать, привязав его к сценариям умного дома. Например, настройте запуск уборки в определенном режиме только тогда, когда все члены семьи ушли из дома, а датчики движения показали отсутствие активности в течение 30 минут. Это позволяет роботу работать без риска сбиться с маршрута из-за перемещений людей или животных.</p>
+
+<p>Вы можете создавать <strong>сценарии</strong> в приложении <code>Smart Home</code>, которые меняют настройки маршрута в зависимости от времени суток. Днем робот может работать в режиме «Тихая уборка» с обходом детской комнаты, а ночью, когда все спят, включать режим «Максимальная мощность» и заходить в те зоны, которые днем были закрыты. Это требует тщательной настройки виртуальных стен и таймеров.</p>
+
+<p>Для пользователей <em>Home Assistant</em> или других систем автоматизации доступны более глубокие настройки через API. Вы можете программно менять карту, отправлять робота в конкретные координаты и получать отчеты о пройденном маршруте. Это открывает простор для создания уникальных сценариев, недоступных в стандартных приложениях, и позволяет интегрировать работу пылесоса в общую экосистему умного дома.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Использование виртуальных стен и разделение карты — это единственный способ заставить робота-пылесоса убирать по вашему сценарию, а не по случайному алгоритму.</p></div>
+
+<h2 id="частые-вопросы-пользователей-о-маршрутизации">Частые вопросы пользователей о маршрутизации</h2>
+
+<details>
+<summary>Почему робот не запоминает карту после перезагрузки?</summary>
+<p>Это может произойти, если вы отключили функцию сохранения карты в настройках или если карта была повреждена. Проверьте, включен ли режим «Сохранить карту» в настройках устройства. Также убедитесь, что робот не сбросился до заводских настроек.</p>
+</details>
+
+<details>
+<summary>Можно ли заставить робота убирать только конкретный угол комнаты?</summary>
+<p>Да, используя функцию «Точечная уборка» или создав виртуальную зону, которая охватывает только нужный угол. Запустите уборку только для выбранной зоны, и робот построит маршрут исключительно внутри её границ.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот постоянно теряет карту в коридоре?</summary>
+<p>Коридоры часто бывают узкими и темными. Попробуйте добавить освещение или уменьшить скорость движения робота в этом районе. Также проверьте, нет ли зеркал на стенах, которые могут сбить лазерный датчик.</p>
+</details>
+
+<details>
+<summary>Как изменить порядок уборки комнат?</summary>
+<p>В приложении перейдите в раздел «Карта», выберите настроенные комнаты и расставьте их в порядке приоритета. Сохраните этот сценарий как «Избранное» или «Предустановку», чтобы робот всегда начинал уборку в этом порядке.</p>
+</details>
+
+<details>
+<summary>Влияет ли тип напольного покрытия на маршрут?</summary>
+<p>Да, робот может менять скорость и давление на щетку в зависимости от покрытия. Если у вас комбинированный пол (ковер и плитка), убедитесь, что зоны с ковром правильно размечены, чтобы робот не застревал на стыках.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#первичная-калибровка-и-создание-карты-помещения">Первичная калибровка и создание карты помещения</a></li><li><a href="#настройка-виртуальных-стен-и-запретных-зон">Настройка виртуальных стен и запретных зон</a></li><li><a href="#оптимизация-зон-уборки-и-последовательности">Оптимизация зон уборки и последовательности</a></li><li><a href="#решение-проблем-с-навигацией-и-застреванием">Решение проблем с навигацией и застреванием</a></li><li><a href="#сравнение-режимов-движения-и-их-влияние-на-маршрут">Сравнение режимов движения и их влияние на маршрут</a></li><li><a href="#интеграция-с-умным-домом-и-автоматизация">Интеграция с умным домом и автоматизация</a></li><li><a href="#частые-вопросы-пользователей-о-маршрутизации">Частые вопросы пользователей о маршрутизации</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-podsoedinit-pylesos-dlya-bassejna-k-filtru.html" class="related-card">Как подсоединить пылесос для бассейна к фильтру: инструкция</a></li><li><a href="/articles/c/ch/chto-takoe-marshrutizator-u-robota-pylesosa-xiaomi-vacuum-mop.html" class="related-card">Что такое маршрутизатор для робота-пылесоса Xiaomi Vacuum Mop</a></li><li><a href="/articles/r/ro/robot-pylesos-xiaomi-kak-vklyuchit-wi-fi.html" class="related-card">Как подключить робот-пылесос Xiaomi к Wi-Fi: полное руководство</a></li><li><a href="/articles/r/ro/robot-pylesos-xiaomi-mi-robot-vacuum-mop-kak-dobavit-golosovoj-paket.html" class="related-card">Как добавить голосовой пакет в Xiaomi Mi Robot Vacuum Mop: Полная инструкция</a></li><li><a href="/articles/k/ka/kak-ustanovit-vremya-robot-pylesos.html" class="related-card">Как правильно установить время на робот-пылесос: полное руководство</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-podsoedinit-pylesos-dlya-bassejna-k-filtru.html" class="related-bottom-card"><span class="related-bottom-title">Как подсоединить пылесос для бассейна к фильтру: инструкция</span><span class="related-bottom-desc">Подробная схема подключения донного пылесоса к системе фильтрации. Советы по настройке скиммера, хво</span></a><a href="/articles/c/ch/chto-takoe-marshrutizator-u-robota-pylesosa-xiaomi-vacuum-mop.html" class="related-bottom-card"><span class="related-bottom-title">Что такое маршрутизатор для робота-пылесоса Xiaomi Vacuum Mop</span><span class="related-bottom-desc">Разбираем роль роутера в работе Xiaomi Vacuum Mop: настройка Wi-Fi, влияние стандартов 2.4 ГГц, устр</span></a><a href="/articles/r/ro/robot-pylesos-xiaomi-kak-vklyuchit-wi-fi.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi к Wi-Fi: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция, как включить Wi-Fi на робот-пылесосе Xiaomi. Решение частых проблем, настройки</span></a><a href="/articles/r/ro/robot-pylesos-xiaomi-mi-robot-vacuum-mop-kak-dobavit-golosovoj-paket.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить голосовой пакет в Xiaomi Mi Robot Vacuum Mop: Полная инструкция</span><span class="related-bottom-desc">Подробное руководство по смене голоса робота-пылесоса Xiaomi. Узнайте, как установить русские озвучк</span></a><a href="/articles/k/ka/kak-ustanovit-vremya-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Как правильно установить время на робот-пылесос: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по настройке времени на роботе-пылесосе разных брендов. Решение проблем синхрон</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-redmond-k-telefonu-rv-r630s.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Redmond RV-R630S к телефону: полная инструкция</span><span class="related-bottom-desc">Пошаговая настройка робота-пылесоса Redmond RV-R630S через приложение Ready for Sky. Решение частых </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как настроить расписание уборки роботом пылесосом Xiaomi — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговая инструкция по программированию таймера уборки в приложении Mi Home. Настройка сценариев, зон и расписаний для моделей Xiaomi.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-zaprogrammirovat-robot-pylesos-xiaomi-dlya-uborki-po-raspisaniyu.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как настроить расписание уборки роботом пылесосом Xiaomi">
+    <meta property="og:description" content="Пошаговая инструкция по программированию таймера уборки в приложении Mi Home. Настройка сценариев, зон и расписаний для моделей Xiaomi.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как настроить расписание уборки роботом пылесосом Xiaomi</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как запрограммировать робот-пылесос Xiaomi для уборки по расписанию</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#базовая-подготовка-и-подключение-устройства">Базовая подготовка и подключение устройства</a></li><li><a href="#настройка-времени-и-часового-пояса">Настройка времени и часового пояса</a></li><li><a href="#создание-расписания-в-приложении-mi-home">Создание расписания в приложении Mi Home</a></li><li><a href="#настройка-уборки-по-зонам-и-виртуальным-стенам">Настройка уборки по зонам и виртуальным стенам</a></li><li><a href="#управление-сценариями-умного-дома-xiaomi-smart-life">Управление сценариями умного дома (Xiaomi Smart Life)</a></li><li><a href="#частые-проблемы-и-способы-их-решения">Частые проблемы и способы их решения</a></li><li><a href="#заключение-и-рекомендации">Заключение и рекомендации</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Современные роботы-пылесосы от <em>Xiaomi</em> и суббрендов вроде <em>Roborock</em> или <em>Viomi</em> предлагают не просто автоматическую очистку пола, но и глубокий уровень управления процессом через мобильное приложение. Пользователи часто используют их как «умных помощников», которые убирают дом, пока хозяева находятся на работе или спят. Это требует грамотной настройки таймеров и сценариев, чтобы устройство работало в нужное время и с нужной интенсивностью.</p>
+<p>Программирование <strong>расписания уборки</strong> превращает гаджет из простого исполнительного механизма в автономную систему поддержания чистоты. В зависимости от модели, функционал может незначительно отличаться, но базовая логика работы через экосистему <em>Mi Home</em> остается единой для большинства устройств. Именно поэтому важно понимать принципы настройки, чтобы максимально эффективно использовать технические возможности вашего помощника.</p>
+<p>В этой статье мы разберем все этапы: от базовой привязки устройства до создания сложных сценариев с виртуальными стенами. Вы узнаете, как избежать частых ошибок, при которых робот отказывается убираться, и как правильно настроить <strong>карту помещения</strong> для работы по зонам.</p>
+
+<h2 id="базовая-подготовка-и-подключение-устройства">Базовая подготовка и подключение устройства</h2>
+<p>Прежде чем приступить к настройке таймера, необходимо убедиться, что робот-пылесос корректно интегрирован в вашу домашнюю сеть. Без стабильного подключения к Wi-Fi удаленное управление и синхронизация времени будут невозможны. Большинство моделей <em>Xiaomi</em> работают в диапазоне 2.4 ГГц, что часто становится причиной проблем при подключении.</p>
+<p>Убедитесь, что ваш маршрутизатор раздает сигнал в этой полосе. Если у вас современный двухдиапазонный роутер, возможно, потребуется временно отключить сеть 5 ГГц или создать отдельную точку доступа для умного дома. Только после успешной регистрации устройства в приложении можно переходить к настройке часов.</p>
+<p>Важно проверить, что на устройстве установлен актуальный <strong>прошивка</strong>. Старые версии ПО могут содержать баги, из-за которых таймер сбрасывается или не запускает уборку в заданное время. Обновление производится через меню настроек устройства в приложении.</p>
+
+<h2 id="настройка-времени-и-часового-пояса">Настройка времени и часового пояса</h2>
+<p>Самая частая причина, почему робот не запускается в нужное время — рассинхронизация часов. Если на сервере приложения время отличается от локального времени пользователя, таймер просто не сработает. Перейдите в настройки конкретного устройства и найдите пункт «Часы» или «Время».</p>
+<p>Вам необходимо вручную или автоматически установить верный <strong>часовой пояс</strong>. Если вы часто путешествуете или находитесь в поездке, эта настройка может сбиться. Также проверьте, включена ли опция автоматического обновления времени через сеть. Это критически важно для точности срабатывания расписания.</p>
+<blockquote>⚠️ Внимание: Если время на устройстве отличается от реального более чем на 10 минут, робот может пропустить запланированный цикл уборки или начать его в неподходящий момент. Сверяйте настройки сразу после перезагрузки роутера.</blockquote>
+
+<h2 id="создание-расписания-в-приложении-mi-home">Создание расписания в приложении Mi Home</h2>
+<p>Основной инструмент для программирования — раздел «Расписание» (Schedule) в карточке устройства. Нажав на иконку плюса, вы сможете добавить новое правило. Интерфейс интуитивно понятен: выбираете дни недели, время начала и длительность уборки. Для моделей с функцией <strong>карты</strong> доступны дополнительные опции.</p>
+<p>При создании расписания обратите внимание на режим работы. Вы можете выбрать <code>стандартная уборка</code>, <code>тихий режим</code> или <code>турбо-уборка</code>. Для утренней уборки часто выбирают тихий режим, чтобы не будить домочадцев, а для вечерней — более мощный.</p>
+<p>Существует возможность настроить <strong>автоматический возврат на базу</strong> и повторную зарядку, если уборка не была завершена. Это полезно, если у вас большая квартира, где один заряд аккумулятора может быть недостаточен. Робот вернется, зарядится и продолжит работу с того места, где остановился.</p>
+
+<div class="poll-widget" id="poll-b733a9ba"><div class="poll-widget-question">📊 Какой режим уборки вы используете чаще всего?</div><div class="poll-widget-option" data-poll="b733a9ba" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Стандартный</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b733a9ba" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Тихий</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b733a9ba" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Турбо</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b733a9ba" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Уборка только по зонам</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<div class="checklist-block"><h4>☑️ Проверка перед сохранением расписания</h4><label class="check-item"><input type="checkbox"><span>Выбрать дни недели</span></label><label class="check-item"><input type="checkbox"><span>Установить точное время</span></label><label class="check-item"><input type="checkbox"><span>Выбрать мощность всасывания</span></label><label class="check-item"><input type="checkbox"><span>Проверить уровень заряда базы</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="настройка-уборки-по-зонам-и-виртуальным-стенам">Настройка уборки по зонам и виртуальным стенам</h2>
+<p>Продвинутая функция для моделей с лазерной навигацией (LDS) или визуальным SLAM — это уборка по конкретным зонам. В разделе карты вы можете нарисовать виртуальные комнаты или выделить зоны, требующие особого внимания. Это позволяет запрограммировать робота убирать только кухню после обеда или коридор перед выходом.</p>
+<p>Для этого нужно войти в режим редактирования карты, выделить нужную область и сохранить её как «Зону 1», «Зона 2» и так далее. Затем при создании расписания вы выбираете не «Вся квартира», а конкретную сохраненную зону. Это экономит ресурсы батареи и время.</p>
+<p>Также можно использовать <strong>виртуальные стены</strong>, чтобы запретить роботу заходить в определенные комнаты, например, в детскую или комнату с домашними животными во время их сна. Эти границы сохраняются в памяти устройства и действуют автоматически при каждом запуске.</p>
+<blockquote>⚠️ Внимание: При перестановке мебели или изменении планировки квартиры робот может «заблудиться» или не найти базу, если не обновить карту. Обязательно используйте функцию «Обновить карту» перед настройкой новых зон.</blockquote>
+
+<details class="faq-item"><summary>Что делать, если робот не видит карту?</summary><div class="faq-answer"><p>Иногда лаг карты происходит после сбоя питания. Попробуйте отправить робота на базу и запустить процесс «Рекалибровка» в меню карты. Если это не помогает, удалите карту и запустите полное сканирование заново, чтобы сохранить актуальные данные о планировке.»</p></div></details>
+
+<h2 id="управление-сценариями-умного-дома-xiaomi-smart-life">Управление сценариями умного дома (Xiaomi Smart Life)</h2>
+<p>Если вы используете экосистему умного дома, можно привязать уборку к другим событиям. Например, запускать пылесос автоматически, когда датчики движения фиксируют отсутствие людей в квартире более 30 минут. Это реализуется через сценарии в приложении Mi Home.</p>
+<p>Вы можете создать условие: «Если датчик открытия двери показывает, что все ушли, и время после 09:00, то запустить уборку». Это более гибкий подход, чем жесткое расписание, так как учитывает реальное присутствие людей в доме. Такой <strong>умный сценарий</strong> идеально подходит для больших семей с разным графиком.</p>
+<p>Также можно настроить реакцию на голосовые команды через <em>Google Assistant</em> или <em>Alexa</em>. Вы можете сказать: «Алиса, запускай уборку в гостиной», и робот выполнит задачу, если зона «гостиная» сохранена в его памяти. Это удобно для быстрой поддержки чистоты перед приходом гостей.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Для стабильной работы умных сценариев убедитесь, что у вашего робота-пылесоса и всех датчиков (движения, открытия) включена функция «Работать в фоновом режиме» в настройках телефона, чтобы приложение не убивало процессы при закрытии.»</p></div>
+
+<h2 id="частые-проблемы-и-способы-их-решения">Частые проблемы и способы их решения</h2>
+<p>Иногда пользователи сталкиваются с ситуацией, когда робот не запускается по таймеру, хотя настройки кажутся верными. Первой причиной может быть низкий заряд батареи на стартовой позиции. Если робот не может дойти до базы или зарядить её до минимального уровня, он откажется начинать уборку.</p>
+<p>Вторая причина — блокировка приложения на фоне. Если вы закрываете Mi Home на телефоне, система Android или iOS может «усыпить» процесс, и таймер не сработает. Проверьте настройки энергосбережения вашего смартфона, разрешив приложению работать в фоновом режиме.</p>
+<p>Третья причина — устаревшие данные о карте. Если в квартире что-то изменилось, робот может не найти базу и прервать цикл. В таких случаях помогает полная перезагрузка устройства и повторное сканирование помещения.</p>
+
+<table>
+<thead>
+<tr>
+<th>Проблема</th>
+<th>Возможная причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Робот не запускается по таймеру</td>
+<td>Низкий заряд батареи</td>
+<td>Поставьте робота на базу на ночь</td>
+</tr>
+<tr>
+<td>Робот не находит базу</td>
+<td>Смещение или загрязнение сенсоров</td>
+<td>Протрите датчики и проверьте место базы</td>
+</tr>
+<tr>
+<td>Сброс расписания после перезагрузки</td>
+<td>Ошибка синхронизации времени</td>
+<td>Проверьте часовой пояс в настройках</td>
+</tr>
+<tr>
+<td>Уборка только части квартиры</td>
+<td>Сбой карты или виртуальные стены</td>
+<td>Обновите карту помещения</td>
+</tr>
+</tbody>
+</table>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярная очистка датчиков и колес, а также обновление карты помещения — залог того, что запрограммированное расписание будет выполняться без сбоев.»</p></div>
+
+<h2 id="заключение-и-рекомендации">Заключение и рекомендации</h2>
+<p>Программирование робот-пылесоса <em>Xiaomi</em> — это процесс, который позволяет существенно облегчить быт. Правильная настройка расписания, зон и сценариев превращает устройство в полноценного дворецкого. Главное — не бояться экспериментировать с настройками карты и режимами работы.</p>
+<p>Помните, что технология развивается, и обновления прошивки могут добавлять новые функции. Регулярно проверяйте наличие обновлений в приложении. Это гарантирует, что вы используете все преимущества своего устройства.</p>
+<p>Следуя этим советам, вы сможете настроить идеальное расписание уборки, которое будет работать незаметно и эффективно. Ваша квартира всегда будет чистой, без лишних усилий с вашей стороны.</p>
+
+<details>
+<summary>Почему робот не запускается по расписанию, если я закрыл приложение?</summary>
+<p>Если вы полностью закрываете приложение Mi Home или телефон переходит в режим глубокого сна, фоновые процессы могут быть остановлены системой. Рекомендуется разрешить приложению «Автозапуск» и «Работу в фоне» в настройках энергосбережения вашего смартфона, чтобы таймер срабатывал корректно.</p>
+</details>
+
+<details>
+<summary>Можно ли настроить разные расписания для разных дней недели?</summary>
+<p>Да, в приложении Mi Home можно создавать несколько расписаний. Вы можете добавить одно правило для будних дней (например, в 10:00) и другое для выходных (например, в 14:00). Просто создайте два отдельных сценария и привяжите их к соответствующим дням недели.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот застревает в одном и том же месте во время уборки?</summary>
+<p>Если робот регулярно застревает, это означает, что препятствие слишком велико или датчики не распознают его. Попробуйте убрать препятствие или использовать функцию «Виртуальная стена», чтобы запретить роботу заходить в эту зону. Также проверьте, не запутался ли робот в проводах.</p>
+</details>
+
+<details>
+<summary>Как часто нужно обновлять карту помещения?</summary>
+<p>Рекомендуется обновлять карту после любой значительной перестановки мебели или ремонта. Если вы просто двигаете стул, робот справится сам. Но если вы перенесли диван или добавили новую перегородку, запустите процесс «Обновить карту», чтобы робот не терялся.</p>
+</details>
+
+<details>
+<summary>Работает ли расписание, если телефон выключен?</summary>
+<p>Да, расписание хранится в памяти самого робота-пылесоса, а не только в телефоне. Даже если ваш телефон выключен или не подключен к интернету, робот запустится по таймеру, если он был установлен ранее. Однако для получения уведомлений о завершении уборки телефон должен быть включен.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#базовая-подготовка-и-подключение-устройства">Базовая подготовка и подключение устройства</a></li><li><a href="#настройка-времени-и-часового-пояса">Настройка времени и часового пояса</a></li><li><a href="#создание-расписания-в-приложении-mi-home">Создание расписания в приложении Mi Home</a></li><li><a href="#настройка-уборки-по-зонам-и-виртуальным-стенам">Настройка уборки по зонам и виртуальным стенам</a></li><li><a href="#управление-сценариями-умного-дома-xiaomi-smart-life">Управление сценариями умного дома (Xiaomi Smart Life)</a></li><li><a href="#частые-проблемы-и-способы-их-решения">Частые проблемы и способы их решения</a></li><li><a href="#заключение-и-рекомендации">Заключение и рекомендации</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-proshit-pylesos-xiaomi-na-russkij-cherez-android.html" class="related-card">Как прошить пылесос Xiaomi на русский язык через Android</a></li><li><a href="/articles/k/ka/kak-podklyuchit-alisu-k-pylesosu-polaris.html" class="related-card">Как подключить пылесос Polaris к Алисе: полная инструкция</a></li><li><a href="/articles/m/ma/marshrutizator-eto-chto-u-pylesosa.html" class="related-card">Роутер в пылесосе: что это, зачем нужен и как подключить</a></li><li><a href="/articles/p/po/pochemu-robot-pylesos-ne-sokhranyaet-kartu-doma-xiaomi.html" class="related-card">Почему робот-пылесос Xiaomi не сохраняет карту дома: 7 главных причин</a></li><li><a href="/articles/t/to/token-pylesosa-xiaomi-kak-uznat.html" class="related-card">Как узнать токен робота пылесоса Xiaomi: полная инструкция 2026</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-proshit-pylesos-xiaomi-na-russkij-cherez-android.html" class="related-bottom-card"><span class="related-bottom-title">Как прошить пылесос Xiaomi на русский язык через Android</span><span class="related-bottom-desc">Пошаговая инструкция по смене языка на роботах-пылесосах Xiaomi через Android. Установка Mi Home Chi</span></a><a href="/articles/k/ka/kak-podklyuchit-alisu-k-pylesosu-polaris.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить пылесос Polaris к Алисе: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по интеграции робота-пылесоса Polaris с голосовым ассистентом Яндекс Алиса. На</span></a><a href="/articles/m/ma/marshrutizator-eto-chto-u-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Роутер в пылесосе: что это, зачем нужен и как подключить</span><span class="related-bottom-desc">Разбираем, что такое маршрутизатор в робот-пылесосе. Зачем нужна Wi-Fi функция, как работает приложе</span></a><a href="/articles/p/po/pochemu-robot-pylesos-ne-sokhranyaet-kartu-doma-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Почему робот-пылесос Xiaomi не сохраняет карту дома: 7 главных причин</span><span class="related-bottom-desc">Робот Xiaomi стирает карту после уборки? Разбираем причины: от сбоя Wi-Fi до проблем с датчиками. По</span></a><a href="/articles/t/to/token-pylesosa-xiaomi-kak-uznat.html" class="related-bottom-card"><span class="related-bottom-title">Как узнать токен робота пылесоса Xiaomi: полная инструкция 2026</span><span class="related-bottom-desc">Пошаговое руководство: как получить токен для робота-пылесоса Xiaomi и Mi Home. Рабочие методы для р</span></a><a href="/articles/p/po/pochemu-robot-pylesos-ne-podklyuchaetsya-k-wifi-cherez-marshrutizator.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос не подключается к Wi-Fi: причины и способы решения</span><span class="related-bottom-desc">Проблемы с подключением робота-пылесоса к роутеру? Разбираем частые ошибки, настройки 2.4 ГГц, смену</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

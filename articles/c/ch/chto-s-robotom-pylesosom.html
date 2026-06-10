@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Что случилось с роботом-пылесосом: диагностика и решение проблем — SOS-Пылесос</title>
+    <meta name="description" content="Статья о типичных поломках роботов-пылесосов, ошибки навигации, забитые фильтры и алгоритмы самостоятельной диагностики для восстановления работы техники.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/c/ch/chto-s-robotom-pylesosom.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Что случилось с роботом-пылесосом: диагностика и решение проблем">
+    <meta property="og:description" content="Статья о типичных поломках роботов-пылесосов, ошибки навигации, забитые фильтры и алгоритмы самостоятельной диагностики для восстановления работы техники.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/problemy-i-resheniya/">Проблемы и решения</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Что случилось с роботом-пылесосом: диагностика и решение проблем</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Что с роботом-пылесосом: диагностика неполадок и методы восстановления</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#почему-робот-не-находит-базу-и-не-заряжается">Почему робот не находит базу и не заряжается</a></li><li><a href="#хаотичное-движение-и-удары-об-мебель">Хаотичное движение и удары об мебель</a></li><li><a href="#проблемы-с-уборкой-слабый-всасывающий-поток">Проблемы с уборкой: слабый всасывающий поток</a></li><li><a href="#ошибка-аккумулятора-и-автономность">Ошибка аккумулятора и автономность</a></li><li><a href="#алгоритмы-самостоятельной-диагностики">Алгоритмы самостоятельной диагностики</a></li><li><a href="#когда-пора-в-сервисный-центр">Когда пора в сервисный центр</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Ситуация, когда вдруг перестает работать <em>умный помощник</em> по уборке, вызывает раздражение, особенно если квартира требует внимания. Вопрос «что с роботом-пылесосом» чаще всего возникает в момент, когда устройство отказывается покидать док-станцию, бьется о стены или хаотично ездит по комнате. Причин такого поведения может быть множество: от банального разряда батареи до сбоя в программном обеспечении или механического повреждения датчиков.</p>
+
+<p>Не стоит сразу нести технику в сервисный центр. В большинстве случаев проблема кроется в мелочах, которые можно устранить самостоятельно за считанные минуты. Необходимо проверить состояние расходных материалов, очистить сенсоры и убедиться, что <strong>система навигации</strong> не блокируется посторонними предметами. Правильная диагностика позволяет сэкономить время и деньги.</p>
+
+<p>Иногда виновником бездействия становится не физическая поломка, а программный глюк или устаревшая прошивка. Современные модели <em>роботизированной техники</em> требуют регулярного обслуживания, аналогично сложным электронным устройствам. Игнорирование простых правил эксплуатации приводит к тому, что агрегат теряет эффективность или вовсе отказывается функционировать.</p>
+
+<h2 id="почему-робот-не-находит-базу-и-не-заряжается">Почему робот не находит базу и не заряжается</h2>
+
+<p>Одной из самых частых жалоб является неспособность устройства вернуться на <em>зарядную станцию</em>. Если робот-пылесос крутится на месте и издает сигналы тревоги, значит, он не видит «дом». Чаще всего виноваты грязные контакты на корпусе пылесоса или на базе. Пыль и волоски, набившиеся в разъемы, создают плохой контакт, из-за чего процесс зарядки прерывается или не начинается вовсе.</p>
+
+<p>Вторая распространенная причина — блокировка датчиков возврата. На передней панели или в нижней части корпуса расположены сенсоры, которые должны «видеть» станцию. Если они покрыты слоем пыли, паутиной или случайными пятнами, устройство перестает ориентироваться в пространстве. Вам нужно тщательно протереть эти зоны сухой безворсовой тканью.</p>
+
+<p>Также стоит проверить расположение самой базы. Она должна стоять на ровной поверхности, на расстоянии не менее 0,5 метра от стен и 1,5 метра от других предметов. Освещение в зоне базы не должно быть слишком ярким или, наоборот, темным, так как это может влиять на работу <strong>оптических сенсоров</strong>. Убедитесь, что на пути к базе нет высоких препятствий, которые могут заслонить сигнал.</p>
+
+<blockquote>
+<p>⚠️ Внимание: Если после чистки контактов робот все равно не садится на базу, попробуйте перепрограммировать её координаты через мобильное приложение. Сброс карты и повторное обучение часто решает проблему программных сбоев навигации.</p>
+</blockquote>
+
+<h2 id="хаотичное-движение-и-удары-об-мебель">Хаотичное движение и удары об мебель</h2>
+
+<p>Если ваш <em>робот-пылесос</em> перестал строить карту и начал ездить по квартире случайным образом, постоянно ударяясь о ножки стульев или диван, это верный признак неисправности системы навигации. Для моделей с лидаром (выдвижной «башней» наверху) частой причиной является залипание механизма вращения или попадание волоса в подшипник. В результате лазерный сканер не может вращаться, и устройство слепнет.</p>
+
+<p>Модели с визуальными камерами могут терять ориентацию из-за недостатка освещения или, наоборот, бликов на полу. Глянцевые поверхности, зеркала и стекло часто сбивают с толку алгоритмы <strong>компьютерного зрения</strong>. В таких случаях робот может пытаться «провалиться» под прозрачный журнальный столик или застрять перед зеркальной дверью шкафа.</p>
+
+<p>Не забывайте про бампер. Если демпфер под передней панелью сломан или заклинен, робот будет воспринимать любое легкое касание мебели как серьезное препятствие или, наоборот, не будет реагировать на стены до самого удара. Проверьте, свободно ли нажимается передняя часть корпуса. Замените изношенные щетки-разметки, так как они также участвуют в ориентации в пространстве.</p>
+
+<div class="poll-widget" id="poll-d5f239c9"><div class="poll-widget-question">📊 Какая проблема с роботом у вас самая частая?</div><div class="poll-widget-option" data-poll="d5f239c9" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Не едет на базу</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="d5f239c9" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Тупо бьется об мебель</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="d5f239c9" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Мало ходит от батареи</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="d5f239c9" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Грязное белье не убирает</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Система навигации критически зависит от чистоты датчиков и правильного освещения в комнате. Регулярная очистка внешних сенсоров — залог стабильной работы картографии.</p></div>
+
+<h2 id="проблемы-с-уборкой-слабый-всасывающий-поток">Проблемы с уборкой: слабый всасывающий поток</h2>
+
+<p>Снижение мощности всасывания — это сигнал о том, что в системе циркуляции воздуха что-то мешает. Самая очевидная причина — переполненный <strong>мусорный контейнер</strong>. Даже если датчик не срабатывает, избыток пыли в отсеке может блокировать поток воздуха, заставляя вентилятор работать на износ.</p>
+
+<p>Второй виновник — забитый HEPA-фильтр или основной фильтр перед мотором. Фильтры имеют свойство накапливать мельчайшие частицы, которые со временем превращаются в плотную корку. Через такую преграду воздух практически не проходит. Вам нужно достать фильтр и тщательно продуть его или промыть водой (если это разрешено инструкцией для вашей модели <em>Xiaomi</em>, <em>Roborock</em> или <em>Ecovacs</em>).</p>
+
+<p>Не менее важно проверить главную щетку. Если длинный волос или нить намертво намотались на вал, вращение будет затруднено, а всасывание — снижено. Разблокируйте вал, удалите намотку и проверьте резиновые роторы на наличие трещин. Старая, изношенная резина не может эффективно поднимать мусор с ковра, что создает иллюзию плохой работы мотора.</p>
+
+<p>Иногда проблема кроется в самом мусоросборнике: если он вставлен не до конца, система не может создать вакуум. Убедитесь, что крышка контейнера закрыта плотно и защелкнулась с характерным звуком. Прозрачный корпус бункера также может иметь трещины, через которые подсасывается лишний воздух, снижая КПД всей системы.</p>
+
+<div class="checklist-block"><h4>☑️ Чек-лист проверки системы всасывания</h4><label class="check-item"><input type="checkbox"><span>Очистить контейнер от мусора</span></label><label class="check-item"><input type="checkbox"><span>Промыть HEPA-фильтр</span></label><label class="check-item"><input type="checkbox"><span>Освободить вал щетки</span></label><label class="check-item"><input type="checkbox"><span>Проверить герметичность мусоросборника</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<details class="faq-item"><summary>Что делать, если щетка жужжит, но не крутится?</summary><div class="faq-answer"><p>Скорее всего, сгорел мотор привода щетки или сбились шестеренки в редукторе. В этом случае потребуется замена узла в сервисном центре.</p></div></details>
+
+<h2 id="ошибка-аккумулятора-и-автономность">Ошибка аккумулятора и автономность</h2>
+
+<p>Если робот-пылесос внезапно выключается через 5 минут работы или вообще не включается, проблема почти наверняка в аккумуляторе. Литий-ионные батареи имеют ограниченный срок службы и со временем теряют емкость. Если устройству более 3-4 лет, это естественный износ. Однако, если робот новый, причиной может быть глубокий разряд.</p>
+
+<p>Иногда контакты на аккумуляторе окисляются или смещаются, из-за чего система не видит заряда. В этом случае помогает аккуратная очистка контактов спиртом или повторная установка батареи с небольшим усилием. Также стоит проверить, не перегревался ли робот во время работы — тепловой датчик может блокировать запуск при критических температурах.</p>
+
+<p>Важно отметить, что <strong>прошивка</strong> также может влиять на отображение заряда. Если программа «думает», что батарея заряжена на 100%, а реально там 20%, робот может отказать в начале уборки. В таких случаях помогает полный цикл разрядки и зарядки, чтобы контроллер перекалибровал показания.</p>
+
+<table>
+<thead>
+<tr>
+<th>Симптом</th>
+<th>Вероятная причина</th>
+<th>Решение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Быстро садится</td>
+<td>Износ аккумулятора</td>
+<td>Замена батареи</td>
+</tr>
+<tr>
+<td>Не включается</td>
+<td>Глубокий разряд</td>
+<td>Долгая зарядка (2-3 часа)</td>
+</tr>
+<tr>
+<td>Горит красный свет</td>
+<td>Ошибка батареи</td>
+<td>Очистка контактов, перезагрузка</td>
+<tr>
+<td>Срабатывает защита</td>
+<td>Перегрев или замыкание</td>
+<td>Охлаждение, проверка проводки</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="алгоритмы-самостоятельной-диагностики">Алгоритмы самостоятельной диагностики</h2>
+
+<p>Большинство современных моделей имеют встроенный режим диагностики, который позволяет пользователю выявить неисправность без специальных приборов. Для этого нужно найти комбинацию кнопок или пункт в меню <code>Настройки → Система → Диагностика</code>. В этом режиме робот проверит работу моторов, датчиков и поворотных механизмов по очереди.</p>
+
+<p>Если на дисплее появляется код ошибки (например, E01, E12 или символы), это самый верный способ узнать, что произошло. Расшифровку кодов можно найти в официальном руководстве пользователя или на сайте производителя. Коды ошибок обычно делятся на группы: проблемы с колесами, датчиками падения, турбо-щеткой или зарядкой.</p>
+
+<p>Не забывайте о перезагрузке. Как и любой компьютер, робот-пылесос может «зависнуть» с ошибкой. Полное обесточивание устройства (вынуть аккумулятор, подождать 10 минут и вставить обратно) часто сбрасывает временные программные сбои. Это первый шаг, который нужно предпринять при любых странностях в поведении.</p>
+
+<blockquote>
+<p>⚠️ Внимание: При проведении диагностики с открытым корпусом соблюдайте технику безопасности. Не прикасайтесь к внутренним платам мокрыми руками и не включайте устройство без крышки, чтобы избежать короткого замыкания.</p>
+</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Сделайте фото ошибки на экране или кода ошибки перед тем, как стирать пыль тряпкой. Это поможет быстрее найти решение в интернете, если вы забудете, какой именно код мигал.</p></div>
+
+<h2 id="когда-пора-в-сервисный-центр">Когда пора в сервисный центр</h2>
+
+<p>Несмотря на простоту конструкции, робот-пылесос содержит чувствительную электронику, которую нельзя чинить «на коленке». Если вы очистили все доступные узлы, проверили контакты и перезагрузили устройство, но проблема осталась — необходим профессиональный осмотр. Самостоятельное вскрытие корпуса может привести к потере гарантии.</p>
+
+<p>Основные признаки, требующие визита в сервис: запах гари, искрение, сильный нагрев корпуса в одном месте или механические повреждения после падения. Также, если робот упал с высоты (например, с лестницы), внутренние крепления могут сместиться, что не всегда видно снаружи. В таких случаях <strong>механическая целостность</strong> нарушена и требует замены деталей.</p>
+
+<p>Иногда проблема кроется в материнской плате или контроллере мотора, что требует пайки и сложной диагностики. Не пытайтесь заменить эти узлы самостоятельно, если у вас нет соответствующего опыта и оборудования. Неправильная установка может привести к выходу из строя всего устройства.</p>
+
+<details>
+<summary>Как часто нужно менять расходники?</summary>
+<p>Рекомендуется менять главное фильтры каждые 3-6 месяцев, щетки — раз в 6-8 месяцев, а колесные подшипники — по мере износа. Частота замены зависит от интенсивности использования и типа покрытия в вашем доме.</p>
+</details>
+
+<details>
+<summary>Можно ли мыть робота водой?</summary>
+<p>Категорически нет. Даже если корпус кажется герметичным, влага может попасть внутрь через динамики, микрофоны или щели. Мыть можно только съемные части: контейнер, щетки и фильтр (с последующей полной сушкой).</p>
+</details>
+
+<details>
+<summary>Что делать, если робот застрял под мебелью?</summary>
+<p>Используйте функцию «Locate» в приложении, чтобы он издал звук. Аккуратно освободите его, не дергая резко. Проверьте, не застрял ли датчик высоты, и дайте устройству время на перезагрузку перед повторным запуском.</p>
+</details>
+
+<details>
+<summary>Почему робот шумит сильнее обычного?</summary>
+<p>Причина может быть в износе подшипников вращающихся деталей, засоре в воздуховоде или работе мотора на максимальной мощности из-за высокого сопротивления (например, на толстом ковре).</p>
+</details>
+
+<blockquote>
+<p>⚠️ Внимание: Если вы используете сторонние расходные материалы низкого качества, это может привести к повреждению датчиков или мотора. Производитель может отказать в гарантийном ремонте в случае обнаружения неоригинальных запчастей.</p>
+</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярное обслуживание и своевременная замена расходников продлевают жизнь роботу-пылесосу на годы. Игнорирование небольших неисправностей ведет к дорогостоящему ремонту.</p></div></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#почему-робот-не-находит-базу-и-не-заряжается">Почему робот не находит базу и не заряжается</a></li><li><a href="#хаотичное-движение-и-удары-об-мебель">Хаотичное движение и удары об мебель</a></li><li><a href="#проблемы-с-уборкой-слабый-всасывающий-поток">Проблемы с уборкой: слабый всасывающий поток</a></li><li><a href="#ошибка-аккумулятора-и-автономность">Ошибка аккумулятора и автономность</a></li><li><a href="#алгоритмы-самостоятельной-диагностики">Алгоритмы самостоятельной диагностики</a></li><li><a href="#когда-пора-в-сервисный-центр">Когда пора в сервисный центр</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/c/ch/chto-budet-esli-podnesti-k-gubam-pylesos.html" class="related-card">Что будет, если поднести губы к пылесосу: риски, физиология и реальные последствия</a></li><li><a href="/articles/p/po/pochemu-ne-vsasyvaet-pylesos-redmond.html" class="related-card">Почему не всасывает пылесос Redmond: 7 главных причин и ремонт</a></li><li><a href="/articles/k/ka/kak-vernut-pylesos-kirbi-esli-kuplen-v-kredit.html" class="related-card">Как вернуть пылесос Kirby в кредит: пошаговая инструкция и нюансы</a></li><li><a href="/articles/v/v-/v-slove-pylesos-zvuk-p-kakoj.html" class="related-card">Звук [п] в слове «пылесос»: фонетический разбор и позиция</a></li><li><a href="/articles/p/po/pochemu-robot-pylesos-ezdit-po-diagonali-xiaomi.html" class="related-card">Почему робот-пылесос Xiaomi ездит по диагонали: причины и решение</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/c/ch/chto-budet-esli-podnesti-k-gubam-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Что будет, если поднести губы к пылесосу: риски, физиология и реальные последствия</span><span class="related-bottom-desc">Полный разбор физических и медицинских последствий засасывания губ пылесосом. Виды травм, риск барот</span></a><a href="/articles/p/po/pochemu-ne-vsasyvaet-pylesos-redmond.html" class="related-bottom-card"><span class="related-bottom-title">Почему не всасывает пылесос Redmond: 7 главных причин и ремонт</span><span class="related-bottom-desc">Пылесос Redmond потерял мощность всасывания? Узнайте основные причины: засоры, фильтры, щетки и мото</span></a><a href="/articles/k/ka/kak-vernut-pylesos-kirbi-esli-kuplen-v-kredit.html" class="related-bottom-card"><span class="related-bottom-title">Как вернуть пылесос Kirby в кредит: пошаговая инструкция и нюансы</span><span class="related-bottom-desc">Пошаговый алгоритм возврата купленного в кредит пылесоса Kirby. Расчет переплаты, досрочное погашени</span></a><a href="/articles/v/v-/v-slove-pylesos-zvuk-p-kakoj.html" class="related-bottom-card"><span class="related-bottom-title">Звук [п] в слове «пылесос»: фонетический разбор и позиция</span><span class="related-bottom-desc">Узнайте, какой звук обозначает буква «п» в слове пылесос. Полный фонетический разбор, характеристика</span></a><a href="/articles/p/po/pochemu-robot-pylesos-ezdit-po-diagonali-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Почему робот-пылесос Xiaomi ездит по диагонали: причины и решение</span><span class="related-bottom-desc">Узнайте, почему робот-пылесос Xiaomi движется по диагонали. Разбор алгоритмов навигации, проблем с д</span></a><a href="/articles/p/po/pochemu-ne-tyanet-pylesos-samsung-s-meshkom-dlya-sbora.html" class="related-bottom-card"><span class="related-bottom-title">Пылесос Samsung с мешком не тянет: причины и способы ремонта</span><span class="related-bottom-desc">Пылесос Samsung с мешком перестал всасывать пыль? Узнайте 7 основных причин потери мощности и пошаго</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

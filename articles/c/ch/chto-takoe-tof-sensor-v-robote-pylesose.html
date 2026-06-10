@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>TOF сенсор в роботе-пылесосе: принцип работы и преимущества — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем, что такое TOF сенсор в роботе-пылесосе. Как работает технология, чем отличается от LIDAR и камер, плюсы навигации и нюансы выбора.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/c/ch/chto-takoe-tof-sensor-v-robote-pylesose.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="TOF сенсор в роботе-пылесосе: принцип работы и преимущества">
+    <meta property="og:description" content="Разбираем, что такое TOF сенсор в роботе-пылесосе. Как работает технология, чем отличается от LIDAR и камер, плюсы навигации и нюансы выбора.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">TOF сенсор в роботе-пылесосе: принцип работы и преимущества</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Что такое TOF сенсор в роботе-пылесосе: полный гид по технологии</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#вводная-часть">Вводная часть</a></li><li><a href="#принцип-работы-технологии-time-of-flight">Принцип работы технологии Time of Flight</a></li><li><a href="#сравнение-tof-с-другими-системами-навигации">Сравнение TOF с другими системами навигации</a></li><li><a href="#преимущества-использования-tof-в-бытовых-условиях">Преимущества использования TOF в бытовых условиях</a></li><li><a href="#нюансы-эксплуатации-и-обслуживания">Нюансы эксплуатации и обслуживания</a></li><li><a href="#топ-производителей-и-моделей-с-tof">ТОП производителей и моделей с TOF</a></li><li><a href="#будущее-навигации-и-развитие-технологий">Будущее навигации и развитие технологий</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="вводная-часть">Вводная часть</h2>
+
+<p>Современный рынок бытовой техники переполнен моделями, обещающими идеальную чистоту без участия человека. Однако эффективность уборки напрямую зависит от того, насколько точно робот понимает пространство вокруг себя. Именно здесь на сцену выходит технология <strong>TOF</strong>, которая становится стандартом де-факто для продвинутых моделей навигации.</p>
+
+<p>Многие пользователи путают различные типы датчиков или полагают, что лазерная башня — единственно верное решение. На самом деле, <em>Time of Flight</em> представляет собой более совершенный и компактный метод измерения расстояний, который позволяет устройству строить карту помещения с невероятной скоростью и точностью.</p>
+
+<p>В этой статье мы подробно разберем физический принцип работы, преимущества перед конкурентами и реальные примеры использования этой технологии в популярных брендах. Вы узнаете, стоит ли переплачивать за наличие такого модуля и как он влияет на качество уборки в вашем доме.</p>
+
+<h2 id="принцип-работы-технологии-time-of-flight">Принцип работы технологии Time of Flight</h2>
+
+<p>Аббревиатура <strong>TOF</strong> расшифровывается как <em>Time of Flight</em>, что в переводе означает «время пролета». Это физический метод измерения расстояния, основанный на фиксации времени, за которое световой импульс проходит от излучателя до объекта и возвращается обратно к приемнику. В отличие от простых инфракрасных датчиков, которые лишь определяют наличие препятствия, TOF вычисляет точную дистанцию в миллисекундах.</p>
+
+<p>Работа системы строится на следующем алгоритме: модуль испускает луч невидимого инфракрасного света, который отражается от стен, мебели или ковров. Специальный высокочувствительный сенсор улавливает отраженный сигнал. Микропроцессор, встроенный в робота, мгновенно обрабатывает задержку между отправкой и получением импульса, преобразуя её в метрическое значение.</p>
+
+<p>Главная особенность технологии заключается в её скорости и независимости от яркости окружающего освещения. <strong>TOF сенсор</strong> способен строить трехмерную карту пространства, понимая не только плоские стены, но и объем предметов. Это критически важно для обхода сложных конструкций, таких как ножки стульев, кабели на полу или детские игрушки.</p>
+
+<p>Важно отметить, что в отличие от классических лазерных сканеров (LIDAR), которые часто вращаются механически, модули TOF могут быть как сканирующими, так и статичными матричными датчиками. Это позволяет инженерам делать корпуса роботов более низкими, чтобы они пролезали под диваны и кровати, сохраняя при этом высокую точность навигации.</p>
+
+<h2 id="сравнение-tof-с-другими-системами-навигации">Сравнение TOF с другими системами навигации</h2>
+
+<p>Чтобы понять ценность технологии, необходимо сравнить её с альтернативными решениями, которые встречаются в бюджетных и среднеценовых сегментах. Основной конкурент — это <strong>LIDAR</strong>, то есть лазерный дальномер, обычно выглядящий как вращающаяся башенка на корпусе устройства. Хотя LIDAR обеспечивает отличную точность, он имеет физические ограничения по высоте и уязвим к механическим повреждениям при столкновениях.</p>
+
+<p>Вторая группа — это роботы на основе <em>камер</em> (VSLAM) и гироскопов с инфракрасными датчиками. Камеры зависят от освещения: в темноте они «слепнут» и начинают хаотично ездить. Гироскопические модели без визуальной привязки часто теряют ориентацию и проходят по одним и тем же участкам несколько раз, пропуская другие. <strong>TOF сенсор</strong> лишен этих недостатков, так как работает в полной темноте и обладает высокой скоростью обновления карты.</p>
+
+<p>Ниже приведена сравнительная таблица основных характеристик различных технологий навигации:</p>
+
+<table>
+<thead>
+<tr>
+<th>Технология</th>
+<th>Зависимость от света</th>
+<th>Точность эшелонирования</th>
+<th>Высота корпуса</th>
+<th>Скорость построения карты</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TOF</td>
+<td>Нет (работает в темноте)</td>
+<td>Высокая (до миллиметра)</td>
+<td>Низкая (до 8-9 см)</td>
+<td>Очень высокая</td>
+</tr>
+<tr>
+<td>LIDAR (Лазер)</td>
+<td>Нет</td>
+<td>Очень высокая</td>
+<td>Высокая (башня +4 см)</td>
+<td>Высокая</td>
+</tr>
+<tr>
+<td>VSLAM (Камера)</td>
+<td>Да (нужен свет)</td>
+<td>Средняя</td>
+<td>Средняя</td>
+<td>Средняя</td>
+</tr>
+<tr>
+<td>Гироскоп + ИК</td>
+<td>Нет</td>
+<td>Низкая</td>
+<td>Любая</td>
+<td>Низкая</td>
+</tr>
+</tbody>
+</table>
+
+<p>Выбирая устройство, стоит обратить внимание на то, что использование <strong>TOF</strong> часто позволяет производителям интегрировать дополнительные функции, такие как распознавание типа пола или обнаружение мелких предметов. Это делает робота более автономным и безопасным для интерьера.</p>
+
+<blockquote>⚠️ Внимание: Не все производители указывают в характеристиках «TOF» открытым текстом, иногда это маскируется под термины «3D-компас», «интеллектуальная навигация» или «лазерный модуль без башни». Всегда уточняйте тип датчика в технической документации перед покупкой.</blockquote>
+
+<div class="poll-widget" id="poll-626e20b1"><div class="poll-widget-question">📊 Какая навигация стоит в вашем пылесосе?</div><div class="poll-widget-option" data-poll="626e20b1" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Лазерная башня (LIDAR)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="626e20b1" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Камера (VSLAM)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="626e20b1" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">TOF сенсор</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="626e20b1" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскоп без карты</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="626e20b1" data-idx="4" onclick="pbPollVote(this)"><span class="poll-widget-label">Не знаю, какой тип</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="преимущества-использования-tof-в-бытовых-условиях">Преимущества использования TOF в бытовых условиях</h2>
+
+<p>Основное преимущество такой системы — это способность эффективно работать в условиях низкой освещенности. Если вы планируете запускать уборку вечером или ночью, когда свет выключен, <em>робот-пылесос с TOF</em> не потеряет ориентацию. Это критически важно для владельцев домашних животных, которые могут испачкать пол, пока вы спите или находитесь в другой комнате.</p>
+
+<p>Еще одним мощным плюсом является компактность. Благодаря отсутствию вращающейся механической башни, корпус устройства становится более плоским. Это позволяет ему свободно заезжать под низкую мебель, включая современные диваны, тумбочки и кофейные столики, где скапливается наибольшее количество пыли. <strong>TOF сенсор</strong> при этом продолжает сканировать пространство "сверху вниз" или под углом, не теряя в качестве данных.</p>
+
+<p>Технология также обеспечивает высокую скорость реакции. Робот способен мгновенно идентифицировать внезапно появившееся препятствие, например, ребенка или кота, и скорректировать траекторию. Это снижает риск столкновений и повреждений как самого устройства, так и предметов интерьера. В отличие от инерционных систем, которые могут врезаться на высокой скорости, TOF реагирует практически мгновенно.</p>
+
+<p>Список ключевых преимуществ можно сформулировать так:</p>
+<ul>
+<li>🚀 Мгновенное построение карты помещения даже в полной темноте.</li>
+<li>🛋️ Возможность уборки под мебелью с минимальным зазором (от 7 см).</li>
+<li>🛡️ Высокая точность обхода мелких препятствий (провода, тапочки).</li>
+<li>⚡ Быстрая реакция на изменения в обстановке комнаты.</li>
+</ul>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>При выборе модели обратите внимание на высоту корпуса: наличие TOF позволяет инженерам делать корпус ниже, что критично для уборки под мебелью с ножками ниже 10 сантиметров.</p></div>
+
+<h2 id="нюансы-эксплуатации-и-обслуживания">Нюансы эксплуатации и обслуживания</h2>
+
+<p>Несмотря на высокую надежность, оборудование требует правильного ухода. Поскольку <strong>TOF сенсор</strong> использует оптические элементы, его линза должна быть чистой. Пыль, шерсть животных или пятна от напитков могут искажать отраженный сигнал, что приведет к ошибкам в построении карты или хаотичному движению.</p>
+
+<p>Регулярная чистка Sensory-модуля — это простая процедура, но она часто игнорируется пользователями. Рекомендуется протирать переднюю панель и датчики мягкой сухой тряпкой после каждой 3-4 уборки. Использование агрессивных химикатов или влажных салфеток с спиртом нежелательно, так как это может повредить антибликовое покрытие линзы.</p>
+
+<p>Важно учитывать, что в некоторых случаях помехи могут создаваться другими источниками света. Прямые лучи мощных прожекторов или отражения от глянцевых поверхностей могут создавать «слепые зоны». Хотя современные алгоритмы программно отсекают такие помехи, в экстремальных условиях точность может незначительно снизиться.</p>
+
+<blockquote>⚠️ Внимание: Избегайте установки робота-пылесоса в комнате с интенсивным зеркальным освещением или декоративной подсветкой, направленной прямо на пол, так как это может вызвать ложные срабатывания датчиков расстояния.</blockquote>
+
+<div class="checklist-block"><h4>☑️ Чистка сенсоров TOF</h4><label class="check-item"><input type="checkbox"><span>Организовать доступ к передней панели</span></label><label class="check-item"><input type="checkbox"><span>Снять верхнюю крышку (при необходимости)</span></label><label class="check-item"><input type="checkbox"><span>Протереть линзу сухой микрофиброй</span></label><label class="check-item"><input type="checkbox"><span>Проверить отсутствие царапин на стекле</span></label><label class="check-item"><input type="checkbox"><span>Включить тестовый режим</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 5</div></div>
+
+<h2 id="топ-производителей-и-моделей-с-tof">ТОП производителей и моделей с TOF</h2>
+
+<p>На сегодняшний день технология активно внедряется ведущими брендами, такими как <em>Xiaomi</em>, <em>Roborock</em>, <em>Dreame</em> и <em>Viomi</em>. Именно эти компании первыми начали массово использовать компактные лазерные модули, отказываясь от громоздких башен в моделях среднего ценового сегмента.</p>
+
+<p>Особое внимание стоит уделить моделям серии <code>Dreame L10s</code> или <code>Roborock Q Revo</code>, где инженеры смогли совместить продвинутый <strong>TOF</strong> с системами моющих платформ. В таких устройствах навигация работает в связке с камерами RGB, создавая гибридную систему, которая видит не только геометрию, но и типы поверхностей.</p>
+
+<p>При выборе конкретной модели важно понимать разницу между «чистым» TOF и гибридными решениями. В бюджетных сегментах иногда встречаются упрощенные версии, которые используют технологию только для обхода препятствий, но строят карту по гироскопу. Это снижает итоговую точность навигации.</p>
+
+<details class="faq-item"><summary>Популярные модели с TOF</summary><div class="faq-answer"><p>Roborock Q7 Max (гибрид), Dreame D10 Plus, Xiaomi Robot Vacuum S10, Viomi V-RVCLM21B. Обратите внимание, что в некоторых ревизиях этих моделей могут использоваться разные типы сенсоров, уточняйте при покупке.</p></div></details>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Наличие TOF сенсора в сочетании с мощной системой всасывания делает робота универсальным инструментом для уборки как твердых полов, так и ковровых покрытий с высоким ворсом.</p></div>
+
+<h2 id="будущее-навигации-и-развитие-технологий">Будущее навигации и развитие технологий</h2>
+
+<p>Развитие <strong>TOF</strong> идет по пути интеграции с искусственным интеллектом. Следующий шаг — это не просто измерение расстояния, а распознавание объектов. Современные алгоритмы уже учатся отличать провода от человеческих ног, а миску с кормом от игрушечного мяча. Это позволяет роботу не просто обходить препятствие, а перестраивать маршрут с учетом типа объекта.</p>
+
+<p>В будущем ожидается появление мультимодальных сенсоров, объединяющих TOF с тепловизорами или ультразвуковыми датчиками. Это позволит устройствам видеть сквозь легкие шторы или определять наличие жидкостей на полу до того, как они будут размазаны щеткой. <em>Технология</em> станет еще более незаметной, но при этом невероятно умной.</p>
+
+<p>Для пользователя это означает полную автоматизацию процесса: вы просто нажимаете кнопку, а робот сам решает, как лучше пропылесосить сложную комнату с детьми и животными. Ошибки навигации останутся в прошлом, уступив место точным и эффективным маршрутам.</p>
+
+<blockquote>⚠️ Внимание: Быстрое развитие ПО означает, что старые модели могут получать обновления, улучшающие работу сенсоров, но физическое "железо" (сам датчик) не меняется. Уточняйте возможности обновлений для вашей конкретной модели перед покупкой.</blockquote>
+
+<h2 id="часто-задаваемые-вопросы">Часто задаваемые вопросы</h2>
+
+<details>
+<summary>Нужно ли выключать свет при работе робота с TOF?</summary>
+<p>Нет, технология TOF (Time of Flight) работает в инфракрасном спектре, который невидим для человеческого глаза. Робот отлично строит карту и ориентируется в полной темноте, поэтому выключать свет не требуется.</p>
+</details>
+
+<details>
+<summary>Чем TOF лучше обычной камеры?</summary>
+<p>Камеры (VSLAM) зависят от освещения и могут теряться в темноте или при резкой смене контраста. TOF измеряет расстояние физически по времени полета луча, что дает стабильность и высокую скорость работы в любых условиях освещенности.</p>
+</details>
+
+<details>
+<summary>Может ли робот с TOF застрять под низкой мебелью?</summary>
+<p>Роботы с TOF обычно имеют более низкий корпус (около 8-9 см) по сравнению с моделями, имеющими лазерную башню. Это значительно снижает риск застревания под диванами и кроватями, но всегда проверяйте высоту мебели перед запуском.</p>
+</details>
+
+<details>
+<summary>Как часто нужно чистить датчик TOF?</summary>
+<p>Рекомендуется протирать сенсорную панель мягкой сухой тканью после каждой 3-4 уборки. Грязь на линзе может исказить сигнал и привести к ошибкам навигации или столкновениям.</p>
+</details>
+
+<details>
+<summary>Мешает ли черное покрытие пола работе сенсора?</summary>
+<p>Инфракрасный луч TOF может частично поглощаться черными или очень темными поверхностями, что иногда создает "дыры" в карте. Однако современные алгоритмы компенсируют это, дублируя сканирование, поэтому в большинстве случаев это не влияет на итоговое качество уборки.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#вводная-часть">Вводная часть</a></li><li><a href="#принцип-работы-технологии-time-of-flight">Принцип работы технологии Time of Flight</a></li><li><a href="#сравнение-tof-с-другими-системами-навигации">Сравнение TOF с другими системами навигации</a></li><li><a href="#преимущества-использования-tof-в-бытовых-условиях">Преимущества использования TOF в бытовых условиях</a></li><li><a href="#нюансы-эксплуатации-и-обслуживания">Нюансы эксплуатации и обслуживания</a></li><li><a href="#топ-производителей-и-моделей-с-tof">ТОП производителей и моделей с TOF</a></li><li><a href="#будущее-навигации-и-развитие-технологий">Будущее навигации и развитие технологий</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kakoj-robot-pylesos-razgovarivaet-matom.html" class="related-card">Робот-пылесос, который ругается матом: мифы, звуки и настройка</a></li><li><a href="/articles/k/ka/kak-pereproshit-robot-pylesos-ksiaomi.html" class="related-card">Как перепрошить робот-пылесос Xiaomi: полная инструкция по смене ПО</a></li><li><a href="/articles/x/xi/xiaomi-robot-kakoj-kupit-pylesos.html" class="related-card">Какой робот-пылесос Xiaomi купить в 2026 году: топ моделей и советы</a></li><li><a href="/articles/p/py/pylesos-kotoryj-zombi-ishchet.html" class="related-card">Пылесос, который ищет зомби: мифы, игры и реальная уборка</a></li><li><a href="/articles/r/ro/robot-pylesos-s-vlazhnoj-uborkoj-kakoj-luchshe-rejting-2021.html" class="related-card">Робот пылесос с влажной уборкой: рейтинг 2021, какой лучше выбрать</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kakoj-robot-pylesos-razgovarivaet-matom.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос, который ругается матом: мифы, звуки и настройка</span><span class="related-bottom-desc">Ищете робот-пылесос с матом? Разбираем, откуда берутся ругательства у умных помощников, как настроит</span></a><a href="/articles/k/ka/kak-pereproshit-robot-pylesos-ksiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как перепрошить робот-пылесос Xiaomi: полная инструкция по смене ПО</span><span class="related-bottom-desc">Пошаговое руководство по перепрошивке роботов-пылесосов Xiaomi. Обзор методов смены региона, установ</span></a><a href="/articles/x/xi/xiaomi-robot-kakoj-kupit-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Какой робот-пылесос Xiaomi купить в 2026 году: топ моделей и советы</span><span class="related-bottom-desc">Выбираете робота-пылесос Xiaomi? Сравнение моделей, анализ функций, советы по выбору мощности и нави</span></a><a href="/articles/p/py/pylesos-kotoryj-zombi-ishchet.html" class="related-bottom-card"><span class="related-bottom-title">Пылесос, который ищет зомби: мифы, игры и реальная уборка</span><span class="related-bottom-desc">Почему в сети ищут &#x27;пылесос для зомби&#x27;? Разбор вирусных игр, мемов и реальных роботов-уборщиков для </span></a><a href="/articles/r/ro/robot-pylesos-s-vlazhnoj-uborkoj-kakoj-luchshe-rejting-2021.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос с влажной уборкой: рейтинг 2021, какой лучше выбрать</span><span class="related-bottom-desc">Рейтинг лучших роботов-пылесосов с влажной уборкой 2021 года. Обзор моделей Xiaomi, Roborock, iRobot</span></a><a href="/articles/c/ch/chem-otlichaetsya-robot-pylesos-polaris-0826w-ot-0726w.html" class="related-bottom-card"><span class="related-bottom-title">Polaris 0826W против 0726W: главное отличие и выбор</span><span class="related-bottom-desc">Сравнение роботов-пылесосов Polaris 0826W и 0726W. Разбор мощности, навигации, карт и функций. Узнай</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

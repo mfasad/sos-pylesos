@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как создать языковой пакет для пылесоса: инструкция по прошивке и модификации — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговый гайд по созданию и установке кастомных языковых пакетов для роботизированных пылесосов. Анализ форматов, инструменты и риски перепрошивки.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-sozdat-yazykovoj-paket-dlya-pylesosa.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как создать языковой пакет для пылесоса: инструкция по прошивке и модификации">
+    <meta property="og:description" content="Пошаговый гайд по созданию и установке кастомных языковых пакетов для роботизированных пылесосов. Анализ форматов, инструменты и риски перепрошивки.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как создать языковой пакет для пылесоса: инструкция по прошивке и модификации</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как создать языковой пакет для пылесоса: руководство по кастомизации</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#анализ-структуры-прошивки-и-форматы-файлов">Анализ структуры прошивки и форматы файлов</a></li><li><a href="#инструментарий-для-извлечения-и-редактирования">Инструментарий для извлечения и редактирования</a></li><li><a href="#процесс-локализации-и-перевода-интерфейса">Процесс локализации и перевода интерфейса</a></li><li><a href="#сборка-и-внедрение-модификации-в-систему">Сборка и внедрение модификации в систему</a></li><li><a href="#тестирование-и-отладка-ошибок">Тестирование и отладка ошибок</a></li><li><a href="#альтернативные-методы-и-использование-кастомных-прошивок">Альтернативные методы и использование кастомных прошивок</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Установка локализации, отличной от заводской, часто становится необходимостью для владельцев техники из разных регионов. Разработчики редко учитывают специфику диалектов или региональных особенностей, поэтому создание собственного <strong>языкового пакета</strong> позволяет адаптировать интерфейс под конкретные нужды. Это не просто замена текста, а глубокая работа с ресурсами прошивки устройства.</p>
+<p>Процесс требует понимания структуры файлов, используемых производителем, и навыков работы с архивами. В отличие от смартфонов, где смена языка происходит в пару кликов, в <em>роботах-пылесосах</em> файлы ресурсов часто скрыты или зашифрованы. Вам предстоит извлечь их, отредактировать и внедрить обратно в систему без потери функциональности.</p>
+<p>Создание такой модификации может открыть доступ к отсутствующим функциям или исправить неточные переводы, которые раздражают пользователей годами. Однако важно подходить к задаче системно, чтобы не превратить умное устройство в "кирпич". В этом материале мы разберем технические аспекты извлечения и модификации файлов ресурсов.</p>
+
+<h2 id="анализ-структуры-прошивки-и-форматы-файлов">Анализ структуры прошивки и форматы файлов</h2>
+<p>Первым этапом работы является получение доступа к файловой системе устройства. Обычно производители упаковывают ресурсы в специфические архивы или используют стандартные форматы Android, если аппаратная платформа это позволяет. Вам потребуется найти файл, отвечающий за отображение текста, часто он имеет расширение <code>.xml</code>, <code>.json</code> или <code>.res</code>.</p>
+<p>В современных моделях, таких как <em>Xiaomi Mi Robot Vacuum</em> или <em>Dreame</em>, ресурсы часто лежат в директории <code>/res/values/</code> внутри прошивки. В старых или специфических устройствах (например, <em>Roborock</em> ранних версий) может использоваться бинарный формат, требующий специальных конвертеров для редактирования. Непонимание структуры приведет к тому, что устройство просто не загрузится после установки.</p>
+<p>Необходимо определить, какой <strong>движок рендеринга</strong> использует интерфейс. Если это веб-интерфейс (WebView), то файлы будут иметь структуру HTML/CSS, что упрощает задачу. В случае нативного интерфейса потребуется утилита для декомпиляции APK-файлов или патчинг бинарных ресурсов напрямую. Ошибки в кодировке (UTF-8 против UTF-16) могут превратить текст в набор иероглифов.</p>
+
+<blockquote>⚠️ Внимание: Перед началом любых манипуляций с файлами прошивки обязательно создайте полную резервную копию оригинальной системы. Восстановление после неудачной модификации часто требует физического доступа к плате с помощью программатора.</blockquote>
+
+<h2 id="инструментарий-для-извлечения-и-редактирования">Инструментарий для извлечения и редактирования</h2>
+<p>Для работы вам понадобится набор специализированных утилит. Стандартные архиваторы вроде 7-Zip могут не справиться со специфическими контейнерами прошивки. Используйте инструменты вроде <code>apktool</code> для Android-систем или <code>binwalk</code> для анализа образов прошивки. Эти программы позволяют распаковать структуру и найти папки с ресурсами.</p>
+<p>Редактирование текста требует текстовых редакторов, поддерживающих различные кодировки. Обычный Блокнот часто ломает UTF-16, поэтому используйте <em>Notepad++</em> или <em>Sublime Text</em>. При работе с <strong>JSON-файлами</strong> убедитесь, что вы не нарушаете синтаксис: лишняя запятая или пропущенная кавычка приведут к ошибке парсинга и краху приложения.</p>
+<p>Если вы работаете с бинарными строками, вам могут понадобиться шестнадцатеричные редакторы, такие как <em>HxD</em>. Здесь важно точно знать длину строки, так как внедрение более длинного текста может " развесть" структуру файла, если не использовать специальные плейсхолдеры. <mark>Критично важно сохранять исходную длину строк в бинарных форматах, иначе сдвиг адресов сделает файл нечитаемым.</mark></p>
+
+<details class="faq-item"><summary>Что делать, если файл зашифрован?</summary><div class="faq-answer"><p>Иногда производители используют проприетарное шифрование. В таких случаях может потребоваться поиск ключей дешифровки на форумах разработчиков или использование отладочного режима ADB для извлечения данных напрямую из памяти устройства в момент работы.</p></div></details>
+
+<div class="poll-widget" id="poll-eaca01f1"><div class="poll-widget-question">📊 Какой формат файлов вы встречали чаще всего?</div><div class="poll-widget-option" data-poll="eaca01f1" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">XML</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="eaca01f1" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">JSON</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="eaca01f1" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">BIN (Бинарный)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="eaca01f1" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Ресурсный архив (.tar/.img)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="процесс-локализации-и-перевода-интерфейса">Процесс локализации и перевода интерфейса</h2>
+<p>Самый ответственный этап — непосредственный перевод текста. Не пытайтесь переводить всё подряд; сосредоточьтесь на ключевых элементах: меню, уведомления об ошибках и статусы уборки. Перевод технической терминологии должен быть точным, чтобы пользователь понимал суть сообщения, например, "Забит фильтр" вместо "Фильтр загрязнен".</p>
+<p>При вводе текста учитывайте <strong>ограничения пространства</strong> на дисплее. Экраны роботов-пылесосов часто имеют низкое разрешение и небольшие размеры. Если вы переведете короткое слово "Ошибка" на длинную фразу "Критическая системная ошибка", текст может не поместиться на экран, обрезавшись или наложившись на другие элементы.</p>
+<p>Используйте специальные символы только при необходимости. Многие шрифты, встроенные в прошивку, не имеют поддержки редких иероглифов или специфических знаков. Если вы добавите символ, которого нет в шрифте, вместо него появится квадрат или вопросительный знак, что испортит визуальное восприятие.</p>
+<p>Следующий список поможет вам проверить качество перевода:</p>
+<ul>
+  <li>✅ Проверьте соответствие контекста: слово "Пауза" не должно переводиться как "Приостановка", если интерфейс требует краткости.</li>
+  <li>✅ Убедитесь, что все переменные (например, номер карты или уровень заряда) остались на месте и не были случайно удалены.</li>
+  <li>✅ Протестируйте текст на разных версиях прошивки, так как производители могут менять длину строк в обновлениях.</li>
+</ul>
+
+<div class="checklist-block"><h4>☑️ Чек-лист перед сборкой</h4><label class="check-item"><input type="checkbox"><span>Скачать оригинальный файл ресурсов</span></label><label class="check-item"><input type="checkbox"><span>Открыть в редакторе кода</span></label><label class="check-item"><input type="checkbox"><span>Внести изменения в перевод</span></label><label class="check-item"><input type="checkbox"><span>Проверить синтаксис JSON/XML</span></label><label class="check-item"><input type="checkbox"><span>Сохранить с правильной кодировкой</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 5</div></div>
+
+<h2 id="сборка-и-внедрение-модификации-в-систему">Сборка и внедрение модификации в систему</h2>
+<p>После редактирования файлов необходимо собрать их обратно в структуру прошивки. Это часто более сложный этап, чем само редактирование. Инструменты, которые вы использовали для распаковки, обычно имеют команду для переупаковки (например, <code>apktool b</code>). Важно убедить, что цифровая подпись пакета не нарушена, если система требует строгой проверки целостности.</p>
+<p>Внедрение пакета может происходить через <strong>ADB (Android Debug Bridge)</strong> или путем прошивки всего образа через режим восстановления (Recovery). Для пользователей с правами root это проще: достаточно заменить файл в директории <code>/system/app/</code> или <code>/data/local/</code>. Однако на устройствах без root-прав потребуется перепрошивка всего образа.</p>
+<p>Если вы создаете отдельный пакет, который не заменяет системные файлы, а подгружается поверх, убедитесь, что он имеет приоритет загрузки. В некоторых случаях система ищет ресурсы по ID, и если ваш ID совпадает с оригинальным, система подхватит ваши изменения автоматически.</p>
+<p>Рассмотрите таблицу распространенных путей к файлам ресурсов для популярных брендов:</p>
+<table>
+  <thead>
+    <tr>
+      <th>Бренд</th>
+      <th>Тип системы</th>
+      <th>Типичный путь к ресурсам</th>
+      <th>Сложность модификации</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Xiaomi</td>
+      <td>Android-based</td>
+      <td><code>/data/app/com.xiaomi.vacuum/</code></td>
+      <td>Средняя (требуются root/ADB)</td>
+    </tr>
+    <tr>
+      <td>Roborock</td>
+      <td>Closed Linux</td>
+      <td><code>/usr/local/etc/</code> или архивы</td>
+      <td>Высокая (шифрование)</td>
+    </tr>
+    <tr>
+      <td>Ecovacs</td>
+      <td>Proprietary</td>
+      <td>Встроен в бинарный образ</td>
+      <td>Очень высокая</td>
+    </tr>
+    <tr>
+      <td>Neato</td>
+      <td>Linux/Android</td>
+      <td>XML в папке ресурсов</td>
+      <td>Низкая</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>⚠️ Внимание: Производители часто выпускают обновления безопасности, которые блокируют несанкционированную модификацию файлов. Если ваша прошивка обновится автоматически, ваш языковой пакет может быть удален или система может перестать загружаться.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед перезагрузкой устройства с новым языковым пакетом убедитесь, что заряд батареи составляет не менее 80%. Внезапное отключение питания во время применения изменений может привести к повреждению файловой системы.</p></div>
+
+<h2 id="тестирование-и-отладка-ошибок">Тестирование и отладка ошибок</h2>
+<p>После установки пакета необходимо провести тщательное тестирование. Запустите устройство и проверьте все меню: от выбора режима уборки до настроек Wi-Fi. Обратите внимание на тексты, которые динамически подставляются в зависимости от ситуации, например, сообщения о застревании или нехватке воды.</p>
+<p>Используйте <strong>логи системы</strong> для поиска ошибок. Если интерфейс вылетает, проверьте <code>dmesg</code> или логи приложения через ADB. Часто ошибка вызывается не самим текстом, а некорректным escape-символом, который система не может обработать. Например, использование одинарных кавычек внутри строки, ограниченной одинарными кавычками.</p>
+<p>Протестируйте работу с голосовым модулем, если он интегрирован в интерфейс. Иногда изменение текстовых меток влияет на файлы аудио-подсказок. Если вы изменили название режима, а аудио-файл остался старым, пользователь увидит несоответствие между текстом и голосом.</p>
+<p>Обратите внимание на следующие возможные проблемы:</p>
+<ul>
+  <li>❌ Текст обрезается или накладывается на элементы интерфейса.</li>
+  <li>❌ Приложение закрывается сразу после открытия конкретного меню.</li>
+  <li>❌ Голосовые сообщения не проигрываются или воспроизводятся с ошибками.</li>
+</ul>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Тестирование должно включать не только визуальный осмотр, но и проверку всех сценариев работы: старт уборки, возврат на базу, ошибки датчиков и настройка расписания.</p></div>
+
+<h2 id="альтернативные-методы-и-использование-кастомных-прошивок">Альтернативные методы и использование кастомных прошивок</h2>
+<p>Если создание собственного пакета кажется слишком трудоемким, рассмотрите возможность установки кастомной прошивки. Сообщества энтузиастов часто выпускают готовые решения для популярных моделей, которые включают расширенные языковые пакеты. Это снижает риск ошибок, так как прошивки уже протестированы сообществом.</p>
+<p>Однако использование сторонних прошивок лишает вас гарантии производителя и может привести к потере функций, зависящих от серверов компании. Например, некоторые модели перестают работать с официальным приложением после установки модифицированного ПО. Вам придется использовать альтернативные клиенты, такие как <em>Home Assistant</em> или <em>Vacuum Cleaner</em>.</p>
+<p>Важно понимать разницу между "локализацией" и "хакерством". Создание языкового пакета — это легальная модификация пользовательского интерфейса, но если вы меняете логику работы двигателя или обходите программные блокировки, это попадает в серую зону ответственности. Всегда сверяйтесь с лицензионным соглашением.</p>
+
+<blockquote>⚠️ Внимание: Убедитесь, что выбранный вами метод модификации не нарушает условия гарантии. В некоторых случаях даже вскрытие корпуса для подключения к плате может стать основанием для отказа в сервисном обслуживании.</blockquote>
+
+<details class="faq-item"><summary>Можно ли использовать языковые пакеты от других моделей?</summary><div class="faq-answer"><p>Только если архитектура процессора и версия ОС идентичны. Кросс-модельная установка часто приводит к конфликтам драйверов и нестабильной работе интерфейса.</p></div></details>
+
+<h2 id="faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</h2>
+
+<details>
+  <summary>Можно ли создать языковой пакет без прав Root на устройстве?</summary>
+  <p>Без прав Root доступ к системным файлам ограничен. Вы можете попробовать использовать ADB для установки модифицированных APK-файлов в пользовательский раздел, но это не всегда гарантирует работу системных элементов интерфейса.</p>
+</details>
+
+<details>
+  <summary>Что делать, если после установки текста превратились в иероглифы?</summary>
+  <p>Это проблема кодировки. Скорее всего, вы сохранили файл в UTF-16, а система ожидает UTF-8, или наоборот. Откройте файл в редакторе, выберите "Преобразовать в" нужную кодировку и пересохраните.</p>
+</details>
+
+<details>
+  <summary>Удалит ли официальное обновление мой языковой пакет?</summary>
+  <p>Да, в большинстве случаев обновление прошивки перезапишет системные файлы, включая ресурсы локализации, возвращая заводской язык. Вам придется переустанавливать пакет после каждого обновления.</p>
+</details>
+
+<details>
+  <summary>Как проверить, какой формат файла ресурсов использует мой пылесос?</summary>
+  <p>Скачайте прошивку, откройте её архиватором. Если вы видите папки <code>res</code> и файлы <code>strings.xml</code> — это Android-структура. Если файлы имеют странные расширения или нет структуры папок — это проприетарный формат, требующий специализированных утилит.</p>
+</details>
+
+<details>
+  <summary>Где найти готовые языковые пакеты для популярных моделей?</summary>
+  <p>Ищите на специализированных форумах, таких как 4PDA или XDA Developers, а также на GitHub. Сообщества часто делятся своими наработками по кастомизации интерфейсов для <em>Xiaomi</em>, <em>Roborock</em> и других брендов.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#анализ-структуры-прошивки-и-форматы-файлов">Анализ структуры прошивки и форматы файлов</a></li><li><a href="#инструментарий-для-извлечения-и-редактирования">Инструментарий для извлечения и редактирования</a></li><li><a href="#процесс-локализации-и-перевода-интерфейса">Процесс локализации и перевода интерфейса</a></li><li><a href="#сборка-и-внедрение-модификации-в-систему">Сборка и внедрение модификации в систему</a></li><li><a href="#тестирование-и-отладка-ошибок">Тестирование и отладка ошибок</a></li><li><a href="#альтернативные-методы-и-использование-кастомных-прошивок">Альтернативные методы и использование кастомных прошивок</a></li><li><a href="#faq-часто-задаваемые-вопросы">FAQ: Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-na-russkij-yazyk-bez-prilozheniya.html" class="related-card">Как настроить робот пылесос Xiaomi на русский язык без приложения</a></li><li><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-cherez-prilozhenie-mi-home-po-komnatam.html" class="related-card">Настройка робота-пылесоса Xiaomi по комнатам в Mi Home: полная инструкция</a></li><li><a href="/articles/n/ne/ne-mogu-podklyuchit-robot-pylesos-xiaomi-k-telefonu-ajfon-chto-delat.html" class="related-card">Робот пылесос Xiaomi не подключается к iPhone: 7 рабочих способов</a></li><li><a href="/articles/k/ka/kak-vklyuchit-blyutuz-na-pylesose-xiaomi-rabote.html" class="related-card">Как включить Bluetooth на роботе-пылесосе Xiaomi: Полная инструкция по подключению</a></li><li><a href="/articles/k/ka/kak-pomenyat-golos-na-robot-pylesos-xiaomi.html" class="related-card">Как поменять голос на робот пылесос Xiaomi: полные инструкции</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-na-russkij-yazyk-bez-prilozheniya.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить робот пылесос Xiaomi на русский язык без приложения</span><span class="related-bottom-desc">Пошаговая инструкция по смене языка на робот-пылесосах Xiaomi и Roborock без смартфона. Разбор меню,</span></a><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-cherez-prilozhenie-mi-home-po-komnatam.html" class="related-bottom-card"><span class="related-bottom-title">Настройка робота-пылесоса Xiaomi по комнатам в Mi Home: полная инструкция</span><span class="related-bottom-desc">Подробная инструкция: как настроить карту, разделить её на комнаты и управлять уборкой в приложении </span></a><a href="/articles/n/ne/ne-mogu-podklyuchit-robot-pylesos-xiaomi-k-telefonu-ajfon-chto-delat.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос Xiaomi не подключается к iPhone: 7 рабочих способов</span><span class="related-bottom-desc">Полное руководство: почему робот Xiaomi не видит айфон и как исправить связь. Пошаговая настройка Wi</span></a><a href="/articles/k/ka/kak-vklyuchit-blyutuz-na-pylesose-xiaomi-rabote.html" class="related-bottom-card"><span class="related-bottom-title">Как включить Bluetooth на роботе-пылесосе Xiaomi: Полная инструкция по подключению</span><span class="related-bottom-desc">Пошаговое руководство по активации Bluetooth на пылесосах Xiaomi. Решение частых проблем, настройка </span></a><a href="/articles/k/ka/kak-pomenyat-golos-na-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как поменять голос на робот пылесос Xiaomi: полные инструкции</span><span class="related-bottom-desc">Пошаговая инструкция: смена языка и голосовых пакетов на роботах Xiaomi. Обзор приложений, ограничен</span></a><a href="/articles/k/ka/kak-sokhranit-kartu-uborki-robota-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Как сохранить карту уборки робота пылесоса: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция: как создать резервную копию карты, перенести её и предотвратить потерю данных </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

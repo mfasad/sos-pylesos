@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как работает голосовое управление роботом-пылесосом через Алису — SOS-Пылесос</title>
+    <meta name="description" content="Настройка сценариев, команды для Яндекс Станции и особенности взаимодействия умного дома с роботом-пылесосом. Полная инструкция по интеграции.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-obshchaetsya-alisa-i-pylesos.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как работает голосовое управление роботом-пылесосом через Алису">
+    <meta property="og:description" content="Настройка сценариев, команды для Яндекс Станции и особенности взаимодействия умного дома с роботом-пылесосом. Полная инструкция по интеграции.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как работает голосовое управление роботом-пылесосом через Алису</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как общается Алиса с роботом-пылесосом и почему это удобно</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#принципы-взаимодействия-устройств-в-умном-доме">Принципы взаимодействия устройств в умном доме</a></li><li><a href="#настройка-связи-через-приложение-яндекс">Настройка связи через приложение Яндекс</a></li><li><a href="#голосовые-команды-и-сценарии-управления">Голосовые команды и сценарии управления</a></li><li><a href="#почему-алиса-не-видит-или-не-управляет-устройством">Почему Алиса не видит или не управляет устройством?</a></li><li><a href="#особенности-работы-с-разными-брендами">Особенности работы с разными брендами</a></li><li><a href="#создание-сложных-автоматизированных-сценариев">Создание сложных автоматизированных сценариев</a></li><li><a href="#важные-нюансы-безопасности-и-стабильности">Важные нюансы безопасности и стабильности</a></li><li><a href="#faq-частые-вопросы-пользователей">FAQ: Частые вопросы пользователей</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>В современном доме технологии перестали быть просто инструментами и превратились в компаньонов, способных понимать голосовые команды. <strong>Яндекс Алиса</strong> стала ключевым звеном в этой экосистеме, позволяя управлять бытовой техникой без необходимости искать пульты или приложения на смартфоне. Взаимодействие голосового ассистента с <em>роботом-пылесосом</em> — это не просто магия, а четкий алгоритм обмена данными через локальную сеть или облачные сервисы.</p>
+
+<p>Многие пользователи ошибочно полагают, что для управления нужен специальный «умный» пылесос с встроенным модулем Яндекс. На самом деле, чаще всего используется технология <strong>умного дома</strong>, где робот становится одним из множества устройств в экосистеме. Это позволяет создавать сложные сценарии, когда уборка запускается автоматически по расписанию или при вашем уходе из дома.</p>
+
+<p>Процесс, как общается Алиса и пылесос, строится на передаче команд от голосового модуля к серверам Яндекса, а затем к приложению производителя техники. Скорость отклика зависит от стабильности интернет-соединения и поддержки протоколов <strong>MQTT</strong> или <strong>Matter</strong> конкретным устройством. Давайте разберем, как настроить этот диалог и какие команды действительно работают.</p>
+
+<h2 id="принципы-взаимодействия-устройств-в-умном-доме">Принципы взаимодействия устройств в умном доме</h2>
+
+<p>Фундаментом успешного общения является правильное сопряжение устройств. Когда вы говорите «Алиса, включи пылесос», ваш голос улавливается микрофоном колонки, оцифровывается и отправляется на серверы обработки естественного языка. Система распознает намерение пользователя и ищет устройство с именем «пылесос» в вашем списке умных предметов.</p>
+
+<p>Критически важно, чтобы оба устройства находились в одной сети Wi-Fi или были корректно привязаны к аккаунту в приложении <em>Яндекс Умный дом</em>. Если робот-пылесос управляется через стороннее приложение (например, <em>Xiaomi Mi Home</em> или <em>Roborock</em>), необходимо выполнить процедуру связки аккаунтов. Без этой привязки Алиса физически не сможет отправить команду на запуск.</p>
+
+<p>Технически процесс выглядит как цепочка: <strong>голосовая команда</strong> -> облако Яндекса -> API производителя -> локальная сеть устройства. В идеале задержка составляет доли секунды, но на практике она зависит от загруженности сети. Некоторые модели требуют повторения команды, если сигнал был потерян на этапе передачи.</p>
+
+<h2 id="настройка-связи-через-приложение-яндекс">Настройка связи через приложение Яндекс</h2>
+
+<p>Первый шаг к тому, чтобы Алиса начала понимать ваш пылесос, — это добавление устройства в приложение. Откройте приложение <em>Яндекс</em> или <em>Дом с Алисой</em> и перейдите в раздел «Устройства». Нажмите кнопку «+» и выберите опцию добавления нового устройства. Система предложит найти поддерживаемые бренды или использует функцию сканирования.</p>
+
+<p>Если ваш робот поддерживает интеграцию, выберите его производителя из списка, например <em>Roborock</em>, <em>Xiaomi</em>, <em>Dreame</em> или <em>Livio</em>. Появится окно авторизации, где потребуется войти в аккаунт, к которому привязан пылесос. После успешного входа система автоматически обнаружит доступные функции: запуск, остановку, возврат на базу или выбор режима уборки.</p>
+
+<p>Важно внимательно проверить права доступа, которые запрашивает приложение. Для полноценной работы <strong>интеграция</strong> должна иметь разрешение на управление и чтение статуса устройства. Отказ в правах может привести к тому, что Алиса будет отвечать «Я не могу управлять этим устройством», даже если оно добавлено в список.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка подключения</h4><label class="check-item"><input type="checkbox"><span>Выполнен вход в аккаунт производителя</span></label><label class="check-item"><input type="checkbox"><span>Устройство добавлено в Яндекс Умный дом</span></label><label class="check-item"><input type="checkbox"><span>Названия устройств уникальны</span></label><label class="check-item"><input type="checkbox"><span>Проверена работа локального управления</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<p>Иногда автоматический поиск не находит устройство. В этом случае используйте поиск по названию или модели вручную. Убедитесь, что прошивка вашего пылесоса обновлена до последней версии, так как старые версии ПО могут не поддерживать современные протоколы связи с умным домом.</p>
+
+<h2 id="голосовые-команды-и-сценарии-управления">Голосовые команды и сценарии управления</h2>
+
+<p>После настройки вы можете управлять уборкой простыми фразами. Базовый набор команд включает «Алиса, включи пылесос», «Алиса, останови уборку» и «Алиса, отправь пылесос на зарядку». Но возможности <strong>голосового управления</strong> гораздо шире, если использовать кастомные фразы и сценарии.</p>
+
+<p>Вы можете настроить реакцию на специфические команды. Например, скажите «Алиса, наведи порядок» и привяжите эту фразу к действию «Запуск уборки в кухне». Это избавляет от необходимости произносить длинные и технические названия устройств. Также можно создавать сложные <strong>сценарии</strong>, объединяющие несколько действий: открыть шторы, включить свет и запустить робота.</p>
+
+<p>Для продвинутых пользователей доступны настройки через <code>Яндекс.Алиса</code> в разделе сценариев. Здесь можно задать условия: «Если я выхожу из дома, то включай пылесос». Система отслеживает геолокацию вашего телефона и автоматически запускает уборку, когда вы покидаете зону действия Wi-Fi. Это идеальный вариант для поддержания чистоты в отсутствие владельцев.</p>
+
+<details class="faq-item"><summary>Секреты настройки сценариев</summary><div class="faq-answer"><p>Многие пользователи не знают, что можно настроить реакцию на время суток. Например, робот может пылесосить только после 10 утра, чтобы не будить домочадцев. Установите ограничение в сценарии по времени, и техника будет работать только в разрешенные часы.</p></div></details>
+
+<p>Не забывайте про управление режимами уборки. Команды вроде «Алиса, включи режим точечной уборки» или «Алиса, включи режим интенсивной уборки» работают, если производитель открыл доступ к этим функциям через API. В некоторых моделях такие команды требуются для уборки ковра или сильно загрязненных зон.</p>
+
+<h2 id="почему-алиса-не-видит-или-не-управляет-устройством">Почему Алиса не видит или не управляет устройством?</h2>
+
+<p>Самая частая проблема — отсутствие видимости устройства в списке. Это почти всегда связано с тем, что пылесос находится в другой подсети или работает через <strong>гостевую сеть</strong>. Умные устройства часто конфликтуют с настройками безопасности роутера, которые изолируют клиентов друг от друга. Проверьте настройки вашего Wi-Fi роутера.</p>
+
+<blockquote>⚠️ Внимание: Если вы используете систему Mesh или несколько роутеров с разными SSID, убедитесь, что и колонка, и робот подключены к одному узлу сети или что между ними разрешен доступ. Изоляция клиентов Wi-Fi блокирует команду запуска.</blockquote>
+
+<p>Другая причина — устаревшее приложение производителя. Разработчики часто меняют API, и старые версии перестают синхронизироваться с экосистемой Яндекса. Обновите приложение, в котором вы обычно управляете роботом, до версии, указанной в <em>Google Play</em> или <em>App Store</em>. После обновления повторите процедуру связки аккаунтов.</p>
+
+<p>Иногда проблема кроется в названии устройства. Если у вас несколько пылесосов или устройств с одинаковыми именами, Алиса может путаться. Переименуйте устройство в приложении <em>Яндекс Умный дом</em> на уникальное имя, например «Робот в гостиной» или «Кухонный пылесос». Это решит проблему неразборчивости команд.</p>
+
+<div class="poll-widget" id="poll-7ce5c28c"><div class="poll-widget-question">📊 Какая проблема чаще всего возникает при подключении?</div><div class="poll-widget-option" data-poll="7ce5c28c" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Алиса не находит устройство</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7ce5c28c" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Команды не выполняются</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7ce5c28c" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Устройство пропадает из сети</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7ce5c28c" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Все работает без сбоев</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="особенности-работы-с-разными-брендами">Особенности работы с разными брендами</h2>
+
+<p>Не все производители одинаково активно поддерживают интеграцию с голосовыми ассистентами. Лидеры рынка, такие как <em>Roborock</em> и <em>Xiaomi</em>, обеспечивают наиболее полную поддержку, включая управление зонами и картами. Российские бренды, например <em>Yandex</em> (собственные модели) и <em>Redmond</em>, также имеют отличную совместимость с Алисой.</p>
+
+<p>Менее популярные или старые модели могут работать только в режиме «Вкл/Выкл». В таких случаях невозможно задать конкретную зону уборки или изменить мощность всасывания голосом. Это ограничение заложено в прошивке устройства и не может быть исправлено со стороны Яндекса.</p>
+
+<p>Если вы планируете покупку нового пылесоса, обратите внимание на наличие логотипа «Работает с Алисой» на упаковке. Это гарантирует, что устройство будет полностью интегрировано в экосистему без необходимости использования сторонних хабов или сложных настроек.</p>
+
+<table>
+<thead>
+<tr>
+<th>Бренд</th>
+<th>Поддерживаемые команды</th>
+<th>Особенности интеграции</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Roborock</td>
+<td>Полный контроль, карты, зоны</td>
+<td>Требует связки через Mi Home или Cloud</td>
+</tr>
+<tr>
+<td>Xiaomi</td>
+<td>Запуск, пауза, зарядка</td>
+<td>Часто требует использования Mi Home</td>
+</tr>
+<tr>
+<td>Yandex</td>
+<td>Все функции</td>
+<td>Нативная интеграция, не требует настройки</td>
+</tr>
+<tr>
+<td>Redmond</td>
+<td>Базовые команды</td>
+<td>Нужен хаб или прямая интеграция</td>
+</tr>
+<tr>
+<td>Dreame</td>
+<td>Режимы, запуск, зарядка</td>
+<td>Поддержка через приложение Dreame</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="создание-сложных-автоматизированных-сценариев">Создание сложных автоматизированных сценариев</h2>
+
+<p>Самая мощная функция — это автоматизация. Вы можете настроить сценарий, который запускает уборку каждый раз, когда уровень заряда батареи падает ниже определенного значения, или когда открыта дверь. Для этого перейдите в раздел <code>Сценарии</code> в приложении и создайте новое условие.</p>
+
+<p>Добавьте условие «Если я выхожу из зоны Wi-Fi» и действие «Включить пылесос». Система будет автоматически отслеживать ваше местоположение. Это особенно удобно, если вы уезжаете на работу, а дома нужно убрать шерсть животных или пыль.</p>
+
+<p>Можно создать сценарий «Доброе утро», который включает свет, открывает шторы и, при необходимости, запускает пылесос в одной комнате. Это создает ощущение настоящего умного дома, где техника работает согласованно, а не хаотично.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед запуском автоматической уборки убедитесь, что на полу нет проводов, игрушек и мелких предметов, которые робот может зацепить. Автоматика не всегда видит препятствия так же хорошо, как человек.</p></div>
+
+<h2 id="важные-нюансы-безопасности-и-стабильности">Важные нюансы безопасности и стабильности</h2>
+
+<p>Иногда робот может застрять или потерять связь во время уборки, если управление осуществляется через облако. В таких случаях желательно иметь возможность управления через локальную сеть. Убедитесь, что ваш роутер поддерживает <strong>локальную передачу данных</strong> и не блокирует порты, используемые приложением.</p>
+
+<p>Также стоит помнить о конфиденциальности. Команды, передаваемые через облако, могут обрабатываться сторонними серверами. Если вас это беспокоит, используйте модели, поддерживающие локальное управление без интернета, или ограничьте права доступа в настройках приложения.</p>
+
+<p>Регулярно проверяйте обновления прошивки устройства. Производители часто выпускают патчи, исправляющие ошибки в работе с голосовыми ассистентами. Запускать проверку обновлений стоит раз в месяц, чтобы избежать внезапных сбоев в работе.</p>
+
+<blockquote>⚠️ Внимание: Если вы используете сторонние плагины или модифицированные приложения для управления роботом, голосовое управление через Алису может перестать работать. Официальные приложения обеспечивают максимальную стабильность связи.</blockquote>
+
+<p>Не забывайте и о физической безопасности. Если робот застревает, он должен уметь сигнализировать об этом. Настройте оповещения в приложении, чтобы получать уведомления, если <strong>робот-пылесос</strong> требует внимания. Это позволит быстро решить проблему, не дожидаясь полной разрядки батареи.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Голосовое управление упрощает жизнь, но требует стабильной сети и актуального ПО. Регулярная проверка обновлений и правильные настройки роутера — залог беспроблемной работы.</p></div>
+
+<h2 id="faq-частые-вопросы-пользователей">FAQ: Частые вопросы пользователей</h2>
+
+<details>
+<summary>Можно ли управлять пылесосом Алисой без интернета?</summary>
+<p>В большинстве случаев нет, так как обработка голосовой команды происходит на серверах Яндекса. Однако, если вы используете локальную интеграцию через Home Assistant или специальные хабы, возможно управление без выхода в интернет, но это требует сложной настройки.</p>
+</details>
+
+<details>
+<summary>Почему Алиса говорит «Я не могу выполнить команду»?</summary>
+<p>Это может означать, что устройство не отвечает или находится в состоянии ошибки (например, застрял). Проверьте статус робота в приложении производителя и убедитесь, что он не заблокирован.</p>
+</details>
+
+<details>
+<summary>Сколько пылесосов можно подключить к одной Алисе?</summary>
+<p>Теоретически неограниченное количество, но на практике рекомендуется не более 10-15 устройств для комфортного управления. Лучше дать каждому устройство уникальное имя.</p>
+</details>
+
+<details>
+<summary>Можно ли настроить уборку по расписанию через голос?</summary>
+<p>Да, через приложение «Яндекс Умный дом» можно создать сценарий по времени или дате. Голосом можно только активировать уже созданный сценарий, например «Алиса, запусти расписание уборки».</p>
+</details>
+
+<details>
+<summary>Работает ли управление с других устройств (телефона, планшета)?</summary>
+<p>Да, если вы вошли в тот же аккаунт Яндекса, что и на колонке. Управление доступно из приложения «Дом с Алисой» на любом вашем устройстве.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#принципы-взаимодействия-устройств-в-умном-доме">Принципы взаимодействия устройств в умном доме</a></li><li><a href="#настройка-связи-через-приложение-яндекс">Настройка связи через приложение Яндекс</a></li><li><a href="#голосовые-команды-и-сценарии-управления">Голосовые команды и сценарии управления</a></li><li><a href="#почему-алиса-не-видит-или-не-управляет-устройством">Почему Алиса не видит или не управляет устройством?</a></li><li><a href="#особенности-работы-с-разными-брендами">Особенности работы с разными брендами</a></li><li><a href="#создание-сложных-автоматизированных-сценариев">Создание сложных автоматизированных сценариев</a></li><li><a href="#важные-нюансы-безопасности-и-стабильности">Важные нюансы безопасности и стабильности</a></li><li><a href="#faq-частые-вопросы-пользователей">FAQ: Частые вопросы пользователей</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-k-telefonu-iq-home.html" class="related-card">Как подключить робот-пылесос IQ Home к телефону: полная инструкция</a></li><li><a href="/articles/k/ka/kak-pomenyat-ozvuchku-robota-pylesosa-xiaomi.html" class="related-card">Как поменять озвучку робота-пылесоса Xiaomi: полная инструкция</a></li><li><a href="/articles/k/ka/kak-nauchit-razgovarivat-robot-pylesos-xiaomi-po-russki-na-ajfone.html" class="related-card">Как включить русский голос на роботе-пылесосе Xiaomi с iPhone</a></li><li><a href="/articles/k/ka/kak-naladit-pylesos.html" class="related-card">Как наладить работу пылесоса: полная инструкция по настройке</a></li><li><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-vacuum-cleaner-1s.html" class="related-card">Как настроить робот-пылесос Xiaomi Vacuum Cleaner 1S: полное руководство</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-k-telefonu-iq-home.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос IQ Home к телефону: полная инструкция</span><span class="related-bottom-desc">Пошаговая настройка смартфона и роутера для управления роботом-пылесосом IQ Home. Решение частых оши</span></a><a href="/articles/k/ka/kak-pomenyat-ozvuchku-robota-pylesosa-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как поменять озвучку робота-пылесоса Xiaomi: полная инструкция</span><span class="related-bottom-desc">Узнайте, как сменить голосовые пакеты на пылесосах Xiaomi. Инструкция по смене региона, использовани</span></a><a href="/articles/k/ka/kak-nauchit-razgovarivat-robot-pylesos-xiaomi-po-russki-na-ajfone.html" class="related-bottom-card"><span class="related-bottom-title">Как включить русский голос на роботе-пылесосе Xiaomi с iPhone</span><span class="related-bottom-desc">Пошаговая инструкция: настройка русского языка и голосового помощника на Xiaomi Robot Vacuum через п</span></a><a href="/articles/k/ka/kak-naladit-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Как наладить работу пылесоса: полная инструкция по настройке</span><span class="related-bottom-desc">Пошаговое руководство по настройке и настройке пылесоса. Устранение ошибок, калибровка, чистка фильт</span></a><a href="/articles/k/ka/kak-nastroit-robot-pylesos-xiaomi-vacuum-cleaner-1s.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить робот-пылесос Xiaomi Vacuum Cleaner 1S: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по подключению, настройке карт и режимов уборки для модели Xiaomi Vacuum Cleane</span></a><a href="/articles/k/ka/kak-sbrosit-nastrojki-na-robot-pylesos-xiaomi-vacuum.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить настройки на робот-пылесос Xiaomi: Полная инструкция по Hard и Soft Reset</span><span class="related-bottom-desc">Пошаговое руководство по сбросу настроек роботов-пылесосов Xiaomi. Способы сброса через приложение, </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

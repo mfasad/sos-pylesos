@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Приложение Webpack для робота-пылесоса: инструкция по настройке и управлению — SOS-Пылесос</title>
+    <meta name="description" content="Полная инструкция: как установить, настроить и использовать приложение Webpack для робота-пылесоса. Разбор функций, карты, режимов уборки и устранения ошибок.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/p/pr/prilozhenie-webpack-dlya-robota-pylesosa-kak-polzovatsya.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Приложение Webpack для робота-пылесоса: инструкция по настройке и управлению">
+    <meta property="og:description" content="Полная инструкция: как установить, настроить и использовать приложение Webpack для робота-пылесоса. Разбор функций, карты, режимов уборки и устранения ошибок.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Приложение Webpack для робота-пылесоса: инструкция по настройке и управлению</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Приложение Webpack для робота-пылесоса: полное руководство по управлению</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение-в-экосистему-webpack-и-умную-уборку">Введение в экосистему Webpack и умную уборку</a></li><li><a href="#первичная-настройка-и-сопряжение-с-мобильным-устройством">Первичная настройка и сопряжение с мобильным устройством</a></li><li><a href="#интерфейс-приложения-и-основные-режимы-работы">Интерфейс приложения и основные режимы работы</a></li><li><a href="#планирование-уборки-и-автоматизация-процессов">Планирование уборки и автоматизация процессов</a></li><li><a href="#управление-картой-и-зонирование-помещений">Управление картой и зонирование помещений</a></li><li><a href="#техническое-обслуживание-и-диагностика-ошибок">Техническое обслуживание и диагностика ошибок</a></li><li><a href="#подключение-к-голосовым-ассистентам-и-умному-дому">Подключение к голосовым ассистентам и умному дому</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение-в-экосистему-webpack-и-умную-уборку">Введение в экосистему Webpack и умную уборку</h2>
+<p>Современные пылесосы перестали быть просто механическими устройствами, превратившись в сложные роботизированные системы, требующие точного программного обеспечения. <strong>Приложение Webpack</strong> выступает центральным пультом управления, позволяющим пользователю контролировать каждый аспект работы устройства прямо со смартфона. Это программное решение обеспечивает бесшовную интеграцию робота в систему умного дома и открывает доступ к расширенным функциям, которые недоступны при использовании только физических кнопок.</p>
+<p>Многие владельцы сталкиваются с затруднениями при первом запуске, так как интерфейс может показаться перегруженным техническими деталями. Однако понимание логики работы <em>Webpack</em> позволяет значительно повысить эффективность уборки и снизить износ техники. В этой статье мы подробно разберем процесс сопряжения, настройки расписания и обслуживания устройства через мобильное приложение.</p>
+
+<h2 id="первичная-настройка-и-сопряжение-с-мобильным-устройством">Первичная настройка и сопряжение с мобильным устройством</h2>
+<p>Первым и самым важным этапом является правильное подключение робота к сети Wi-Fi. Убедитесь, что ваш смартфон подключен к двухдиапазонной сети <code>2.4 ГГц</code>, так как большинство моделей роботов не поддерживают частоту <code>5 ГГц</code>. Скачайте официальное приложение из магазина приложений вашего устройства и создайте учетную запись, используя электронную почту.</p>
+<p>После регистрации нажмите кнопку «Добавить устройство» в главном меню. Следуйте инструкциям на экране: обычно требуется удерживать комбинацию кнопок на корпусе пылесоса до звукового сигнала. В процессе настройки вам будет предложено ввести пароль от вашего Wi-Fi роутера. Это обязательное условие для полноценной работы функций удаленного управления.</p>
+<p>Если соединение не устанавливается с первого раза, проверьте, не включен ли режим «Гостевая сеть» на вашем роутере. Также стоит убедиться, что <strong>Bluetooth</strong> на смартфоне активирован, так как он часто используется для быстрого обнаружения устройства на близком расстоянии.</p>
+<blockquote>⚠️ Внимание: Если приложение не видит устройство, попробуйте перезагрузить роутер и сбросить настройки Wi-Fi на самом пылесосе, удерживая кнопки «Домой» и «Спираль» в течение 5 секунд.</blockquote>
+
+<div class="poll-widget" id="poll-75a05dbe"><div class="poll-widget-question">📊 Какой бренд робота-пылесоса вы используете?</div><div class="poll-widget-option" data-poll="75a05dbe" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Xiaomi</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="75a05dbe" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Roborock</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="75a05dbe" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Ecovacs</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="75a05dbe" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Dreame</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="75a05dbe" data-idx="4" onclick="pbPollVote(this)"><span class="poll-widget-label">Другой</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<div class="checklist-block"><h4>☑️ Подготовка к сопряжению</h4><label class="check-item"><input type="checkbox"><span>Включить Wi-Fi 2.4 ГГц</span></label><label class="check-item"><input type="checkbox"><span>Скачать приложение Webpack</span></label><label class="check-item"><input type="checkbox"><span>Зарядить пылесос на 50%</span></label><label class="check-item"><input type="checkbox"><span>Подготовить пароль от сети</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="интерфейс-приложения-и-основные-режимы-работы">Интерфейс приложения и основные режимы работы</h2>
+<p>Главный экран приложения Webpack предоставляет быстрый доступ к основным действиям: началу уборки, возвращению на базу и приостановке процесса. Верхняя часть экрана обычно отображает <strong>статус батареи</strong> и текущий <em>режим работы</em>. Ниже расположена интерактивная карта помещения, которая отображает в реальном времени позицию робота и пройденные зоны.</p>
+<p>В боковом меню вы можете найти настройки мощности всасывания, тип уборки и планировщик. Важно отметить, что <strong>навигационные алгоритмы</strong> в приложении позволяют настраивать зоны, которые робот должен обходить. Это особенно актуально для владельцев домашних животных или тех, кто не хочет, чтобы пылесос забирался в труднодоступные места.</p>
+<p>Использование <em>виртуальных стен</em> и <strong>запретных зон</strong> реализовано интуитивно: достаточно просто нарисовать линию или заштрихованный прямоугольник на карте. Эти настройки сохраняются в памяти устройства и применяются автоматически при каждой следующей уборке без необходимости повторных действий.</p>
+<p>Некоторые версии приложения позволяют создавать <strong>многоэтажные карты</strong>, что удобно для владельцев коттеджей и квартир с лестницами. Переключение между этажами происходит автоматически, когда робот заезжает на другой уровень и загружает соответствующую карту.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед первой масштабной уборкой проведите «разведку» дома, запустив робота в режиме только создания карты без уборки, чтобы проверить корректность работы датчиков в темных углах.</p></div>
+
+<h2 id="планирование-уборки-и-автоматизация-процессов">Планирование уборки и автоматизация процессов</h2>
+<p>Одной из ключевых функций приложения Webpack является возможность создания гибкого расписания. Вы можете настроить уборку не только по дням недели, но и по конкретным часам. Например, запуск работы можно установить на время, когда вы находитесь на работе, чтобы вернуться в чистый дом.</p>
+<p>В настройках расписания вы можете задать <strong>индивидуальные режимы</strong> для разных дней. В будни может включаться режим «Только сухая уборка» на максимальной мощности, а в выходные — комплексная уборка с моющим модулем. Это помогает экономить воду и моющие средства, а также продлевает жизнь расходным материалам.</p>
+<p>Для продвинутых пользователей доступна функция <em>умных сценариев</em>, которые можно привязать к другим устройствам умного дома. Например, робот может начать уборку автоматически, когда вы покидаете дом, если датчики движения зафиксируют отсутствие людей.</p>
+<blockquote>⚠️ Внимание: При настройке расписания учитывайте время зарядки батареи. Если робот не успеет завершить уборку и вернуться на базу, он может прервать процесс и потребовать повторного запуска вручную.</blockquote>
+
+<details class="faq-item"><summary>Что делать, если робот не может вернуться на базу?</summary><div class="faq-answer"><p>Если робот потерял карту базы, проверьте, не переставили ли вы зарядную станцию. Убедитесь, что перед базой нет препятствий в радиусе 1.5 метров. Попробуйте перенастроить карту в приложении, удалив старую и построив новую.</p></div></details>
+
+<h2 id="управление-картой-и-зонирование-помещений">Управление картой и зонирование помещений</h2>
+<p>Приложение Webpack обладает мощным инструментом для редактирования карты, который позволяет разделить открытое пространство на логические комнаты. Это необходимо для выполнения <strong>уборки по комнатам</strong>, когда вам нужно убрать только кухню или гостиную, не затрагивая спальню.</p>
+<p>Для создания комнат используйте функцию «Разделить», проводя линии между стенами. Если стены были разделены ошибочно, их можно объединить с помощью функции «Объединить». После создания комнат каждой из них можно присвоить имя, например, «Ванная», «Кухня» или «Детская».</p>
+<p>Важно настроить <strong>силу всасывания</strong> и <strong>расход воды</strong> для каждой конкретной комнаты. В ванной комнате может потребоваться высокий уровень воды для мытья плитки, а на коврах в гостиной — максимальная мощность всасывания. Эти настройки сохраняются в профиле каждой комнаты и применяются автоматически.</p>
+<p>Также в меню редактирования карты можно установить <em>виртуальные барьеры</em>. Это невидимые стены, которые робот будет обходить. Убедитесь, что барьеры проходят точно по линиям стен, чтобы робот не застревал в углах или не пропускал участки уборки.</p>
+
+<table>
+<thead>
+<tr>
+<th>Режим уборки</th>
+<th>Описание</th>
+<th>Рекомендуемое применение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Тихий</td>
+<td>Минимальная мощность всасывания</td>
+<td>Уборка во время сна или работы</td>
+</tr>
+<tr>
+<td>Стандарт</td>
+<td>Баланс между шумом и эффективностью</td>
+<td>Ежедневная поддержка чистоты</td>
+</tr>
+<tr>
+<td>Турбо</td>
+<td>Максимальная мощность</td>
+<td>Уборка ковров с высоким ворсом</td>
+</tr>
+<tr>
+<td>Точечная</td>
+<td>Уборка небольшого участка</td>
+<td>Удаление локального загрязнения</td>
+</tr>
+</tbody>
+</table>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Правильное зонирование и настройка параметров для каждой комнаты позволяют роботу-пылесосу работать максимально эффективно, экономя ресурсы и время.</p></div>
+
+<h2 id="техническое-обслуживание-и-диагностика-ошибок">Техническое обслуживание и диагностика ошибок</h2>
+<p>Приложение Webpack содержит встроенный раздел диагностики, который помогает пользователю отслеживать состояние расходных материалов и выявлять неисправности. В этом разделе отображается процент износа <strong></strong> (основной щетки), боковых щеток, HEPA-фильтра и контейнера для пыли.</p>
+<p>Если датчики сообщают о необходимости замены детали, приложение предложит купить оригинальный расходник или просто напомнит о чистке. Регулярная очистка датчиков и щеток через приложение позволяет избежать ошибок, связанных с «потерей навигации» или «застреванием».</p>
+<p>В случае возникновения ошибки, приложение выведет код проблемы и краткое описание. Например, ошибка <code>E-01</code> может означать проблему с колесом, а <code>E-05</code> — отсутствие сигнала от базовой станции. В разделе «Помощь» часто есть видеоинструкции по устранению конкретных проблем.</p>
+<blockquote>⚠️ Внимание: Не игнорируйте уведомления о низком заряде батареи или забитом фильтре. Их игнорирование может привести к поломке мотора или сбоям в работе навигационной системы.</blockquote>
+
+<details class="faq-item"><summary>Как сбросить настройки карты?</summary><div class="faq-answer"><p>Для полного сброса карты зайдите в настройки устройства, выберите «Карта» и нажмите «Сбросить карту». После этого робот перейдет в режим создания новой карты с нуля, как при первой покупке.</p></div></details>
+
+<h2 id="подключение-к-голосовым-ассистентам-и-умному-дому">Подключение к голосовым ассистентам и умному дому</h2>
+<p>Современное приложение Webpack поддерживает интеграцию с популярными голосовыми помощниками, такими как <em>Google Assistant</em> и <em>Amazon Alexa</em>. Это позволяет запускать уборку, останавливать её или возвращать робота на базу голосовыми командами, не прибегая к использованию смартфона.</p>
+<p>Для настройки интеграции необходимо зайти в раздел «Умный дом» в приложении Webpack и выбрать соответствующий сервис. После авторизации вы сможете управлять роботом через голосовые команды. Например, фраза «Окей, Google, запусти уборку в гостиной» приведет к немедленному старту процесса.</p>
+<p>Также возможно создание сценариев, где робот взаимодействует с другими устройствами. Если вы используете умные розетки, можно настроить сценарий, при котором робот включается только после того, как вы уйдете из дома, а умный свет выключится.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Интеграция с голосовыми ассистентами превращает робота-пылесос в полноценную часть экосистемы умного дома, делая управление максимально удобным и бесконтактным.</p></div>
+
+<h2 id="часто-задаваемые-вопросы">Часто задаваемые вопросы</h2>
+<details>
+<summary>Почему робот не подключается к приложению Webpack?</summary>
+<p>Чаще всего причина кроется в неправильном выборе сети Wi-Fi. Убедитесь, что вы используете сеть 2.4 ГГц, а не 5 ГГц. Также проверьте, что пароль введен верно и на телефоне включен Bluetooth.</p>
+</details>
+<details>
+<summary>Как исправить ошибку «Робот не может найти базу»?</summary>
+<p>Проверьте, не переставлена ли базовая станция. Убедитесь, что перед ней нет препятствий. Попробуйте очистить контакты на базе и на роботе. Если проблема не решена, выполните перенастройку карты в приложении.</p>
+</details>
+<details>
+<summary>Можно ли использовать приложение без интернета?</summary>
+<p>Нет, для первичной настройки и обновления карт интернет необходим. Однако, если карта уже загружена в память робота, вы можете управлять базовыми функциями через локальный Wi-Fi, но функции удаленного доступа будут недоступны.</p>
+</details>
+<details>
+<summary>Как часто нужно обновлять приложение Webpack?</summary>
+<p>Рекомендуется обновлять приложение до последней версии сразу после выхода обновления. Это обеспечивает совместимость с новыми функциями робота и исправляет возможные программные ошибки.</p>
+</details>
+<details>
+<summary>Что делать, если карта построена некорректно?</summary>
+<p>Вы можете удалить текущую карту в настройках приложения и запустить режим «Создание новой карты». Убедитесь, что в помещении достаточно света и нет движущихся объектов, мешающих навигации.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение-в-экосистему-webpack-и-умную-уборку">Введение в экосистему Webpack и умную уборку</a></li><li><a href="#первичная-настройка-и-сопряжение-с-мобильным-устройством">Первичная настройка и сопряжение с мобильным устройством</a></li><li><a href="#интерфейс-приложения-и-основные-режимы-работы">Интерфейс приложения и основные режимы работы</a></li><li><a href="#планирование-уборки-и-автоматизация-процессов">Планирование уборки и автоматизация процессов</a></li><li><a href="#управление-картой-и-зонирование-помещений">Управление картой и зонирование помещений</a></li><li><a href="#техническое-обслуживание-и-диагностика-ошибок">Техническое обслуживание и диагностика ошибок</a></li><li><a href="#подключение-к-голосовым-ассистентам-и-умному-дому">Подключение к голосовым ассистентам и умному дому</a></li><li><a href="#часто-задаваемые-вопросы">Часто задаваемые вопросы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-sdelat-chtoby-robot-pylesos-govoril-na-russkom-xiaomi.html" class="related-card">Как заставить робот-пылесос Xiaomi говорить по-русски: полная инструкция</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-mjstg1-k-telefonu.html" class="related-card">Как подключить робот-пылесос Xiaomi MJSTG1 к телефону: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kak-sokhranit-kartu-u-robota-pylesosa.html" class="related-card">Как сохранить карту робота-пылесоса: Полная инструкция по сохранению</a></li><li><a href="/articles/k/ka/kak-nastroit-uborku-po-komnatam-na-pylesose-xiaomi.html" class="related-card">Как настроить уборку по комнатам на пылесосе Xiaomi: полное руководство</a></li><li><a href="/articles/k/ka/kak-postavit-ozvuchku-na-robot-pylesos-xiaomi.html" class="related-card">Как поставить озвучку на робот-пылесос Xiaomi: русификация и настройки</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-sdelat-chtoby-robot-pylesos-govoril-na-russkom-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как заставить робот-пылесос Xiaomi говорить по-русски: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство: как сменить язык на русском в приложениях Mi Home и Xiaomi Home, перепрошить </span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-mjstg1-k-telefonu.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi MJSTG1 к телефону: пошаговая инструкция</span><span class="related-bottom-desc">Подробная инструкция по настройке и подключению модели MJSTG1 к приложению Mi Home. Решение частых о</span></a><a href="/articles/k/ka/kak-sokhranit-kartu-u-robota-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Как сохранить карту робота-пылесоса: Полная инструкция по сохранению</span><span class="related-bottom-desc">Узнайте, как правильно сохранить карту робота-пылесоса, чтобы не потерять зоны и запреты после обнов</span></a><a href="/articles/k/ka/kak-nastroit-uborku-po-komnatam-na-pylesose-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить уборку по комнатам на пылесосе Xiaomi: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по настройке зонной уборки и разделения комнат на роботах-пылесосах Xiaomi. Нас</span></a><a href="/articles/k/ka/kak-postavit-ozvuchku-na-robot-pylesos-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как поставить озвучку на робот-пылесос Xiaomi: русификация и настройки</span><span class="related-bottom-desc">Подробная инструкция по смене голосового сопровождения на робот-пылесосах Xiaomi. Русификация через </span></a><a href="/articles/k/ka/kak-nastroit-pylesos-syaomi-cherez-prilozhenie.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить пылесос Xiaomi через приложение Mi Home: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по подключению и настройке робота-пылесоса Xiaomi в приложении Mi Home. Решени</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

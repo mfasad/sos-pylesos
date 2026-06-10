@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как создать умную карту для робот-пылесоса Xiaomi Dreame F9 — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговая инструкция по созданию карты помещений для Dreame F9. Настройка зон, виртуальных стен и оптимизация уборки через приложение Mi Home.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-sozdat-umnuyu-kartu-robot-pylesos-xiaomi-dreame-f9.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как создать умную карту для робот-пылесоса Xiaomi Dreame F9">
+    <meta property="og:description" content="Пошаговая инструкция по созданию карты помещений для Dreame F9. Настройка зон, виртуальных стен и оптимизация уборки через приложение Mi Home.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как создать умную карту для робот-пылесоса Xiaomi Dreame F9</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как создать умную карту робот-пылесоса Xiaomi Dreame F9</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#подготовка-помещения-и-настройка-приложения">Подготовка помещения и настройка приложения</a></li><li><a href="#первичное-создание-карты-помещений">Первичное создание карты помещений</a></li><li><a href="#настройка-зон-и-виртуальных-границ">Настройка зон и виртуальных границ</a></li><li><a href="#сохранение-и-управление-несколькими-картами">Сохранение и управление несколькими картами</a></li><li><a href="#редактирование-и-оптимизация-карты">Редактирование и оптимизация карты</a></li><li><a href="#решение-проблем-с-навигацией-и-сканированием">Решение проблем с навигацией и сканированием</a></li><li><a href="#дополнительные-функции-и-советы-по-эксплуатации">Дополнительные функции и советы по эксплуатации</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Современные роботы-пылесосы, такие как <em>Xiaomi Dreame F9</em>, перестали быть просто автоматическими метлами, просто хаотично перемещающимися по квартире. Их главной особенностью стало умение строить цифровые модели пространства, что позволяет проводить уборку структурно и эффективно. Создание <strong>умной карты</strong> — это базовый этап, без которого невозможно полноценное использование функций зонной уборки или настройки виртуальных границ.</p>
+
+<p>Процесс картографирования может показаться сложным для новичков, но на деле он сводится к выполнению нескольких простых действий в приложении. Вашему помощнику необходимо изучить планировку помещения, определить границы стен и обнаружить препятствия. После завершения этого этапа <em>Dreame F9</em> запомнит геометрию комнаты и будет двигаться по заранее спланированному маршруту, а не бродить случайно.</p>
+
+<p>В этой статье мы подробно разберем, как правильно запустить процесс построения карты, какие ошибки чаще всего допускают пользователи и как настроить карту под ваши специфические нужды. Мы рассмотрим не только базовое создание, но и редактирование зон, сохранение нескольких макетов и устранение типичных проблем с навигацией.</p>
+
+<h2 id="подготовка-помещения-и-настройка-приложения">Подготовка помещения и настройка приложения</h2>
+
+<p>Прежде чем запускать робота на первый картографический заезд, необходимо подготовить пространство. <strong>Умная навигация</strong> Dreame F9 работает на основе LiDAR-сканера, расположенного в "башне" на корпусе устройства, поэтому обзор должен быть максимально чистым. Уберите с пола мелкие предметы, провода, игрушки и временные препятствия, которые могут сбить с толку датчики.</p>
+
+<p>Для корректной работы системы <strong>SLAM</strong> (одновременная локализация и построение карт) важно обеспечить достаточное освещение. Хотя лазерный сканер не зависит от света, камеры и другие сенсоры, помогающие в ориентации, работают лучше при дневном свете или включенном искусственном освещении. Также проверьте, чтобы <code>докинг-станция</code> стояла в открытом месте, с двух сторон от неё было не менее 0,5 метра свободного пространства, а впереди — не менее 1,5 метра.</p>
+
+<p>Убедитесь, что на вашем смартфоне установлено актуальное приложение <code>Mi Home</code> или <code>Dreamehome</code>. Соедините устройство с Wi-Fi сетью 2.4 ГГц, так как многие модели не поддерживают сети 5 ГГц для первичной настройки. После успешного сопряжения перейдите в меню устройства и убедитесь, что доступны все функции управления.</p>
+
+<p>Если вы только распаковали <em>Dreame F9</em>, снимите транспортировочные пленки с колес и щеток. Иногда производитель оставляет защитные элементы на датчиках Cliff, что может привести к ошибке "Робот застрял" во время первого прохода. Очистите датчики сухой мягкой тканью перед стартом.</p>
+
+<h2 id="первичное-создание-карты-помещений">Первичное создание карты помещений</h2>
+
+<p>Самый важный этап — это первый полноценный цикл уборки, который робот использует для построения карты. Не запускайте режим "Точечная уборка" или "Возврат на базу", так как в этих режимах робот не сохраняет данные о геометрии комнаты. Вам нужно выбрать режим <strong>Обычная уборка</strong> и дать роботу закончить работу до конца.</p>
+
+<p>В процессе движения Dreame F9 будет строить карту в реальном времени. Вы сможете видеть прогресс в приложении, где зеленая линия показывает пройденный путь, а серая — еще не исследованную территорию. Робот будет двигаться змейкой, заполняя пространство, и периодически возвращаться на док для подзарядки, если батарея разрядится, продолжая уборку с того же места.</p>
+
+<p>Важно, чтобы в комнате не было резких изменений в освещении или перемещения людей и животных вблизи робота, так как это может вызвать ложные срабатывания датчиков. Рекомендуется оставить робота одного на время первого заезда. Если вы услышите звуковой сигнал о пропущенном месте или ошибке, не вмешивайтесь в процесс, пока робот сам не вернется в нормальный режим.</p>
+
+<p>После завершения уборки робот автоматически сохранит карту. В меню приложения появится раздел <code>Карта</code> или <strong>Редактирование карты</strong>, где вы увидите построенный план вашей квартиры. Если карта получилась неполной или с ошибками, вы можете удалить её и запустить процесс заново, но чаще всего первый заезд дает отличный результат.</p>
+
+<h2 id="настройка-зон-и-виртуальных-границ">Настройка зон и виртуальных границ</h2>
+
+<p>После создания базовой карты <strong>Dreame F9</strong> раскрывает свои главные возможности. Теперь вы можете задать конкретные зоны для уборки, исключить из процесса отдельные комнаты или запретить роботу заходить в определенные места. Все это делается через инструменты редактирования в приложении.</p>
+
+<p>Для начала разберем <strong>виртуальные стены</strong>. Эта функция полезна для зон, где нет физических перегородок, например, границы между кухней и гостиной. Вы просто проводите линию на карте, и робот будет воспринимать её как невидимый барьер. Это работает и для запрета входа в комнаты с животными, где могут лежать игрушки.</p>
+
+<ul>
+  <li>🚫 <strong>Запретная зона</strong>: Робот не будет заезжать в этот квадрат, но будет пропылесосить вокруг него.</li>
+  <li>🚧 <strong>Виртуальная стена</strong>: Линия, которую робот не пересечет ни в каком режиме уборки.</li>
+  <li>🧹 <strong>Зональная уборка</strong>: Выделение конкретного участка (например, только в кухне) для быстрой уборки.</li>
+</ul>
+
+<p>Также доступна функция <strong>разделения карты</strong>. Если у вас квартира-студия или проходная комната, робот может объединить их в одну зону, что не всегда удобно. Вы можете вручную разделить одну большую зону на две отдельные, чтобы управлять ими независимо. Это делается инструментом "Разделить", где вы проводите линию через помещение, которое хотите разделить.</p>
+
+<p>Для более точных настроек используйте функцию <strong>объединения зон</strong>, если робот по ошибке разбил одну комнату на несколько частей из-за отсутствия мебели или узких проходов. Инструмент "Объединить" позволяет склеить соседние зоны в одну логическую единицу. Это критически важно для корректной работы функции "Уборка всей квартиры", чтобы робот понимал, где заканчивается одна комната и начинается другая.</p>
+
+<h2 id="сохранение-и-управление-несколькими-картами">Сохранение и управление несколькими картами</h2>
+
+<p>Одной из самых мощных функций <em>Dreame F9</em> является возможность сохранять до трех разных карт памяти. Это идеально подходит для владельцев двухуровневых квартир или тех, кто переезжает между домом и дачей. Робот может запомнить планировку первого этажа и второго этажа, переключаясь между ними в зависимости от того, где находится база.</p>
+
+<p>Чтобы сохранить текущую карту, зайдите в меню <code>Настройки карты</code> и выберите опцию <strong>Сохранить карту</strong>. Назовите её понятно, например, "1-й этаж" или "Квартира". После этого робот запомнит геометрию. Если вы переместите базу на другой этаж, робот сам предложит создать новую карту или загрузить существующую из памяти.</p>
+
+<p>Важно понимать, что при переключении между картами <strong>навигационные данные</strong> могут сбрасываться. Роботу потребуется время на локализацию, чтобы понять, на какой именно карте он сейчас находится. Не пугайтесь, если он начнет движение хаотично в первые секунды — это нормальный процесс поиска своего положения в пространстве относительно сохраненной модели.</p>
+
+<p>Если планировка квартиры изменилась (например, переставили мебель или сделали перепланировку), старую карту лучше удалить и построить новую. Попытка редактировать устаревшую карту может привести к тому, что робот будет пытаться проехать сквозь стену или застрянет в месте, которого физически больше нет. Регулярная актуализация данных повышает эффективность работы.</p>
+
+<div class="poll-widget" id="poll-2ae8caaa"><div class="poll-widget-question">📊 Какой тип планировки у вашей квартиры?</div><div class="poll-widget-option" data-poll="2ae8caaa" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Студия</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2ae8caaa" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Двушка</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2ae8caaa" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Трешка</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2ae8caaa" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Двухуровневая</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="2ae8caaa" data-idx="4" onclick="pbPollVote(this)"><span class="poll-widget-label">Загородный дом</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="редактирование-и-оптимизация-карты">Редактирование и оптимизация карты</h2>
+
+<p>Иногда автоматическое построение карты дает сбои, и в приложении появляются "фантомные" стены или пропущенные участки. В этом случае на помощь приходит ручной режим <strong>редактирования карты</strong>. Вы можете удалять лишние линии, рисовать новые границы или корректировать положение стен.</p>
+
+<p>Для удаления лишних стен выберите инструмент "Удалить стену" и проведите линию через некорректный участок. Это часто бывает нужно, если робот из-за бликов на полу или прозрачной мебели "нарисовал" стену там, где её нет. Также можно использовать функцию <strong>слияния</strong>, если одна комната разбилась на две части из-за пустого пространства посередине.</p>
+
+<p>Если робот постоянно застревает в одном и том же месте, вы можете установить там <strong>виртуальный запрет</strong> или добавить тамбур, чтобы робот обходил его стороной. Это особенно актуально для сложных зон с большим количеством ножек стульев или низких подставок, которые сканируются некорректно.</p>
+
+<blockquote>
+<p>⚠️ <strong>Внимание!</strong> Изменения в карте, внесенные вручную, могут привести к ошибкам навигации, если они не соответствуют реальной геометрии помещения. Всегда проверяйте, чтобы линии стен на экране совпадали с реальными углами комнаты.</p>
+</blockquote>
+
+<p>Не забывайте о функции <strong>настройки уровня пола</strong>, если у вас многоуровневая квартира с порогами. Хотя Dreame F9 может преодолевать пороговые барьеры высотой до 2 см, слишком высокие переходы могут сбивать датчики. В этом случае лучше пометить область как "запретную", чтобы робот не пытался туда заезжать.</p>
+
+<div class="checklist-block"><h4>☑️ Чек-лист по редактированию карты</h4><label class="check-item"><input type="checkbox"><span>Проверить линии стен на соответствие реальности</span></label><label class="check-item"><input type="checkbox"><span>Удалить фантомные перегородки</span></label><label class="check-item"><input type="checkbox"><span>Настроить запретные зоны для животных</span></label><label class="check-item"><input type="checkbox"><span>Сохранить изменения в памяти робота</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="решение-проблем-с-навигацией-и-сканированием">Решение проблем с навигацией и сканированием</h2>
+
+<p>В процессе использования могут возникнуть ситуации, когда робот перестает понимать, где находится, или карта начинает "разъезжаться". Это часто происходит, если <code>LiDAR-сканер</code> загрязнен пылью или если робот был перемещен вручную без использования режима "Перенос" в приложении.</p>
+
+<p>Если карта стала неряшливой или робот стал двигаться хаотично, первым делом очистите сканер. Возьмите сухую ватную палочку и аккуратно протрите вращающуюся часть "башни" на корпусе. Затем зайдите в настройки и попробуйте функцию <strong>Пересканирование</strong> или <strong>Обновление карты</strong>, не удаляя полностью старую карту, если это возможно.</p>
+
+<p>Другая частая проблема — это отсутствие связи между роботом и приложением во время построения карты. Если вы видите в приложении, что робот двигается, но карта не строится, проверьте стабильность Wi-Fi соединения. <strong>Потеря пакетов</strong> данных может привести к тому, что робот будет строить карту на лету, но не сможет её корректно загрузить в облако или на сервер приложения.</p>
+
+<p>В редких случаях может потребоваться полный сброс навигационных данных. Для этого зайдите в <code>Настройки устройства</code> → <strong>Управление картой</strong> → <strong>Сброс карты</strong>. После этого робот вернется к заводским настройкам и потребует повторного запуска процесса построения карты с нуля. Это крайняя мера, но она часто помогает при серьезных программных сбоях.</p>
+
+<blockquote>
+<p>⚠️ <strong>Внимание!</strong> При сбросе карты все созданные виртуальные стены и зоны будут удалены. Перед проведением сброса убедитесь, что вы готовы потратить время на повторное создание всех настроек.</p>
+</blockquote>
+
+<p>Также обратите внимание на уровень заряда батареи. Если робот часто возвращается на базу во время уборки, это может быть связано с износом аккумулятора или слишком большим расстоянием до док-станции. В таких случаях карта может строиться фрагментарно. Проверьте состояние батареи в приложении и при необходимости замените её на новую.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если робот часто теряет карту, попробуйте переместить док-станцию в более открытое место и убедиться, что перед ней нет зеркал или стеклянных поверхностей, которые могут создавать помехи для лазера.</p></div>
+
+<h2 id="дополнительные-функции-и-советы-по-эксплуатации">Дополнительные функции и советы по эксплуатации</h2>
+
+<p>Помимо базового построения карты, <em>Dreame F9</em> предлагает ряд дополнительных функций, которые делают уборку еще удобнее. Одна из них — <strong>расписание уборки</strong> по зонам. Вы можете настроить так, чтобы по будням робот убирал только кухню, а по выходным — всю квартиру целиком.</p>
+
+<p>Интересная функция — это <strong>запрет на мопинг</strong> в определенных зонах. Если у вас есть ковер, который нельзя мыть, вы можете нарисовать вокруг него зону "Нельзя мыть", и робот будет пылесосить её, но пропустит этап с влажной уборкой. Это сохраняет ковер в идеальном состоянии и продлевает срок службы водного модуля.</p>
+
+<p>Также стоит обратить внимание на настройки скорости уборки. В <code>Настройках карты</code> можно изменить скорость движения робота для разных зон. Например, в коридоре можно установить высокую скорость, а в детской комнате — низкую и тихую. Это позволяет оптимизировать процесс и не беспокоить домочадцев во время уборки.</p>
+
+<p>Не забывайте обновлять прошивку устройства. Производитель часто выпускает обновления, которые улучшают алгоритмы построения карты и добавляют новые функции. Зайдите в <code>Настройки</code> → <strong>Проверка обновлений</strong> и установите последнюю версию ПО, если она доступна.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Параметр</th>
+      <th>Значение</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Тип навигации</td>
+      <td>LiDAR</td>
+      <td>Лазерное сканирование для точного построения карты</td>
+    </tr>
+    <tr>
+      <td>Макс. порог</td>
+      <td>20 мм</td>
+      <td>Максимальная высота порога, который может преодолеть робот</td>
+    </tr>
+    <tr>
+      <td>Память карт</td>
+      <td>3 карты</td>
+      <td>Количество сохраняемых планировок помещений</td>
+    </tr>
+    <tr>
+      <td>Скорость уборки</td>
+      <td>3 уровня</td>
+      <td>Возможность настройки скорости в зависимости от зоны</td>
+    </tr>
+    <tr>
+      <td>Виртуальные стены</td>
+      <td>Безлимитно</td>
+      <td>Количество создаваемых запретных зон и стен</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Использование <strong>умной карты</strong> превращает робот-пылесос из простого устройства в полноценного домашнего помощника. Правильная настройка экономит время, энергию батареи и обеспечивает тщательную уборку каждого уголка квартиры.</p>
+
+<p>Помните, что качество карты зависит не только от техники, но и от подготовки помещения. Регулярно проверяйте состояние датчиков и обновляйте карту при изменении планировки. Тогда ваш <em>Xiaomi Dreame F9</em> будет работать безупречно долгие годы.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Грамотное использование виртуальных стен и зонной уборки позволяет адаптировать работу робота под сложные планировки и специфические требования эксплуатации.</p></div>
+
+<details>
+  <summary>Что делать, если робот не может найти базу после создания карты?</summary>
+  <p>Если робот не может найти базу, проверьте, не перемещали ли вы её. Убедитесь, что перед базой нет препятствий, а боковые стороны свободны. Попробуйте вручную вернуть робота на базу и нажать кнопку "Док" на корпусе. Если проблема сохраняется, возможно, карта накладывается неверно, и стоит пересоздать её.</p>
+</details>
+
+<details>
+  <summary>Можно ли использовать карту для двухуровневой квартиры?</summary>
+  <p>Да, Dreame F9 поддерживает сохранение до трех карт. Вы можете создать карту для первого этажа, перенести базу на второй этаж и создать вторую карту. Робот будет запоминать расположение базы на каждом этаже и переключаться между картами автоматически.</p>
+</details>
+
+<details>
+  <summary>Как удалить ненужную зону на карте?</summary>
+  <p>В режиме редактирования карты выберите инструмент "Удалить зону" или "Удалить стену". Проведите линию через ненужный участок, чтобы удалить его. После этого не забудьте сохранить изменения, чтобы они применились к будущим уборкам.</p>
+</details>
+
+<details>
+  <summary>Почему робот построил карту с ошибками?</summary>
+  <p>Ошибки могут возникнуть из-за плохого освещения, наличия зеркал, стекла или прозрачных предметов в помещении. Также причина может быть в том, что робот был перемещен вручную во время уборки. Попробуйте построить карту заново, убрав все помехи.</p>
+</details>
+
+<details>
+  <summary>Сколько времени занимает построение карты?</summary>
+  <p>Время зависит от площади помещения и количества препятствий. В среднем, для квартиры площадью 60-80 кв.м. процесс занимает от 30 до 50 минут. Если площадь больше, время может увеличиться до часа и более.</p>
+</details>
+
+<details class="faq-item"><summary>Что делать, если карта не сохраняется?</summary><div class="faq-answer"><p>Если карта не сохраняется, проверьте интернет-соединение. Возможно, робот не может загрузить данные на сервер. Попробуйте перезагрузить роутер и повторить попытку. Также убедитесь, что в приложении нет ошибок синхронизации.</p></div></details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#подготовка-помещения-и-настройка-приложения">Подготовка помещения и настройка приложения</a></li><li><a href="#первичное-создание-карты-помещений">Первичное создание карты помещений</a></li><li><a href="#настройка-зон-и-виртуальных-границ">Настройка зон и виртуальных границ</a></li><li><a href="#сохранение-и-управление-несколькими-картами">Сохранение и управление несколькими картами</a></li><li><a href="#редактирование-и-оптимизация-карты">Редактирование и оптимизация карты</a></li><li><a href="#решение-проблем-с-навигацией-и-сканированием">Решение проблем с навигацией и сканированием</a></li><li><a href="#дополнительные-функции-и-советы-по-эксплуатации">Дополнительные функции и советы по эксплуатации</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-vklyuchit-robot-pylesos-xiaomi-cherez-internet.html" class="related-card">Как подключить робот-пылесос Xiaomi к Wi-Fi и настроить удаленный доступ</a></li><li><a href="/articles/k/ka/kak-nastroit-vaj-faj-na-pylesose-xiaomi.html" class="related-card">Настройка Wi-Fi на роботе-пылесосе Xiaomi: полная инструкция</a></li><li><a href="/articles/k/ka/kak-sdelat-robota-pylesosa-govoryashchim.html" class="related-card">Как сделать робота-пылесоса говорящим: Настройка голосовых уведомлений</a></li><li><a href="/articles/p/py/pylesos-belyj-shum-issledovanij-gde-poslushat.html" class="related-card">Белый шум и пылесосы: где найти исследования и послушать звуки</a></li><li><a href="/articles/k/ka/kak-vklyuchit-robot-pylesos-xiaomi-pervyj-raz-s-prilozheniem.html" class="related-card">Как подключить и настроить робот-пылесос Xiaomi с приложением Mi Home</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-vklyuchit-robot-pylesos-xiaomi-cherez-internet.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi к Wi-Fi и настроить удаленный доступ</span><span class="related-bottom-desc">Полная инструкция: пошаговое подключение робота-пылесоса Xiaomi к сети, настройка приложения Mi Home</span></a><a href="/articles/k/ka/kak-nastroit-vaj-faj-na-pylesose-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Настройка Wi-Fi на роботе-пылесосе Xiaomi: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по подключению робота-пылесоса Xiaomi к роутеру. Решение частых ошибок, настро</span></a><a href="/articles/k/ka/kak-sdelat-robota-pylesosa-govoryashchim.html" class="related-bottom-card"><span class="related-bottom-title">Как сделать робота-пылесоса говорящим: Настройка голосовых уведомлений</span><span class="related-bottom-desc">Узнайте, как включить голосовое сопровождение, изменить язык и настроить озвучку робота-пылесоса. По</span></a><a href="/articles/p/py/pylesos-belyj-shum-issledovanij-gde-poslushat.html" class="related-bottom-card"><span class="related-bottom-title">Белый шум и пылесосы: где найти исследования и послушать звуки</span><span class="related-bottom-desc">Исследования влияния шума пылесоса на сон. Где послушать белый шум от работающего прибора. Обзор нау</span></a><a href="/articles/k/ka/kak-vklyuchit-robot-pylesos-xiaomi-pervyj-raz-s-prilozheniem.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить и настроить робот-пылесос Xiaomi с приложением Mi Home</span><span class="related-bottom-desc">Пошаговая инструкция по первому включению, сопряжению с Wi-Fi и настройке робот-пылесосов Xiaomi чер</span></a><a href="/articles/k/ka/kak-na-robote-pylesose-xiaomi-sdelat-russkij-yazyk.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить русский язык на робот-пылесос Xiaomi: Полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по смене языка на Xiaomi, Roborock и Dreame. Официальные приложения, кастомные</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

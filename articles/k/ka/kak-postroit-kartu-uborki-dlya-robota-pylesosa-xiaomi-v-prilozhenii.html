@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как построить карту уборки для робота-пылесоса Xiaomi в приложении Mi Home — SOS-Пылесос</title>
+    <meta name="description" content="Пошаговая инструкция по созданию и редактированию карты уборки в Mi Home. Настройка виртуальных стен, зон и комнат для роботов Xiaomi.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-postroit-kartu-uborki-dlya-robota-pylesosa-xiaomi-v-prilozhenii.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как построить карту уборки для робота-пылесоса Xiaomi в приложении Mi Home">
+    <meta property="og:description" content="Пошаговая инструкция по созданию и редактированию карты уборки в Mi Home. Настройка виртуальных стен, зон и комнат для роботов Xiaomi.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как построить карту уборки для робота-пылесоса Xiaomi в приложении Mi Home</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как построить карту уборки для робота-пылесоса Xiaomi в приложении</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#подготовка-помещения-к-первому-сканированию-карты">Подготовка помещения к первому сканированию карты</a></li><li><a href="#процесс-инициализации-карты-в-приложении">Процесс инициализации карты в приложении</a></li><li><a href="#сохранение-и-управление-несколькими-картами">Сохранение и управление несколькими картами</a></li><li><a href="#редактирование-карты-деление-на-комнаты-и-зоны">Редактирование карты: деление на комнаты и зоны</a></li><li><a href="#настройка-виртуальных-границ-и-запретных-зон">Настройка виртуальных границ и запретных зон</a></li><li><a href="#типичные-проблемы-при-построении-карты-и-их-решение">Типичные проблемы при построении карты и их решение</a></li><li><a href="#таблица-параметров-и-настроек-для-разных-типов-помещений">Таблица параметров и настроек для разных типов помещений</a></li><li><a href="#особенности-работы-с-моющими-моделями">Особенности работы с моющими моделями</a></li><li><a href="#заключение">Заключение</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Современные роботы-пылесосы от <em>Xiaomi</em> и суббрендов вроде <em>Roborock</em> перестали быть просто автоматическими метлами, беспорядочно хащащими пол. Их главная «фишка» — интеллектуальное картирование пространства, которое позволяет устройству не просто двигаться, а понимать геометрию квартиры. Без корректно построенной карты невозможна работа таких функций, как уборка по комнатам, создание виртуальных границ или настройка разной мощности всасывания в разных зонах.</p>
+
+<p>Процесс инициализации карты занимает от 15 до 40 минут в зависимости от площади помещения и сложности планировки. Важно понимать, что робот использует комбинированный метод навигации: лазерный дальномер (LDS) сканирует потолок и стены, а инфракрасные датчики и гироскоп корректируют положение в пространстве. Именно это сочетание технологий обеспечивает высокую точность построения схемы помещения в приложении <code>Mi Home</code> или <code>Mi Robot Vacuum</code>.</p>
+
+<p>Если вы только распаковали новую модель <em>Xiaomi S10</em> или <em>S6 MaxV</em>, первое, что вам предстоит сделать — запустить процедуру обучения пространства. Не пытайтесь сразу же настраивать сложные зоны или делить квартиру на комнаты, пока робот не завершит полный цикл первичного сканирования. Иначе карта может получиться фрагментарной, а навигация будет давать сбои при попытке вернуться на базу.</p>
+
+<h2 id="подготовка-помещения-к-первому-сканированию-карты">Подготовка помещения к первому сканированию карты</h2>
+
+<p>Качество будущей карты напрямую зависит от того, насколько чисто и упорядоченно будет выглядеть квартира в момент первого запуска. Робот <em>Xiaomi</em> ориентируется по контрастным объектам, поэтому наличие множества мелких предметов на полу может сбивать алгоритм с толку или приводить к тому, что устройство будет считать их препятствиями, а не частью интерьера.</p>
+
+<p>Уберите с пола кабели, игрушки, обувь, корзины для белья и любые другие предметы, которые могут застрять под колесами или бампером. Особое внимание уделите зонам вокруг базы зарядки: перед ней и по бокам должен быть свободный коридор шириной минимум 1,5 метра, а по бокам — 0,5 метра. Это критически важно для того, чтобы лазерный сканер мог корректно зафиксировать стартовую точку.</p>
+
+<p>Также стоит проверить освещение в помещении. Хотя современные модели оснащены датчиками, работающими в темноте, наличие естественного света или включенных ламп помогает камерам на борту (если они есть) лучше распознавать текстуру пола и мебель. Закройте двери в те комнаты, которые вы не планируете убирать в данный момент, чтобы робот не «потерялся» в несуществующих проходах.</p>
+
+<p>Перед запуском убедитесь, что база подключена к розетке с напряжением <code>220В</code> и стабильным заземлением. Также проверьте уровень зарядки робота: он должен быть не менее <code>80%</code>. Если батарея разряжена, устройство может прервать процесс построения карты посередине, и вам придется начинать всё заново, что затянет настройку на неопределенное время.</p>
+
+<h2 id="процесс-инициализации-карты-в-приложении">Процесс инициализации карты в приложении</h2>
+
+<p>После подготовки помещения необходимо запустить приложение <code>Mi Home</code> и добавить устройство, если вы этого еще не сделали. Выберите регион сервера (обычно это «Россия» или «Китай» в зависимости от версии прошивки) и следуйте инструкциям по подключению к Wi-Fi сети. Важно, чтобы сеть работала в диапазоне <code>2.4 ГГц</code>, так как большинство моделей <em>Xiaomi</em> не поддерживают частоту <code>5 ГГц</code> для подключения к облаку.</p>
+
+<p>В главном окне управления роботом найдите кнопку быстрого старта или значок «Уборка». Для создания карты лучше выбрать режим «Полная уборка» или «Быстрая уборка», но обязательно отключите режим «Точечная уборка». Отправьте робота в путь, нажав на кнопку «Старт» в приложении. В этот момент устройство начнет двигаться по принципу «змейка», сканируя периметр и заполняя пустые зоны.</p>
+
+<p>В течение этого времени не оставляйте робота без присмотра, особенно если в доме есть дети или животные. Они могут перекрыть путь устройству или отключить его от базы. Если робот уперся в препятствие, которое он не может объехать, лучше аккуратно переместить его в свободную зону, чтобы он продолжил построение карты без сбоев.</p>
+
+<div class="poll-widget" id="poll-e7923460"><div class="poll-widget-question">📊 Где чаще всего возникают проблемы с картой?</div><div class="poll-widget-option" data-poll="e7923460" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Плохая навигация</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e7923460" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Слишком пыльно</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e7923460" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Не видит базу</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="e7923460" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Низкий заряд</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<p>На экране приложения в реальном времени будет отображаться сетка, заполняющаяся по мере движения робота. Вы увидите, как устройство прокладывает маршрут, объезжает диваны и столы. Когда робот вернется на базу зарядки, процесс будет считаться завершенным, и карта появится в памяти устройства. Обычно это занимает около 20-30 минут для типовой квартиры-студии.</p>
+
+<h2 id="сохранение-и-управление-несколькими-картами">Сохранение и управление несколькими картами</h2>
+
+<p>После того как робот успешно вернется на базу и закончит сканирование, приложение предложит вам сохранить полученную карту. Это критический момент: если вы не сохраните её, следующая уборка начнется как «первая попытка», и карта может сброситься. Назовите карту понятным именем, например, «Первый этаж» или «Квартира в центре».</p>
+
+<p>Если у вас двухэтажный дом или вы хотите использовать одну модель в разных помещениях, функция «Множественные карты» (Multi-floor mapping) станет незаменимой. Большинство современных моделей <em>Xiaomi</em> и <em>Roborock</em> поддерживают сохранение до 4 карт одновременно. Робот запоминает уникальные признаки каждой карты, такие как форма стен и расположение мебели, и автоматически переключается между ними при переносе устройства в другую локацию.</p>
+
+<p>Для активации этой функции зайдите в меню «Управление картой» и выберите опцию «Добавить карту». Вам нужно будет перенести робота и базу в новое помещение, сгенерировать новую карту и сохранить её под новым именем. При переносе устройства убедитесь, что робот находится на земле, а не в подвешенном состоянии, чтобы сенсоры могли корректно считать новое пространство.</p>
+
+<p>Обратите внимание, что в некоторых прошивках функция множественных карт может быть скрыта в расширенных настройках или требовать обновления ПО до последней версии. Если вы не видите соответствующей опции, проверьте раздел «О системе» и выполните поиск обновлений.</p>
+
+<h2 id="редактирование-карты-деление-на-комнаты-и-зоны">Редактирование карты: деление на комнаты и зоны</h2>
+
+<p>После сохранения карты вы получите доступ к инструменту редактирования. Здесь можно разделить одну большую карту на отдельные комнаты, что позволит настраивать уборку по зонам. Нажмите на кнопку «Редактировать» или «Разделить комнату» и проведите линии вдоль стен. Приложение само предложит варианты разделения, но вы можете скорректировать их вручную для идеального результата.</p>
+
+<p>Для каждой комнаты можно задать индивидуальные параметры: силу всасывания, режим работы (сухая или влажная уборка) и количество проходов. Например, на кухне можно установить максимальное всасывание двойным проходом, а в спальне — тихий режим с одним проходом. Это экономит заряд батареи и время уборки, так как робот не будет тратить ресурсы на ненужные действия.</p>
+
+<p>Также можно объединять комнаты, если перегородка между ними слишком низкая или отсутствует вовсе. Две соседние комнаты можно объединить в одну большую зону, чтобы робот обрабатывал их последовательно как единое пространство. Это особенно удобно для открытых студий, где нет четких границ между зоной кухни и гостиной.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка корректности карты</h4><label class="check-item"><input type="checkbox"><span>Все стены видны</span></label><label class="check-item"><input type="checkbox"><span>Комнаты разделены верно</span></label><label class="check-item"><input type="checkbox"><span>Нет лишних линий</span></label><label class="check-item"><input type="checkbox"><span>База на месте</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="настройка-виртуальных-границ-и-запретных-зон">Настройка виртуальных границ и запретных зон</h2>
+
+<p>Одной из самых полезных функций является создание виртуальных границ, которые робот будет избегать. Вы можете нарисовать на карте «запретную зону» (No-Go Zone), куда устройство не зайдет ни при каких обстоятельствах. Это идеально подходит для мест, где лежат провода, стоят аквариумы или находятся вольеры для животных.</p>
+
+<p>Существует также функция «Виртуальная стена» (Virtual Wall), которая работает как невидимый барьер. В отличие от запретной зоны, она может быть односторонней: робот не пересечет линию в одну сторону, но может вернуться через неё. Это полезно, если вам нужно временно ограничить доступ в определенную комнату, не закрывая дверь физически.</p>
+
+<p>Для моющих моделей доступна настройка «Запрет на мытье» (No-Mop Zone). Здесь вы можете указать зоны, где робот будет пылесосить, но не будет протирать пол тряпкой. Это актуально для ковровых покрытий, которые нельзя мочить, или для участков с электрическими проводами под ковром.</p>
+
+<blockquote>⚠️ Внимание: Виртуальные границы сохраняются только в рамках конкретной карты. Если вы создаете новую карту для другого этажа, настройки зон сбрасываются и их придется настраивать заново.</blockquote>
+
+<p> Поэтому для критически важных зон лучше использовать физические барьеры или магнитные ленты, если модель их поддерживает.</p>
+
+<h2 id="типичные-проблемы-при-построении-карты-и-их-решение">Типичные проблемы при построении карты и их решение</h2>
+
+<p>Иногда процесс построения карты может затянуться или завершиться с ошибками. Наиболее частая причина — отсутствие контраста между полом и мебелью, когда робот не может отличить стену от ковра или дивана. В таких случаях попробуйте временно изменить освещение или добавить контрастные маркеры на края мебели.</p>
+
+<p>Другая распространенная проблема — робот «забывает» карту после перезагрузки или обновления прошивки. Это может случиться, если сброс был выполнен некорректно. Проверьте, что вы сохранили карту именно после завершения цикла сканирования, а не в процессе. Также убедитесь, что дата и время на телефоне синхронизированы, так как рассинхронизация может привести к ошибкам в облачном хранилище карт.</p>
+
+<p>Если робот постоянно натыкается на одно и то же место на карте, возможно, в реальности там изменилась планировка. В этом случае необходимо выполнить полную перепостроек карты: удалите старую карту в приложении и запустите повторное сканирование всего помещения.</p>
+
+<details class="faq-item"><summary>Что делать, если карта не сохраняется?</summary><div class="faq-answer"><p>Попробуйте удалить карту вручную, перезагрузить устройство и запустить сканирование заново. Убедитесь, что место для хранения карт не заполнено, если вы используете несколько карт.</p></div></details>
+
+<p>Иногда приложение может показывать «мертвые зоны» — участки, которые робот не смог засканировать. Это обычно происходит из-за того, что лазерное лучи не достигли этих зон из-за препятствий. Пройдитесь по этим участкам вручную, чтобы убедиться, что они не являются важными частями помещения, и при необходимости скорректируйте путь робота в настройках.</p>
+
+<h2 id="таблица-параметров-и-настроек-для-разных-типов-помещений">Таблица параметров и настроек для разных типов помещений</h2>
+
+<p>Для удобства использования ниже приведена таблица с рекомендуемыми настройками для различных типов помещений. Эти значения являются базовыми и могут быть скорректированы в зависимости от конкретной модели робота и типа напольного покрытия.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип помещения</th>
+<th>Режим всасывания</th>
+<th>Влажная уборка</th>
+<th>Количество проходов</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Гостиная</td>
+<td>Средний</td>
+<td>Слабая</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Кухня</td>
+<td>Максимальный</td>
+<td>Сильная</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Спальня</td>
+<td>Тихий</td>
+<td>Слабая</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Коридор</td>
+<td>Средний</td>
+<td>Средняя</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+
+<p>Использование этих настроек поможет оптимизировать работу робота и продлить срок службы его компонентов. Например, чрезмерная интенсивность всасывания в спальне может привести к быстрому износу мотора и повышенному шуму, что нарушит комфорт отдыха.</p>
+
+<blockquote>⚠️ Внимание: При использовании моющей функции убедитесь, что резервуар для воды заполнен, а тряпка правильно установлена. Неправильная установка может привести к протечкам и повреждению пола.</blockquote>
+
+<p>Не забывайте регулярно очищать фильтры и щетки робота. Загрязненные компоненты могут снизить эффективность уборки и привести к тому, что робот будет пропускать участки, даже если они находятся на карте. Рекомендуется чистить устройство после каждой 3-4 уборки или чаще, если у вас есть домашние животные.</p>
+
+<p>Следите за уровнем заряда батареи. Если робот часто возвращается на базу для подзарядки во время уборки, это может указывать на износ батареи или перегрузку системы. В таких случаях стоит проверить состояние аккумулятора и при необходимости заменить его на новый.</p>
+
+<h2 id="особенности-работы-с-моющими-моделями">Особенности работы с моющими моделями</h2>
+
+<p>Моющие модели <em>Xiaomi</em> имеют свои особенности при построении карты. Они часто используют более сложные алгоритмы для определения границ ковра, чтобы не намочить его. Если робота с функцией моющего пола определить ковровое покрытие, он автоматически поднимет тряпку и увеличит всасывание.</p>
+
+<p>Для корректной работы этой функции необходимо, чтобы ковер был достаточно контрастным по цвету и текстуре. Если ковер имеет тот же цвет, что и пол, робот может не распознать его и намочить. В таких случаях лучше использовать виртуальную зону запрета для влажной уборки.</p>
+
+<p>Также стоит учесть, что моющие модели могут требовать больше времени на уборку из-за необходимости протирать пол. Поэтому при планировании уборки учитывайте, что моющая уборка будет занимать больше времени, чем просто сухая.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед началом моющей уборки проверьте, что тряпка на роботе чистая и не имеет остатков моющего средства, которое может повредить пол.</p></div>
+
+<p>Помните, что моющие модели не предназначены для уборки больших луж или жидкостей. Они справляются только с легкими загрязнениями и пылью. Если на полу пролита жидкость, лучше убрать её вручную перед запуском робота.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Правильная настройка карты уборки — залог эффективной и безопасной работы робота-пылесоса Xiaomi в вашем доме.</p></div>
+
+<h2 id="заключение">Заключение</h2>
+
+<p>Настройка карты уборки для робота-пылесоса <em>Xiaomi</em> — это процесс, который требует немного времени, но приносит значительные выгоды в виде автоматизации и эффективности. Следуя простым правилам подготовки помещения и настройке приложения, вы сможете добиться идеального результата.</p>
+
+<p>Не бойтесь экспериментировать с настройками зон и комнат. Чем больше вы используете возможности приложения, тем лучше робот адаптируется к вашим потребностям. Помните, что карта — это не статичный объект, а динамическая система, которая может меняться вместе с вашей квартирой.</p>
+
+<p>Регулярно обновляйте прошивку устройства, чтобы получать доступ к новым функциям и улучшениям производительности. Разработчики <em>Xiaomi</em> постоянно работают над улучшением алгоритмов навигации и картирования, поэтому новые версии ПО могут существенно улучшить работу вашего робота.</p>
+
+<blockquote>⚠️ Внимание: Если вы переезжаете или делаете ремонт, обязательно удалите старую карту и создайте новую, чтобы робот не пытался ориентироваться по старой планировке.</blockquote>
+
+<p>В конечном итоге, грамотно настроенный робот-пылесос станет вашим верным помощником, освободившим вас от рутины регулярной уборки. Пусть ваш дом всегда будет чистым и уютным с минимальными усилиями с вашей стороны.</p>
+
+<p>Помните, что любая техника требует ухода и внимания. Регулярная проверка состояния расходных материалов и своевременная замена фильтров обеспечат долгую и безотказную работу вашего устройства. Не пренебрегайте рекомендациями производителя по обслуживанию.</p>
+
+<details>
+<summary>Что делать, если робот не видит базу зарядки?</summary>
+<p>Проверьте, что база стоит на ровной поверхности и перед ней есть свободное пространство. Убедитесь, что контакты на базе и роботе чистые. Попробуйте перезагрузить базу и робота.</p>
+</details>
+<details>
+<summary>Как удалить старую карту?</summary>
+<p>Зайдите в приложение Mi Home, выберите робота, откройте карту и нажмите «Управление картой». Выберите карту, которую хотите удалить, и нажмите на иконку корзины.</p>
+</details>
+<details>
+<summary>Можно ли редактировать карту во время уборки?</summary>
+<p>Нет, редактирование карты доступно только тогда, когда робот находится на базе и не выполняет уборку. Попытка редактирования во время работы может привести к ошибкам в навигации.</p>
+</details>
+<details>
+<summary>Как долго хранятся карты в памяти робота?</summary>
+<p>Карты хранятся до тех пор, пока вы их не удалите вручную или не выполните полный сброс настроек устройства. Они не стираются автоматически.</p>
+</details>
+<details>
+<summary>Почему робот иногда пропускает углы комнаты?</summary>
+<p>Это может быть связано с особенностями конструкции робота или сложностью геометрии угла. Проверьте, нет ли препятствий в углу, и попробуйте вручную подвигать робота туда.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#подготовка-помещения-к-первому-сканированию-карты">Подготовка помещения к первому сканированию карты</a></li><li><a href="#процесс-инициализации-карты-в-приложении">Процесс инициализации карты в приложении</a></li><li><a href="#сохранение-и-управление-несколькими-картами">Сохранение и управление несколькими картами</a></li><li><a href="#редактирование-карты-деление-на-комнаты-и-зоны">Редактирование карты: деление на комнаты и зоны</a></li><li><a href="#настройка-виртуальных-границ-и-запретных-зон">Настройка виртуальных границ и запретных зон</a></li><li><a href="#типичные-проблемы-при-построении-карты-и-их-решение">Типичные проблемы при построении карты и их решение</a></li><li><a href="#таблица-параметров-и-настроек-для-разных-типов-помещений">Таблица параметров и настроек для разных типов помещений</a></li><li><a href="#особенности-работы-с-моющими-моделями">Особенности работы с моющими моделями</a></li><li><a href="#заключение">Заключение</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-nauchit-razgovarivat-robot-pylesos-xiaomi-s-alisoj.html" class="related-card">Как подключить робот-пылесос Xiaomi к Алисе: настройки и команды</a></li><li><a href="/articles/k/ka/kak-skachat-golos-na-robot-pylesos-xiaomi-mi.html" class="related-card">Как скачать и установить новый голос на робот-пылесос Xiaomi Mi</a></li><li><a href="/articles/k/ka/kak-nastroit-russkij-yazyk-na-robot-pylesos-xiaomi-1s.html" class="related-card">Как настроить русский язык на Xiaomi Robot Vacuum 1S: полное руководство</a></li><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-k-mi-home-na-android.html" class="related-card">Подключение робот-пылесоса Xiaomi к Mi Home на Android: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kak-podklyuchit-k-prilozheniyu-robot-pylesos-xiaomi-vacuum-mop-essential.html" class="related-card">Как подключить робот-пылесос Xiaomi Vacuum Mop Essential к приложению Mi Home</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-nauchit-razgovarivat-robot-pylesos-xiaomi-s-alisoj.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi к Алисе: настройки и команды</span><span class="related-bottom-desc">Пошаговая инструкция по интеграции робота-пылесоса Xiaomi с голосовым помощником Яндекс Алиса. Настр</span></a><a href="/articles/k/ka/kak-skachat-golos-na-robot-pylesos-xiaomi-mi.html" class="related-bottom-card"><span class="related-bottom-title">Как скачать и установить новый голос на робот-пылесос Xiaomi Mi</span><span class="related-bottom-desc">Пошаговая инструкция по смене голосового сопровождения на пылесосах Xiaomi. Установка китайских, анг</span></a><a href="/articles/k/ka/kak-nastroit-russkij-yazyk-na-robot-pylesos-xiaomi-1s.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить русский язык на Xiaomi Robot Vacuum 1S: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по смене языка на Xiaomi 1S. Смена региона в приложении Mi Home, особенности пр</span></a><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-k-mi-home-na-android.html" class="related-bottom-card"><span class="related-bottom-title">Подключение робот-пылесоса Xiaomi к Mi Home на Android: пошаговая инструкция</span><span class="related-bottom-desc">Подробная инструкция по привязке робота-пылесоса Xiaomi к приложению Mi Home на Android. Решение час</span></a><a href="/articles/k/ka/kak-podklyuchit-k-prilozheniyu-robot-pylesos-xiaomi-vacuum-mop-essential.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi Vacuum Mop Essential к приложению Mi Home</span><span class="related-bottom-desc">Пошаговая инструкция по настройке Xiaomi Vacuum Mop Essential. Привязка к Mi Home, выбор региона, ре</span></a><a href="/articles/k/ka/kak-ustanovit-robot-pylesos-xiaomi-na-telefon-ajfon.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi к iPhone: Полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по настройке робот-пылесосов Xiaomi на iPhone. Решение проблем с iOS, выбор пр</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

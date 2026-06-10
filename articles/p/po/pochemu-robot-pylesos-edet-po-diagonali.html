@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Почему робот-пылесос едет по диагонали: причины и решения — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем, почему робот-пылесос двигается по диагонали: алгоритмы навигации, датчики, карта и ошибки. Экспертный разбор поведения робота.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/p/po/pochemu-robot-pylesos-edet-po-diagonali.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Почему робот-пылесос едет по диагонали: причины и решения">
+    <meta property="og:description" content="Разбираем, почему робот-пылесос двигается по диагонали: алгоритмы навигации, датчики, карта и ошибки. Экспертный разбор поведения робота.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Почему робот-пылесос едет по диагонали: причины и решения</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Почему робот-пылесос едет по диагонали: основные причины и способы устранения</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#как-работают-алгоритмы-навигации">Как работают алгоритмы навигации</a></li><li><a href="#влияние-датчиков-и-препятствий">Влияние датчиков и препятствий</a></li><li><a href="#особенности-работы-на-разных-типах-покрытий">Особенности работы на разных типах покрытий</a></li><li><a href="#настройки-карты-и-зон-уборки">Настройки карты и зон уборки</a></li><li><a href="#поломки-и-технические-неисправности">Поломки и технические неисправности</a></li><li><a href="#сравнение-траекторий-движения">Сравнение траекторий движения</a></li><li><a href="#что-делать-если-траектория-вас-не-устраивает">Что делать, если траектория вас не устраивает</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Многие пользователи сталкиваются с ситуацией, когда их умный помощник по уборке начинает двигаться не по привычным линиям, а под странным углом к стенам. Первым делом возникает подозрение, что техника сломалась, однако в большинстве случаев <strong>диагональное движение</strong> является штатным режимом работы или следствием особенностей навигации. Понимание логики алгоритмов поможет не только успокоить нервы, но и оптимизировать процесс уборки в вашем доме.</p>
+
+<p>Роботы-пылесосы, особенно модели с продвинутой навигацией, не ограничиваются простым хаотичным перемещением. Современные устройства строят карту помещения и рассчитывают траекторию так, чтобы выполнить <strong>чистое перекрытие</strong> площади без пропусков. Если вы видите, что <em>Xiaomi Robot Vacuum</em> или <em>Roborock</em> движется по диагонали, это часто свидетельствует об эффективной работе его системы позиционирования, а не о неисправности.</p>
+
+<h2 id="как-работают-алгоритмы-навигации">Как работают алгоритмы навигации</h2>
+<p>Основа движения любого современного робота — это навигационный алгоритм. В отличие от старых моделей, которые просто ездили по спирали или в случайном порядке, новые устройства используют лазерные датчики (LDS) или камеру (vSLAM) для создания <strong>точной карты</strong> комнаты. Эта карта позволяет роботу понимать геометрию помещения и выбирать оптимальный путь.</p>
+
+<p>Диагональные траектории часто используются для экономии времени и энергии. Проходя комнату под углом, робот может быстрее очистить углы и стыки, которые труднодоступны при движении строго вдоль стен. Система вычисляет, что такой <strong>маршрут уборки</strong> позволяет покрыть большую площадь за меньшее количество проходов. Это особенно актуально в длинных и узких коридорах или комнатах нестандартной формы.</p>
+
+<p>Кроме того, алгоритмы могут менять направление движения в зависимости от типа поверхности. Например, на ковре <strong>робот-пылесос</strong> может двигаться иначе, чем на ламинате, чтобы обеспечить лучшее всасывание грязи. Если датчики фиксируют изменение текстуры или уровня, траектория может корректироваться в реальном времени, создавая визуальный эффект хаотичного или диагонального движения.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Диагональное движение часто является признаком работы продвинутых алгоритмов навигации, направленных на максимальное покрытие площади и экономию энергии.</p></div>
+
+<h2 id="влияние-датчиков-и-препятствий">Влияние датчиков и препятствий</h2>
+<p>Робот постоянно сканирует пространство вокруг себя с помощью множества сенсоров. Если на пути встречаются <strong>динамические препятствия</strong> (например, ноги человека, игрушки или мебель), устройство мгновенно перестраивает маршрут. Это перестроение может выглядеть как резкий поворот на 45 градусов, из-за чего кажется, что робот едет по диагонали.</p>
+
+<p>Иногда датчики могут давать ложные срабатывания, особенно если на них налипла пыль или грязь. Загрязненный <strong>датчик столкновения</strong> может заставить робота отклониться от курса. В таких случаях рекомендуется регулярно протирать сенсоры мягкой сухой тканью. Это простая процедура, которая существенно влияет на точность движения и качество уборки.</p>
+
+<p>Важно учитывать и освещение. Камеры оптической навигации могут по-разному воспринимать затемненные углы или блики на полу. Если робот не может четко определить границы, он может выбрать <strong>безопасный путь</strong> под углом, чтобы избежать падения или застревания. Это особенно заметно в вечернее время или при слабом освещении в комнате.</p>
+
+<blockquote>⚠️ Внимание: Если робот резко меняет направление без видимых препятствий, проверьте чистоту лазерного сканера и оптических сенсоров. Грязь на датчиках — самая частая причина некорректного поведения.</blockquote>
+
+<h2 id="особенности-работы-на-разных-типах-покрытий">Особенности работы на разных типах покрытий</h2>
+<p>Тип напольного покрытия напрямую влияет на поведение робота-пылесоса. На гладком ламинате или керамической плитке колеса могут проскальзывать, что приводит к смещению траектории. В результате робот может двигаться не по прямой, а по <strong>наклонной линии</strong>. Это физическое ограничение, которое сложно обойти только программными методами.</p>
+
+<p>На ковролине или ворсистых коврах робот испытывает повышенное сопротивление. Чтобы преодолеть его, устройство может менять угол атаки, пытаясь "протиснуться" через ворс под более выгодным углом. В таких ситуациях <strong>диагональное движение</strong> становится стратегией преодоления сопротивления, а не просто ошибкой навигации.</p>
+
+<p>Также стоит учитывать высоту порожек и переходов. При переезде через порог робот часто поворачивается, чтобы уменьшить угол наклона и избежать застревания. Эти маневры могут выглядеть как диагональные движения вблизи границ между комнатами. Если переход слишком резкий, робот может вообще отказаться проходить его по прямой.</p>
+
+<div class="poll-widget" id="poll-c7e1e978"><div class="poll-widget-question">📊 Как вы оцениваете качество уборки вашего робота-пылесоса?</div><div class="poll-widget-option" data-poll="c7e1e978" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Отличное, все чисто</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="c7e1e978" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Удовлетворительное, есть пропуски</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="c7e1e978" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Плохое, часто застревает</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="c7e1e978" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не знаю, только купил</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="настройки-карты-и-зон-уборки">Настройки карты и зон уборки</h2>
+<p>В мобильном приложении вы можете настроить <strong>виртуальные стены</strong> и зоны уборки, что напрямую влияет на траекторию. Если вы установили ограничение, робот будет двигаться вдоль него, но если граница задана под углом, робот пойдет по диагонали. Это полезно для зонирования, но может сбивать с толку неподготовленного пользователя.</p>
+
+<p>Особое внимание стоит уделить режиму "Точечная уборка" (Spot Cleaning). В этом режиме робот специально начинает движение по спирали или диагонали, чтобы максимально тщательно очистить <strong>конкретное пятно</strong> или зону. Если вы активировали эту функцию случайно, то наблюдаемое поведение будет именно таким.</p>
+
+<p>Проверьте, не включен ли режим "Уборка по комнате" с выбранным направлением. Некоторые модели позволяют пользователю задать направление движения (например, "вдоль окон" или "перпендикулярно стенам"). Если выбрано направление под углом, робот будет двигаться именно так, игнорируя границы стен. Перепроверьте настройки в разделе <code>Настройки карты → Направления уборки</code>.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка настроек карты</h4><label class="check-item"><input type="checkbox"><span>Открыть мобильное приложение</span></label><label class="check-item"><input type="checkbox"><span>Зайти в настройки карты</span></label><label class="check-item"><input type="checkbox"><span>Проверить режим уборки</span></label><label class="check-item"><input type="checkbox"><span>Осмотреть виртуальные стены</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="поломки-и-технические-неисправности">Поломки и технические неисправности</h2>
+<p>Иногда причина диагонального движения кроется в аппаратной проблеме. Если одно из колес вращается медленнее другого из-за износа подшипника или попадания волоса, робот начнет <strong>уводить в сторону</strong>. Это выглядит как постоянное отклонение от курса, которое может быть интерпретировано как диагональное движение.</p>
+
+<p>Сбой в работе гироскопа или акселерометра также может привести к искажению траектории. Эти датчики отвечают за понимание ориентации робота в пространстве. Если они вышли из строя или требуется калибровка, устройство будет "думать", что оно едет прямо, хотя на самом деле двигается по дуге или под углом. <strong>Калибровка датчиков</strong> может решить эту проблему.</p>
+
+<p>В редких случаях проблема может быть в программном сбое. Глюк прошивки может привести к некорректным расчетам траектории. Попробуйте перезагрузить устройство или обновить ПО через приложение. Если проблема сохраняется, возможно, потребуется <strong>сервисное обслуживание</strong> для замены датчиков или колесной пары.</p>
+
+<details class="faq-item"><summary>Как проверить колеса самостоятельно?</summary><div class="faq-answer"><p>Поднимите робот пылесос и вручную покрутите каждое колесо. Если одно вращается с трудом, издает скрип или останавливается раньше других — проблема в механике. Почистите ось колеса от намотанных волос и проверьте, не застрял ли мусор в подшипнике.</p></div></details>
+
+<h2 id="сравнение-траекторий-движения">Сравнение траекторий движения</h2>
+<p>Чтобы понять, является ли поведение вашего робота нормальным, полезно знать, какие траектории существуют. Обычно встречаются три основных типа движения, которые зависят от модели и настроек. Ниже приведена таблица с описанием режимов.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип движения</th>
+<th>Описание</th>
+<th>Когда используется</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Прямолинейное</td>
+<td>Движение строго параллельно стенам</td>
+<td>Плановая уборка всей площади</td>
+</tr>
+<tr>
+<td>Хаотичное</td>
+<td>Случайные повороты и движение</td>
+<td>Старые модели или режим поиска препятствий</td>
+</tr>
+<tr>
+<td>Диагональное</td>
+<td>Движение под углом 30-45 градусов</td>
+<td>Углы, узкие места, режим точечной уборки</td>
+</tr>
+<tr>
+<td>Спиральное</td>
+<td>Движение по расходящейся или сходящейся спирали</td>
+<td>Режим Spot (точечная уборка)</td>
+</tr>
+</tbody>
+</table>
+
+<p>Понимание этих различий помогает правильно интерпретировать поведение устройства. Если робот едет по диагонали в центре комнаты — это может быть ошибкой. Но если он делает это в углах или при заходе в узкий коридор — это штатная работа алгоритма. <strong>Анализ карты</strong> в приложении покажет, какой именно маршрут был выбран устройством.</p>
+
+<blockquote>⚠️ Внимание: Если робот постоянно уводит в одну сторону и не может выровняться, даже после чистки колес — это признак неисправности привода или гироскопа, требующая ремонта.</blockquote>
+
+<h2 id="что-делать-если-траектория-вас-не-устраивает">Что делать, если траектория вас не устраивает</h2>
+<p>Если диагональное движение мешает уборке или выглядит как сбой, попробуйте несколько простых шагов. Сначала очистите все датчики и колеса от пыли и волос. Это базовый <strong>обслуживание</strong>, который решает 50% проблем с навигацией. Убедитесь, что пол чистый и на нем нет лишних предметов, которые могли бы запутать роботу путь.</p>
+
+<p>Следующий шаг — проверка карты. Удалите старую карту и запустите полную перестройку. Иногда "забывчивость" устройства или старые данные приводят к ошибкам в создании маршрута. В приложении найдите опцию <code>Сброс карты</code> или <code>Перестроить карту</code> и дайте роботу заново изучить помещение. Это займет время, но результат будет точнее.</p>
+
+<p>Если ничего не помогает, проверьте настройки в приложении. Возможно, включен режим, который принудительно меняет направление. Некоторые производители добавляют функции "Умная навигация", которые могут быть слишком активными. Попробуйте отключить их и посмотреть, изменится ли поведение. Если проблема не решается, обратитесь в <strong>техническую поддержку</strong> производителя.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед полным сбросом карты снимите видео движения робота в проблемной зоне. Это поможет службе поддержки быстрее диагностировать проблему, если потребуется ремонт.</p></div>
+
+<p>В заключение стоит сказать, что роботы-пылесосы — это сложные механизмы, которые постоянно учатся и адаптируются. Диагональное движение — это не всегда признак поломки, часто это попытка устройства сделать уборку максимально эффективной. Главное — следить за состоянием датчиков и регулярно обновлять программное обеспечение. Тогда ваш помощник будет работать как часы.</p>
+
+<blockquote>⚠️ Внимание: Обновление прошивки может изменить алгоритмы работы навигации. Читайте описание обновлений перед установкой, чтобы понимать, как изменится поведение робота.</blockquote>
+
+<h2 id="часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</h2>
+
+<details>
+<summary>Почему робот-пылесос едет по диагонали только в одной комнате?</summary>
+<p>Это может быть связано с особенностями геометрии комнаты или наличием специфических препятствий. Алгоритм может решить, что под углом в эту комнату лучше заходить из-за узкого прохода или расположения мебели. Также возможно, что в этой комнате свет или покрытие создают помехи для датчиков, заставляя робота корректировать курс.</p>
+</details>
+
+<details>
+<summary>Можно ли запретить роботу двигаться по диагонали?</summary>
+<p>Полностью запретить диагональное движение нельзя, так как это часть алгоритма навигации для углов и препятствий. Однако вы можете изменить настройки уборки, например, отключить режим "Точечная уборка" или скорректировать виртуальные стены, чтобы робот двигался более прямолинейно по основным зонам.</p>
+</details>
+
+<details>
+<summary>Влияет ли цвет пола на движение робота?</summary>
+<p>Да, цвет пола влияет на работу оптических сенсоров и камер. Слишком темные или слишком светлые поверхности могут вводить датчики в заблуждение, заставляя робота менять траекторию. Также черные линии на полу могут восприниматься как виртуальные стены, что приведет к неожиданным поворотам.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот застревает из-за диагонального движения?</summary>
+<p>Если робот постоянно застревает в углах или под мебелью из-за диагонального движения, проверьте высоту мебели и наличие низких препятствий. Возможно, стоит поднять ножки мебели или использовать специальные заглушки. Также попробуйте изменить зону уборки, исключив проблемные участки.</p>
+</details>
+
+<details>
+<summary>Нужно ли вызывать мастера, если робот едет по диагонали?</summary>
+<p>Сначала попробуйте провести самостоятельную диагностику: очистите датчики, колеса, сбросьте карту и обновите ПО. Вызывать мастера стоит только если проблема сохраняется после всех манипуляций и сопровождается другими признаками неисправности (шум, ошибки в приложении).</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#как-работают-алгоритмы-навигации">Как работают алгоритмы навигации</a></li><li><a href="#влияние-датчиков-и-препятствий">Влияние датчиков и препятствий</a></li><li><a href="#особенности-работы-на-разных-типах-покрытий">Особенности работы на разных типах покрытий</a></li><li><a href="#настройки-карты-и-зон-уборки">Настройки карты и зон уборки</a></li><li><a href="#поломки-и-технические-неисправности">Поломки и технические неисправности</a></li><li><a href="#сравнение-траекторий-движения">Сравнение траекторий движения</a></li><li><a href="#что-делать-если-траектория-вас-не-устраивает">Что делать, если траектория вас не устраивает</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/l/ly/lyublyu-stirat-i-pylesosit-chto-za-tabletki.html" class="related-card">Люблю стирать и пылесосить: что за таблетки и как они работают?</a></li><li><a href="/articles/k/ka/kakoj-luchshij-robot-pylesos-s-vlazhnoj-uborkoj-na-segodnyashnij-den.html" class="related-card">Лучший робот-пылесос с влажной уборкой 2026: Рейтинг топ-моделей</a></li><li><a href="/articles/p/py/pylesos-xiaomi-vacuum-kak.html" class="related-card">Как настроить и использовать пылесос Xiaomi: Полная инструкция</a></li><li><a href="/articles/c/ch/chto-umeet-delat-mnogofunktsionalnyj-pylesos-kratko-tekhnologiya-7-klass.html" class="related-card">Многофункциональный пылесос: технологии и возможности кратко</a></li><li><a href="/articles/k/ka/kakoj-robot-pylesos-luchshe-ubiraet.html" class="related-card">Какой робот-пылесос лучше убирает: рейтинг, тесты и выбор в 2026</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/l/ly/lyublyu-stirat-i-pylesosit-chto-za-tabletki.html" class="related-bottom-card"><span class="related-bottom-title">Люблю стирать и пылесосить: что за таблетки и как они работают?</span><span class="related-bottom-desc">Разбираем, что такое таблетки для стирки и уборки. Обзор капсул для роботов-пылесосов и стиральных м</span></a><a href="/articles/k/ka/kakoj-luchshij-robot-pylesos-s-vlazhnoj-uborkoj-na-segodnyashnij-den.html" class="related-bottom-card"><span class="related-bottom-title">Лучший робот-пылесос с влажной уборкой 2026: Рейтинг топ-моделей</span><span class="related-bottom-desc">Выбираете умного помощника? Наш рейтинг лучших роботов-пылесосов с функцией влажной уборки на 2026 г</span></a><a href="/articles/p/py/pylesos-xiaomi-vacuum-kak.html" class="related-bottom-card"><span class="related-bottom-title">Как настроить и использовать пылесос Xiaomi: Полная инструкция</span><span class="related-bottom-desc">Подробное руководство: как включить, подключить к Wi-Fi, настроить карту и обслуживать робот-пылесос</span></a><a href="/articles/c/ch/chto-umeet-delat-mnogofunktsionalnyj-pylesos-kratko-tekhnologiya-7-klass.html" class="related-bottom-card"><span class="related-bottom-title">Многофункциональный пылесос: технологии и возможности кратко</span><span class="related-bottom-desc">Разбор технологий многофункциональных пылесосов простым языком. Какие функции умеют выполнять соврем</span></a><a href="/articles/k/ka/kakoj-robot-pylesos-luchshe-ubiraet.html" class="related-bottom-card"><span class="related-bottom-title">Какой робот-пылесос лучше убирает: рейтинг, тесты и выбор в 2026</span><span class="related-bottom-desc">Сравнение роботов-пылесосов по качеству уборки: сухая, влажная, навигация и мощность. Узнайте, какие</span></a><a href="/articles/s/sk/skolko-dolzhen-zaryazhatsya-robot-pylesos-xiaomi-pervyj-raz.html" class="related-bottom-card"><span class="related-bottom-title">Сколько заряжать робот-пылесос Xiaomi в первый раз: инструкция и мифы</span><span class="related-bottom-desc">Узнайте, сколько времени требуется для первоначальной зарядки робота-пылесоса Xiaomi. Разбираем мифы</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как правильно запрограммировать робот-пылесос: настройки и карты — SOS-Пылесос</title>
+    <meta name="description" content="Полное руководство по программированию робота-пылесоса: создание карт, настройка зон, выбор режимов уборки и создание виртуальных барьеров для эффективной работы.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-pravilno-zaprogrammirovat-robot-pylesos.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как правильно запрограммировать робот-пылесос: настройки и карты">
+    <meta property="og:description" content="Полное руководство по программированию робота-пылесоса: создание карт, настройка зон, выбор режимов уборки и создание виртуальных барьеров для эффективной работы.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как правильно запрограммировать робот-пылесос: настройки и карты</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как правильно запрограммировать робот-пылесос: полное руководство</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#первичная-подготовка-и-создание-цифровой-карты">Первичная подготовка и создание цифровой карты</a></li><li><a href="#разделение-карты-на-комнаты-и-зоны-уборки">Разделение карты на комнаты и зоны уборки</a></li><li><a href="#виртуальные-барьеры-и-запретные-зоны">Виртуальные барьеры и запретные зоны</a></li><li><a href="#настройка-силы-всасывания-и-уровня-воды">Настройка силы всасывания и уровня воды</a></li><li><a href="#создание-расписания-и-сценариев-уборки">Создание расписания и сценариев уборки</a></li><li><a href="#решение-проблем-и-оптимизация-навигации">Решение проблем и оптимизация навигации</a></li><li><a href="#faq-частые-вопросы-пользователей">FAQ: Частые вопросы пользователей</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Покупка современного робота-пылесоса — это лишь половина дела. Чтобы устройство действительно облегчило жизнь, а не превратилось в бесполезную игрушку, его необходимо грамотно <strong>интегрировать</strong> в ваше жилое пространство. Многие пользователи совершают ошибку, просто нажимая кнопку старт, и удивляются, почему аппарат бьется о ножки стульев или не может найти базу.</p>
+
+<p>Процесс программирования подразумевает не только загрузку прошивки, но и глубокую настройку алгоритмов движения, создание цифровой карты помещения и установку логических ограничений. В зависимости от модели <em>Xiaomi</em>, <em>Roborock</em> или <em>Dreame</em>, интерфейс может отличаться, но базовые принципы взаимодействия с умным домом остаются неизменными.</p>
+
+<h2 id="первичная-подготовка-и-создание-цифровой-карты">Первичная подготовка и создание цифровой карты</h2>
+
+<p>Первым этапом любой настройки является «обучение» устройства планировке квартиры. Без этого шага робот будет работать вслепую, используя случайный метод движения, что крайне неэффективно для больших площадей. Вам нужно запустить режим полного сканирования, чтобы аппарат зафиксировал стены, дверные проемы и основные препятствия.</p>
+
+<p>Важно убедиться, что во время первой процедуры картографирования в комнате нет лишних предметов, которые могут сбить с толку <strong>лидарный датчик</strong>. Идеально, если на полу не будет разбросанных игрушек, проводов или ковриков со сложным узором, который может быть воспринят как яма. После завершения цикла вы получите точную карту в приложении.</p>
+
+<blockquote>⚠️ Внимание: Процесс построения карты может занять от 20 до 45 минут в зависимости от сложности планировки. Не прерывайте работу, даже если робот кажется застрявшим, он может пробираться к следующей точке.</blockquote>
+
+<p>Для успешного программирования необходимо соблюдать строгую последовательность действий, чтобы избежать ошибок сегментации.</p>
+<ul>
+<li>🧹 Уберите с пола все мелкие предметы, провода и игрушки перед запуском.</li>
+<li>📱 Подключите робот к сети 2.4 ГГц для стабильной передачи данных.</li>
+<li>🏠 Запустите режим «Полная уборка» для создания базовой карты.</li>
+<li>🔋 Убедитесь, что уровень заряда батареи составляет не менее 80%.</li>
+</ul>
+
+<div class="poll-widget" id="poll-cc991968"><div class="poll-widget-question">📊 Какой датчик навигации используется в вашем роботе</div><div class="poll-widget-option" data-poll="cc991968" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Лидар (круглый наверху)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="cc991968" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Визуальный (камера)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="cc991968" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскоп (без карты)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="разделение-карты-на-комнаты-и-зоны-уборки">Разделение карты на комнаты и зоны уборки</h2>
+
+<p>После того как карта создана, следующим шагом станет её логическое разделение. Современные алгоритмы позволяют делить единое пространство на отдельные комнаты: кухню, спальню, ванную. Это необходимо для точечного программирования, когда вам нужно убрать только в коридоре, не затрагивая остальные помещения.</p>
+
+<p>В интерфейсе приложения используйте инструмент <code>Разделение карты</code> или <code>Объединение зон</code>. Если робот ошибочно отделил коридор от кухни, вы можете вручную стереть линию и провести её заново. Правильное именование комнат поможет вам использовать голосовые команды через <strong>умные колонки</strong> типа Алисы или Маруси.</p>
+
+<p>Не стоит создавать слишком дробные зоны, если в них нет необходимости. Комплексная уборка всей квартиры часто происходит быстрее, чем последовательная обработка множества маленьких секторов. Однако для точечной очистки кухни после обеда разделение критически важно.</p>
+
+<div class="checklist-block"><h4>☑️ Настройка комнат</h4><label class="check-item"><input type="checkbox"><span>Разделить карту по стенам</span></label><label class="check-item"><input type="checkbox"><span>Переименовать помещения в приложение</span></label><label class="check-item"><input type="checkbox"><span>Проверить границы между комнатами</span></label><label class="check-item"><input type="checkbox"><span>Сохранить конфигурацию карты</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<blockquote>⚠️ Внимание: Избегайте разделения карты по линиям, которые проходят посередине дверного проема. Это может привести к тому, что робот не сможет вернуться в базу после уборки одной комнаты.</blockquote>
+
+<h2 id="виртуальные-барьеры-и-запретные-зоны">Виртуальные барьеры и запретные зоны</h2>
+
+<p>Самый эффективный способ программирования поведения робота — это создание виртуальных ограждений. Физические магнитные ленты ушли в прошлое, теперь достаточно нарисовать линию на экране смартфона. Вы можете запретить роботу заезжать в ванную, к лотку кошки или к зарядной станции.</p>
+
+<p>Различают два основных типа ограничений: «Запретная зона» и «Запретная стена». В первом случае аппарат не только не переступит черту, но и не будет пытаться объехать её, а сразу развернется. Во втором случае робот будет двигаться вдоль границы, но не пересечет её, что удобно для создания коридоров.</p>
+
+<p>Особое внимание уделите зонам с коврами. Если вы не хотите, чтобы робот замывал ворсистое покрытие, настройте <strong>режим обхода</strong> или виртуальную стену вокруг ковра. Это защитит покрытие от повреждения и предотвратит забивание щеток.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если в доме есть питомцы, создайте виртуальную стену вокруг их мисок с едой, чтобы робот случайно не перевернул их во время уборки, но при этом мог убирать крошки вокруг, если требуется режим «обход с заходом» (если поддерживается моделью).</p></div>
+
+<h2 id="настройка-силы-всасывания-и-уровня-воды">Настройка силы всасывания и уровня воды</h2>
+
+<p>Программирование включает в себя и регулировку рабочих параметров. Для разных типов покрытий требуется разная интенсивность работы. На ламинате и линолеуме можно установить максимальную мощность, чтобы убрать пыль из щелей, а на коврах с длинным ворсом — режим «Турбо».</p>
+
+<p>При наличии моющей функции критически важно правильно настроить подачу воды. Избыточная влага может испортить паркет, а слишком малое количество сделает уборку неэффективной. В приложении выберите профиль «Сухая уборка», «Слабая подача» или «Интенсивная подача» в зависимости от типа загрязнения.</p>
+
+<p>Для экономии ресурсов и снижения шума можно запрограммировать разные режимы для разных комнат. Например, в спальне робот будет работать тихо с минимальной мощсью, а на кухне — на полную, чтобы удалить жир и крошки. Это настраивается в разделе <code>Карта уборки</code> через выбор режимов для конкретных зон.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип покрытия</th>
+<th>Рекомендуемая мощность</th>
+<th>Уровень подачи воды</th>
+<th>Особенности</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Линолеум/Плитка</td>
+<td>Максимальная</td>
+<td>Средний</td>
+<td>Эффективное удаление крупных частиц</td>
+</tr>
+<tr>
+<td>Ламинат</td>
+<td>Средняя</td>
+<td>Минимальный</td>
+<td>Защита от разбухания швов</td>
+</tr>
+<tr>
+<td>Ковер (короткий ворс)</td>
+<td>Турбо</td>
+<td>Без воды</td>
+<td>Глубокая чистка, извлечение пыли</td>
+</tr>
+<tr>
+<td>Паркет</td>
+<td>Бесшумная</td>
+<td>Минимальный</td>
+<td>Бережная уборка без разводов</td>
+</tr>
+</tbody>
+</table>
+
+<details class="faq-item"><summary>Как часто менять воду в баке?Вода в баке робота-пылесоса загрязняется очень быстро, даже если кажется чистой. Рекомендуется не использовать одну и ту же воду более 2-х циклов уборки, иначе вы будете просто размазывать грязь по полу.-->
+
+<h2 id="создание-расписания-и-сценариев-уборки">Создание расписания и сценариев уборки</h2>
+
+<p>Истинное удобство достигается при автоматизации процесса. Вы можете запрограммировать робота на уборку в определенное время, например, когда вас нет дома. Это избавляет от необходимости постоянно нажимать кнопки и обеспечивает чистоту к вашему возвращению.</p>
+
+<p>В настройках расписания (<code>Таймер</code>) укажите дни недели и время начала работы. Обратите внимание, что некоторые модели требуют, чтобы робот был на базе для запуска по таймеру, в то время как другие могут начать уборку, находясь в любой точке квартиры.</p>
+
+<p>Также можно настроить создание «Сценариев», которые объединяют несколько действий. Например, сценарий «Вечерняя уборка» может включать в себя</summary><div class="faq-answer"><p> сначала пропылесосить коридор, затем кухню, а в конце — зайти на базу. Такое программирование позволяет гибко управлять ресурсами.</p>
+
+<blockquote>⚠️ Внимание: При настройке расписания учитывайте, что робот может не успеть закончить уборку к определенному моменту, если квартира большая. Лучше ставить таймер с запасом времени в 30-40 минут.</blockquote>
+
+
+
+<h2 id="решение-проблем-и-оптимизация-навигации">Решение проблем и оптимизация навигации</h2>
+
+<p>Иногда даже после тщательного программирования робот может теряться или не находить базу. Это часто связано с изменением мебели или задымленностью воздуха. В таких случаях необходимо обновить карту или очистить сенсоры. Проверьте чистоту лидара и колесных датчиков, так как пыль может искажать данные навигации.</p>
+
+<p>Если робот застревает в одном и том же месте, добавьте эту зону в «Запретную стену» или настройте более медленный режим движения в этой конкретной секции карты. Не пытайтесь исправить это физическими препятствиями, виртуальные настройки работают надежнее и эстетичнее.</p>
+
+<p>Регулярная проверка связи с Wi-Fi роутером также важна для корректной работы. Если сигнал слабый, робот может потерять связь с приложением и заблокировать доступ к настройкам. Убедитесь, что роутер установлен в центре квартиры или имеет усилители сигнала.</p>
+
+<h2 id="faq-частые-вопросы-пользователей">FAQ: Частые вопросы пользователей</h2>
+
+<details>
+<summary>Можно ли переносить базу в другое место после создания карты?</summary>
+<p>Да, но перед этим желательно обновить карту или использовать функцию «Поиск базы». Некоторые модели требуют, чтобы база находилась в пределах прямой видимости или в том же секторе, где она была изначально, иначе навигация может сбиться.</p>
+</details>
+
+<details>
+<summary>Почему робот не может убрать под диваном?</summary>
+<p>Это может быть связано с высотой зазора или наличием препятствий у входа под мебель. Если высота робота больше, чем зазор под диваном, он физически не заедет. Также проверьте, не стоит ли виртуальная стена в начале прохода.</p>
+</details>
+
+<details>
+<summary>Как сбросить настройки карты?</summary>
+<p>Обычно это делается через меню «Управление картой» в приложении, где есть кнопка «Сброс карты» или «Удалить карту». После этого робот начнет процесс обучения заново при следующей полной уборке.</p>
+</details>
+
+<details>
+<summary>Нужно ли закрывать двери во время уборки?</summary>
+<p>Если вы разделили карту на комнаты и хотите убрать только в одной, двери в другие комнаты нужно закрыть, иначе робот выйдет за пределы назначенной зоны. Если уборка общая, двери лучше оставить открытыми.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот видит «фантомные» стены?</summary>
+<p>Это часто случается из-за зеркальных поверхностей или очень темных полов, которые датчики высоты воспринимают как пропасть. Попробуйте закрыть зеркало бумагой или перенастроить чувствительность сенсоров в настройках.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#первичная-подготовка-и-создание-цифровой-карты">Первичная подготовка и создание цифровой карты</a></li><li><a href="#разделение-карты-на-комнаты-и-зоны-уборки">Разделение карты на комнаты и зоны уборки</a></li><li><a href="#виртуальные-барьеры-и-запретные-зоны">Виртуальные барьеры и запретные зоны</a></li><li><a href="#настройка-силы-всасывания-и-уровня-воды">Настройка силы всасывания и уровня воды</a></li><li><a href="#создание-расписания-и-сценариев-уборки">Создание расписания и сценариев уборки</a></li><li><a href="#решение-проблем-и-оптимизация-навигации">Решение проблем и оптимизация навигации</a></li><li><a href="#faq-частые-вопросы-пользователей">FAQ: Частые вопросы пользователей</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-smenit-wifi-na-robote-pylesose-xiaomi.html" class="related-card">Как сменить Wi-Fi на роботе-пылесосе Xiaomi: полная инструкция</a></li><li><a href="/articles/k/ka/kak-podklyuchitsya-k-robotu-pylesosu-mi-vacuum.html" class="related-card">Как подключить робот-пылесос Xiaomi Mi Vacuum к Wi-Fi и приложению</a></li><li><a href="/articles/k/ka/kak-vyklyuchit-tajmer-na-robote-pylesose-midea.html" class="related-card">Как выключить таймер на роботе-пылесосе Midea: полное руководство</a></li><li><a href="/articles/k/ka/kak-zapustit-v-rabotu-robot-pylesos-s-vlazhnoj-uborkoj.html" class="related-card">Как запустить робот-пылесос с влажной уборкой: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kak-rusifitsirovat-pylesos-xiaomi-mi-robot-vacuum-cleaner.html" class="related-card">Как русифицировать пылесос Xiaomi Mi Robot: полные методы</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-smenit-wifi-na-robote-pylesose-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как сменить Wi-Fi на роботе-пылесосе Xiaomi: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по смене сети Wi-Fi на пылесосах Xiaomi, Roborock, Dreame. Решение проблем под</span></a><a href="/articles/k/ka/kak-podklyuchitsya-k-robotu-pylesosu-mi-vacuum.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi Mi Vacuum к Wi-Fi и приложению</span><span class="related-bottom-desc">Пошаговая инструкция: как быстро подключить робот-пылесос Mi Vacuum к смартфону, настроить Wi-Fi 2.4</span></a><a href="/articles/k/ka/kak-vyklyuchit-tajmer-na-robote-pylesose-midea.html" class="related-bottom-card"><span class="related-bottom-title">Как выключить таймер на роботе-пылесосе Midea: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция отключения таймера и планировщика уборки на роботах Midea. Разбор настройки чер</span></a><a href="/articles/k/ka/kak-zapustit-v-rabotu-robot-pylesos-s-vlazhnoj-uborkoj.html" class="related-bottom-card"><span class="related-bottom-title">Как запустить робот-пылесос с влажной уборкой: пошаговая инструкция</span><span class="related-bottom-desc">Узнайте, как правильно подготовить и запустить робот-пылесос с функцией влажной уборки. Инструкция п</span></a><a href="/articles/k/ka/kak-rusifitsirovat-pylesos-xiaomi-mi-robot-vacuum-cleaner.html" class="related-bottom-card"><span class="related-bottom-title">Как русифицировать пылесос Xiaomi Mi Robot: полные методы</span><span class="related-bottom-desc">Инструкция по переводу интерфейса Xiaomi Mi Robot Vacuum в русский язык. Методы через серверный реги</span></a><a href="/articles/k/ka/kak-postavit-maternuyu-ozvuchku-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Как поставить матерную озвучку на робот-пылесос: инструкция</span><span class="related-bottom-desc">Пошаговая замена голоса робота-пылесоса на нецензурный. Методы для Xiaomi, Roborock, iRobot. Риски, </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

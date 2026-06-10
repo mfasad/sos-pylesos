@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как робот-пылесос обходит препятствия: технологии и навигация — SOS-Пылесос</title>
+    <meta name="description" content="Подробный разбор сенсоров, карт и алгоритмов навигации. Узнайте, как робот-пылесос видит мир, объезжает мебель и не застревает в доме.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/r/ro/robot-pylesos-kak-rabotaet-s-prepyatstviyami.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как робот-пылесос обходит препятствия: технологии и навигация">
+    <meta property="og:description" content="Подробный разбор сенсоров, карт и алгоритмов навигации. Узнайте, как робот-пылесос видит мир, объезжает мебель и не застревает в доме.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как робот-пылесос обходит препятствия: технологии и навигация</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Механизмы работы робота-пылесоса с препятствиями: от сенсоров до ИИ</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#фундаментальные-сенсоры-глаза-робота">Фундаментальные сенсоры: глаза робота</a></li><li><a href="#технология-vslam-и-лазерное-сканирование">Технология vSLAM и лазерное сканирование</a></li><li><a href="#распознавание-объектов-и-искусственный-интеллект">Распознавание объектов и искусственный интеллект</a></li><li><a href="#механическая-защита-и-бамперы">Механическая защита и бамперы</a></li><li><a href="#работа-с-проводами-и-сложными-препятствиями">Работа с проводами и сложными препятствиями</a></li><li><a href="#виртуальные-барьеры-и-зоны-запрета">Виртуальные барьеры и зоны запрета</a></li><li><a href="#подготовка-помещения-и-уход-за-датчиками">Подготовка помещения и уход за датчиками</a></li><li><a href="#faq-частые-вопросы-о-навигации">FAQ: Частые вопросы о навигации</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Современный <strong>робот-пылесос</strong> перестал быть просто механическим устройством, двигающимся хаотично по комнате. Сегодня это сложный интеллектуальный комплекс, способный строить карты помещений, распознавать объекты и выбирать оптимальный маршрут уборки. Если раньше техника могла бесконечно толкать тапки или застревать в проводах, то новые модели действуют с хирургической точностью.</p>
+
+<p>Понимание того, как именно агрегат взаимодействует с окружающей средой, помогает пользователю правильно подготовить квартиру и избежать частых застреваний. Вам не нужно знать алгоритмы программирования, но знание основных принципов работы сенсоров позволит оценить реальные возможности вашего гаджета, будь то бюджетная модель или флагманский <em>Xiaomi</em> с лазерным наведением.</p>
+
+<h2 id="фундаментальные-сенсоры-глаза-робота">Фундаментальные сенсоры: глаза робота</h2>
+<p>В основе навигации лежит комбинация различных датчиков, каждый из которых выполняет свою уникальную задачу. Без них <strong>навигационная система</strong> была бы слепа и беспомощна даже в самой простой комнате. Основными «органами чувств» машины выступают лидары, оптические камеры и инфракрасные модули.</p>
+
+<p>Лидар (LDS), представляющий собой вращающуюся башенку на корпусе, сканирует помещение лазерными лучами. Он измеряет расстояние до стен и крупных предметов с высокой точностью, создавая двухмерную карту пространства. Именно благодаря <strong>лазерной навигации</strong> робот точно знает свои координаты и не теряет ориентацию в темноте.</p>
+
+<p>Камеры и инфракрасные датчики дополняют картину, отвечая за объемное восприятие. Оптические сенсоры анализируют текстуру пола и мелких предметов, а ИК-датчики фиксируют перепады высоты и приближение к стенам. Комплексная работа всех этих элементов позволяет создавать полную трехмерную модель комнаты.</p>
+
+<h2 id="технология-vslam-и-лазерное-сканирование">Технология vSLAM и лазерное сканирование</h2>
+<p>Существует два основных подхода к построению карты: vSLAM и LDS. Технология vSLAM (Visual Simultaneous Localization and Mapping) опирается на <em>визуальное восприятие</em>. Камера, расположенная на «голове» устройства, снимает текстуру пола и особенности стен, сопоставляя их с предыдущими кадрами.</p>
+
+<p>Роботы, использующие vSLAM, отлично работают в условиях недостаточного освещения, если у них есть собственные инфракрасные прожекторы. Однако они более чувствительны к визуальным помехам, например, к однотонным обоям без узоров или зеркальным поверхностям. В таких случаях может потребоваться помощь человека для калибровки.</p>
+
+<p>Лазерная система LDS, напротив, не зависит от освещения и текстуры поверхностей. Она просто измеряет расстояние до объекта. Это делает <strong>роботы-пылесосы</strong> с лазером более надежными в сложных условиях, но они часто требуют наличия свободного пространства над собой для вращения датчика. Если вы живете в квартире с огромным количеством узкой мебели, выбор типа навигации становится критическим.</p>
+
+<div class="poll-widget" id="poll-56245002"><div class="poll-widget-question">📊 Какой тип навигации вы предпочли бы?</div><div class="poll-widget-option" data-poll="56245002" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Лазерный (LDS)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="56245002" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Визуальный (vSLAM)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="56245002" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Гироскопический</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="56245002" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не знаю разницы</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="распознавание-объектов-и-искусственный-интеллект">Распознавание объектов и искусственный интеллект</h2>
+<p>Самый современный уровень взаимодействия с препятствиями — это использование искусственного интеллекта (AI). Камеры с поддержкой <strong>распознавания образов</strong> обучены отличать провод от шнурка, тапочку от носка, а ковер от плитки. Это предотвращает застревание робота в проводах и наматывание их на щетку.</p>
+
+<p>Алгоритмы глубокого обучения анализируют тысячи изображений, чтобы робот мог мгновенно классифицировать объект. Если на пути встречается сложная конструкция, например, куча игрушек, <em>Neato</em> или <em>Dreame</em> могут выбрать объездной путь, а не пытаться протиснуться сквозь них. Это существенно экономит время уборки и снижает износ механизмов.</p>
+
+<p>Некоторые продвинутые модели даже умеют определять животных и избегать их, если те лежат на полу. Это особенно актуально для владельцев питомцев. <strong>Тактильные датчики</strong> на бампере также играют роль, обеспечивая мягкий контакт с объектами, которые не были распознаны визуально.</p>
+
+<blockquote>⚠️ Внимание: Результаты работы искусственного интеллекта зависят от качества освещения и контрастности объектов. В полной темноте камеры могут не распознать черный провод на темном полу, поэтому рекомендуется убирать мелкие предметы перед запуском.</blockquote>
+
+<h2 id="механическая-защита-и-бамперы">Механическая защита и бамперы</h2>
+<p>Даже самый умный робот не застрахован от контакта с физическими объектами. Для таких случаев предусмотрен <strong>механический бампер</strong> по периметру корпуса. При столкновении с препятствием бампер нажимает на микровыключатели, сигнализируя процессору о необходимости изменить направление движения.</p>
+
+<p>Этот принцип называется «тактильной навигацией». Он является последним рубежом обороны. Если лазер или камера пропустили низкий стул или ножку шкафа, мягкий бампер предотвратит повреждение и мебели, и самого робота. Современные бамперы оснащены пружинами, которые обеспечивают плавное отталкивание.</p>
+
+<p>Важно регулярно чистить зону бампера от пыли и шерсти, так как забитый грязью механизм может заедать. Это приведет к тому, что робот будет воспринимать препятствие как стену и перестанет двигаться. Проверка подвижности бампера — обязательная часть <strong>технического обслуживания</strong>.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка механической защиты</h4><label class="check-item"><input type="checkbox"><span>Очистить датчики бампера от пыли</span></label><label class="check-item"><input type="checkbox"><span>Проверить подвижность пружин</span></label><label class="check-item"><input type="checkbox"><span>Убедиться в отсутствии шерсти в механизме</span></label><label class="check-item"><input type="checkbox"><span>Тестовый запуск в пустой комнате</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="работа-с-проводами-и-сложными-препятствиями">Работа с проводами и сложными препятствиями</h2>
+<p>Провода остаются главным врагом любой уборочной техники. Даже при наличии AI, переплетенные кабели могут наматываться на боковые щетки или застревать в колесах. <strong>Боковые щетки</strong> часто становятся жертвой кабелей, поэтому их необходимо периодически очищать и проверять на наличие накрученных ниток.</p>
+
+<p>Чтобы минимизировать риски, многие производители рекомендуют перед запуском убирать удлинители и сетевые шнуры. Некоторые модели имеют специальные режимы обхода зон с проводами, которые можно отметить на карте в приложении. В таких зонах робот будет двигаться медленнее или избегать их вовсе.</p>
+
+<details class="faq-item"><summary>Что делать, если робот запутался в проводах?</summary><div class="faq-answer"><p>Если робот запутался, не тяните его за шнур питания, который может наматываться на ось. Лучше отключите его от сети кнопкой и аккуратно освободите колеса и щетки руками. После этого проверьте датчики на предмет повреждений.</p></div></details>
+
+<p>Для сложных ситуаций существуют виртуальные стены или магнитные ленты. Они создают невидимый барьер для <strong>навигационной системы</strong>, заставляя робота считать участок недоступным. Это идеальный способ изолировать зону с большим количеством проводов или коврами с бахромой.</p>
+
+<h2 id="виртуальные-барьеры-и-зоны-запрета">Виртуальные барьеры и зоны запрета</h2>
+<p>Современные приложения позволяют создавать виртуальные границы без использования физических препятствий. Вы можете нарисовать на карте линию, которую <strong>робот-пылесос</strong> никогда не пересечет. Это может быть вход в детскую комнату, зона с домашними растениями или участок с чувствительной электроникой.</p>
+
+<p>Магнитные ленты работают по принципу изменения магнитного поля. Робот воспринимает это поле как невидимую стену. Такой способ надежен и не требует настройки через Wi-Fi, но требует покупки дополнительных аксессуаров. Виртуальные стены через приложение гибче, но зависят от стабильности связи.</p>
+
+<p>Некоторые модели поддерживают создание зон «только прохода» или зон «запрета уборки». Это позволяет роботу проезжать через кухню, чтобы добраться в зал, но не пылесосить там. Настройка этих параметров осуществляется через <code>Настройки карты → Зоны запрета</code> в мобильном приложении.</p>
+
+<blockquote>⚠️ Внимание: В зависимости от прошивки и модели, функционал виртуальных стен может изменяться. Всегда сверяйтесь с инструкцией к вашему устройству, так как старые версии ПО могут не поддерживать создание сложных зон.</blockquote>
+
+<table>
+<thead>
+<tr>
+<th>Тип препятствия</th>
+<th>Основной метод обхода</th>
+<th>Риски</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Стены и мебель</td>
+<td>Лидар (LDS) или vSLAM</td>
+<td>Минимальные</td>
+</tr>
+<tr>
+<td>Провода и кабели</td>
+<td>AI-распознавание + Бампер</td>
+<td>Высокие (заклинивание)</td>
+</tr>
+<tr>
+<td>Пороги и перепады</td>
+<td>Датчики высоты (Cliff sensors)</td>
+<td>Средние (застревание)</td>
+</tr>
+<tr>
+<td>Маленькие игрушки</td>
+<td>Камеры + AI</td>
+<td>Низкие (объезд)</td>
+</tr>
+<tr>
+<td>Зеркальные поверхности</td>
+<td>Вибрация + Бампер</td>
+<td>Высокие (потеря ориентации)</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="подготовка-помещения-и-уход-за-датчиками">Подготовка помещения и уход за датчиками</h2>
+<p>Даже самая совершенная техника не сможет работать эффективно, если датчики закрыты грязью. Пыль, шерсть животных и мелкий мусор могут искажать сигналы лидара или камеры. <strong>Регулярная очистка</strong> сенсоров — залог стабильной работы системы навигации.</p>
+
+<p>Рекомендуется протирать оптические линзы и лазерное окно сухой мягкой тканью раз в неделю. Также важно проверять колеса на наличие намотанных ниток и шерсти, так как это может влиять на одометрию (расчет пройденного пути). Ошибки в одометрии приводят к построению неверных карт.</p>
+
+<p>Перед уборкой стоит проводить «мини-разведку»: убирать крупные предметы, лежащие на полу, и собирать провода в пучки. Это не только ускорит процесс, но и продлит жизнь механизмам. <em>Робот</em> будет меньше сталкиваться и быстрее вернется на базу для зарядки.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Для быстрой проверки работоспособности датчиков запустите робот-пылесос на светлой ровной поверхности и попробуйте провести рукой перед ним — он должен мгновенно остановиться или развернуться.</p></div>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Сочетание лазерной навигации и искусственного интеллекта обеспечивает максимальную безопасность для мебели и самого робота, но требует периодической очистки сенсоров от пыли.</p></div>
+
+<blockquote>⚠️ Внимание: Если робот начал постоянно застревать в одних и тех же местах, проверьте, не изменилась ли расстановка мебели. Обновление карты в приложении может быть необходимо, если вы переставили крупную мебель.</blockquote>
+
+<h2 id="faq-частые-вопросы-о-навигации">FAQ: Частые вопросы о навигации</h2>
+
+<details>
+<summary>Почему робот не видит темные препятствия?</summary>
+<p>Темные поверхности поглощают световой луч от инфракрасных датчиков или лазерный луч, что может вызвать ошибку измерения. В таких случаях робот может принять черный ковер за обрыв пола или не заметить препятствие. Рекомендуется использовать магнитные ленты для зон с темными поверхностями.</p>
+</details>
+
+<details>
+<summary>Можно ли доверять роботу в полной темноте?</summary>
+<p>Роботы с лазерным лидаром (LDS) работают в темноте отлично, так как они используют собственный лазер. Модели с визуальной навигацией (vSLAM) без ИК-подсветки могут теряться. Лучше оставлять включенной дежурную подсветку в помещении.</p>
+</details>
+
+<details>
+<summary>Как часто нужно обновлять карту помещения?</summary>
+<p>Обновлять карту стоит только после серьезной перестановки мебели. Если вы просто передвинули стул, робот должен адаптироваться самостоятельно. Частое сбрасывание карты может привести к потере накопленных данных о планировке.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот постоянно бьется об один и тот же предмет?</summary>
+<p>Это может указывать на неисправность датчиков бампера или загрязнение оптических сенсоров. Попробуйте протереть корпус и проверить работу бампера вручную. Если проблема не исчезнет, возможно, потребуется сервисное обслуживание.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#фундаментальные-сенсоры-глаза-робота">Фундаментальные сенсоры: глаза робота</a></li><li><a href="#технология-vslam-и-лазерное-сканирование">Технология vSLAM и лазерное сканирование</a></li><li><a href="#распознавание-объектов-и-искусственный-интеллект">Распознавание объектов и искусственный интеллект</a></li><li><a href="#механическая-защита-и-бамперы">Механическая защита и бамперы</a></li><li><a href="#работа-с-проводами-и-сложными-препятствиями">Работа с проводами и сложными препятствиями</a></li><li><a href="#виртуальные-барьеры-и-зоны-запрета">Виртуальные барьеры и зоны запрета</a></li><li><a href="#подготовка-помещения-и-уход-за-датчиками">Подготовка помещения и уход за датчиками</a></li><li><a href="#faq-частые-вопросы-о-навигации">FAQ: Частые вопросы о навигации</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-uznat-chto-robot-pylesos-zaryadilsya.html" class="related-card">Как понять, что робот-пылесос полностью зарядился: индикаторы и сигналы</a></li><li><a href="/articles/g/gd/gde-nakhoditsya-rezervuar-dlya-vody-v-robot-pylesos.html" class="related-card">Где находится резервуар для воды в робот-пылесос: типы и замена</a></li><li><a href="/articles/k/ku/kuda-ustanovit-robot-pylesos.html" class="related-card">Куда установить робот-пылесос: правильное место для зарядной базы</a></li><li><a href="/articles/k/ka/kak-otklyuchit-robot-pylesos-polaris.html" class="related-card">Как отключить робот-пылесос Polaris: полное руководство по выключению</a></li><li><a href="/articles/k/ka/kak-proshit-pylesos-ksiaomi.html" class="related-card">Как прошить робот-пылесос Xiaomi: надежные методы и инструкции</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-uznat-chto-robot-pylesos-zaryadilsya.html" class="related-bottom-card"><span class="related-bottom-title">Как понять, что робот-пылесос полностью зарядился: индикаторы и сигналы</span><span class="related-bottom-desc">Узнайте все о том, как определить готовность аккумулятора робот-пылесоса. Разбор световых индикаторо</span></a><a href="/articles/g/gd/gde-nakhoditsya-rezervuar-dlya-vody-v-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Где находится резервуар для воды в робот-пылесос: типы и замена</span><span class="related-bottom-desc">Узнайте, где находится резервуар для воды в роботах-пылесосах разных брендов. Инструкция по поиску, </span></a><a href="/articles/k/ku/kuda-ustanovit-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Куда установить робот-пылесос: правильное место для зарядной базы</span><span class="related-bottom-desc">Где лучше поставить станцию подзарядки, чтобы робот не терялся? Требования к полу, сетям и мебели. И</span></a><a href="/articles/k/ka/kak-otklyuchit-robot-pylesos-polaris.html" class="related-bottom-card"><span class="related-bottom-title">Как отключить робот-пылесос Polaris: полное руководство по выключению</span><span class="related-bottom-desc">Инструкция по выключению робот-пылесоса Polaris. Способы отключения кнопки, приложения и электроники</span></a><a href="/articles/k/ka/kak-proshit-pylesos-ksiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как прошить робот-пылесос Xiaomi: надежные методы и инструкции</span><span class="related-bottom-desc">Полное руководство по обновлению и перепрошивке роботов-пылесосов Xiaomi. Разбор методов через Mi Ho</span></a><a href="/articles/u/um/umnyj-pylesos-kakoj-luchshe-kupit-otzyvy.html" class="related-bottom-card"><span class="related-bottom-title">Умный пылесос: какой лучше купить? Отзывы и реальные тесты</span><span class="related-bottom-desc">Выбираете робот-пылесос? Читайте честные отзывы, сравнение навигации, мощности всасывания и функций.</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

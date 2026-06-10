@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как подключить пылесос Xiaomi к компьютеру: полное руководство — SOS-Пылесос</title>
+    <meta name="description" content="Подробная инструкция по подключению робота-пылесоса Xiaomi к ПК через ADB и Wi-Fi. Настройка права доступа, чтение карт и управление через терминал.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-podklyuchit-pylesos-xiaomi-k-kompyuteru.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как подключить пылесос Xiaomi к компьютеру: полное руководство">
+    <meta property="og:description" content="Подробная инструкция по подключению робота-пылесоса Xiaomi к ПК через ADB и Wi-Fi. Настройка права доступа, чтение карт и управление через терминал.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как подключить пылесос Xiaomi к компьютеру: полное руководство</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как подключить пылесос Xiaomi к компьютеру для управления и диагностики</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#подготовка-оборудования-и-программного-обеспечения">Подготовка оборудования и программного обеспечения</a></li><li><a href="#настройка-сетевого-взаимодействия-и-ip-адресов">Настройка сетевого взаимодействия и IP-адресов</a></li><li><a href="#получение-доступа-к-файловой-системе-через-adb">Получение доступа к файловой системе через ADB</a></li><li><a href="#извлечение-карты-помещения-и-лог-файлов">Извлечение карты помещения и лог-файлов</a></li><li><a href="#управление-режимами-работы-через-командную-строку">Управление режимами работы через командную строку</a></li><li><a href="#таблица-популярных-команд-для-управления-роботом">Таблица популярных команд для управления роботом</a></li><li><a href="#решение-частых-проблем-и-ошибок">Решение частых проблем и ошибок</a></li><li><a href="#альтернативные-методы-подключения-и-управления">Альтернативные методы подключения и управления</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><p>Подключение робота-пылесоса <em>Xiaomi</em> к персональному компьютеру открывает перед пользователем возможности, скрытые от обычного владельца в стандартном приложении. Это необходимо для получения доступа к карте уборки в высоком разрешении, изменения логики движения, изменения режима всасывания или проведения глубокой диагностики оборудования. В отличие от простого сопряжения со смартфоном, работа с ПК требует использования дополнительных утилит и понимания сетевых протоколов, на которых базируется работа <strong>роботизированных устройств</strong>.</p>
+
+<p>Процесс не является магией, но требует аккуратности и соблюдения последовательности действий. Основная задача — обеспечить стабильное соединение между <em>роботом-пылесосом</em> и компьютером по локальной сети Wi-Fi. Без этого шага любые попытки передачи команд или извлечения данных останутся тщетными. Важно понимать, что взаимодействие происходит через специальный интерфейс отладки, который часто скрыт по умолчанию.</p>
+
+<p>В этой статье мы подробно разберем, как настроить связь, какие инструменты понадобятся для работы и как избежать ошибок, способных привести к нестабильной работе техники. Мы рассмотрим методы для различных моделей <em>Xiaomi</em>, включая популярные серии S и V. Подключение к ПК часто становится единственным способом вернуть устройство к жизни при программном сбое или желании получить доступ к <strong>продвинутым функциям</strong>.</p>
+
+<h2 id="подготовка-оборудования-и-программного-обеспечения">Подготовка оборудования и программного обеспечения</h2>
+
+<p>Перед началом любых манипуляций необходимо убедиться в наличии всех необходимых компонентов. Вам понадобится сам робот-пылесос <em>Xiaomi</em>, база для зарядки, стабильная сеть Wi-Fi и компьютер под управлением операционной системы Windows, macOS или Linux. Важно, чтобы компьютер и робот находились в одной подсети, то есть были подключены к одному роутеру или распределителю.</p>
+
+<p>Самым критичным элементом является программное обеспечение на ПК. Стандартный файловый менеджер не увидит устройство, поэтому необходимо установить <strong>ADB (Android Debug Bridge)</strong> — набор инструментов командной строки, позволяющий взаимодействовать с устройствами на базе Android. Большинство моделей <em>Xiaomi</em> работают именно на этой платформе. Также вам понадобится терминальная утилита для отправки команд, например, PuTTY или встроенная консоль Windows.</p>
+
+<p>Убедитесь, что вы знаете IP-адрес вашего робота. Его можно узнать через роутер или стандартное приложение Mi Home, если устройство уже подключено к сети. Далее скачайте архив с ADB-инструментами с официального сайта разработчика и распакуйте его в отдельную папку, например, <code>C:\adb</code>. Не используйте пути с кириллическими символами, так как это может вызвать ошибки при выполнении скриптов.</p>
+
+<ul>
+ <li>📱 Смартфон или планшет для первоначальной настройки сети.</li>
+ <li>💻 Персональный компьютер с установленным <strong>ADB и Fastboot</strong>.</li>
+ <li>🌐 Стабильная сеть Wi-Fi 2.4 ГГц (роботы обычно не видят сети 5 ГГц).</li>
+ <li>🔌 Заряженный робот-пылесос <em>Xiaomi</em>, стоящий на базе.</li>
+</ul>
+
+<blockquote>⚠️ Внимание: Перед началом работы убедитесь, что приложение <em>Mi Home</em> не конфликтует с процессами отладки. Рекомендуется закрыть все фоновые приложения, которые могут пытаться переподключаться к устройству.</blockquote>
+
+<p>Следующий этап — получение прав root или разрешение отладки. В зависимости от прошивки, это может потребовать ввода специального пароля или использования эксплойта. На некоторых моделях <em>Xiaomi</em> (например, серий S50 или S55) доступ к корневой системе заблокирован заводскими настройками. В таких случаях может потребоваться установка кастомной прошивки, что несет определенные риски.</p>
+
+<p>Для проверки связи с устройством откройте командную строку и перейдите в папку с ADB. Введите команду <code>adb devices</code>. Если вы видите строку с серийным номером устройства и статусом <code>device</code>, значит, связь установлена успешно. Если статус <code>unauthorized</code>, проверьте настройки на самом роботе или перезагрузить сервис ADB.</p>
+
+<h2 id="настройка-сетевого-взаимодействия-и-ip-адресов">Настройка сетевого взаимодействия и IP-адресов</h2>
+
+<p>Успех всего процесса на 90% зависит от корректности сетевых настроек. Робот-пылесос <em>Xiaomi</em> должен иметь статический IP-адрес или зафиксированный адрес в DHCP на вашем роутере. Это необходимо, чтобы компьютер мог постоянно обращаться к устройству без изменений адреса после перезагрузки.</p>
+
+<p>Зайдите в настройки вашего роутера и найдите раздел управления DHCP. Убедитесь, что IP-адрес робота-пылесоса не меняется динамически. Лучше всего назначить ему постоянный адрес, например, <code>192.168.1.150</code>. Запишите этот адрес, так как он будет основным ключом для подключения через терминал.</p>
+
+<p>Далее проверьте, разрешен ли доступ к портам на вашем компьютере. Брандмауэр Windows часто блокирует входящие и исходящие соединения для неизвестных приложений. Вам нужно добавить исключение для папки с ADB или временно отключить фаервол на время настройки. Это критически важно для <strong>успешного подключения</strong> и обмена данными.</p>
+
+<ul>
+ <li>🔧 Установите статический IP для робота в настройках роутера.</li>
+ <li>🔥 Отключите брандмауэр или настройте исключение для ADB.</li>
+ <li>📶 Проверьте, что сеть работает на частоте 2.4 ГГц.</li>
+ <li>🔁 Перезагрузите роутер и робот после внесения изменений.</li>
+</ul>
+
+<blockquote>⚠️ Внимание: Если вы используете гостевую сеть Wi-Fi или настройки изоляции клиентов (AP Isolation) на роутере, компьютер и робот не смогут видеть друг друга. Отключите изоляцию в настройках беспроводной сети.</blockquote>
+
+<p>Иногда возникает ситуация, когда робот находится в другой подсети, например, если у вас настроен VLAN или сложные маршруты. В этом случае необходимо добавить статический маршрут на компьютере, чтобы пакеты данных доходили до устройства. Команда маршрутизации зависит от операционной системы, но обычно она выглядит как <code>route add [IP_робота] mask [маска] [шлюз]</code>.</p>
+
+<p>После настройки сети снова запустите проверку связи. Используйте утилиту <code>ping</code> для тестирования доступности робота. Введите <code>ping 192.168.1.150</code> (замените на ваш адрес). Если вы видите ответные пакеты с минимальным временем отклика, значит, физический и сетевой уровни связаны корректно. Теперь можно переходить к программному взаимодействию.</p>
+
+<div class="poll-widget" id="poll-7dc44651"><div class="poll-widget-question">📊 Какую модель пылесоса Xiaomi вы используете?</div><div class="poll-widget-option" data-poll="7dc44651" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Серия S (S50, S55, S6)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7dc44651" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Серия V (V8, V9, V10, V11)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7dc44651" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Серия E (E1, E2)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="7dc44651" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Другая модель</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="получение-доступа-к-файловой-системе-через-adb">Получение доступа к файловой системе через ADB</h2>
+
+<p>Основным инструментом для взаимодействия с файловая системой робота является утилита ADB. Она позволяет не только отправлять команды, но и загружать файлы с устройства на компьютер и наоборот. Для входа в оболочку устройства используйте команду <code>adb shell</code>. После успешного выполнения вы получите доступ к командной строке Linux, встроенной в прошивку.</p>
+
+<p>Внутри оболочки вы увидите приглашение ввода команд, обычно это <code>root@localhost</code> или аналогичное. Здесь можно выполнять стандартные Linux-команды: <code>ls</code> для просмотра списка файлов, <code>cd</code> для переходов по директориям, <code>cat</code> для чтения содержимого текстовых файлов. <strong>Файловая система</strong> робота содержит множество лог-файлов и конфигурационных данных.</p>
+
+<p>Особый интерес представляет директория <code>/sdcard</code> или <code>/data</code>, где часто хранятся карты уборки и настройки сессий. Чтобы скопировать файл с робота на компьютер, используйте команду <code>adb pull /путь/к/файлу/на/роботе/имя_файла</code>. Это позволит вам сохранить карту помещения в оригинальном качестве, недоступном в стандартном приложении.</p>
+
+<p>Если при входе в <code>adb shell</code> вы получаете ошибку доступа, возможно, у вас нет прав суперпользователя. В этом случае потребуется попытка повышения привилегий с помощью команды <code>su</code>. Если система ответит отказом или не найдет файл, значит, прошивка заблокирована и требуется более сложный метод взлома.</p>
+
+<blockquote>⚠️ Внимание: Никогда не удаляйте файлы из системных папок, если вы не уверены в их назначении. Это может привести к полной неработоспособности робота-пылесоса и необходимости перепрошивки. <mark>Случайное удаление файла vslam.conf может привести к полной потере карты помещения.</mark></blockquote>
+
+<p>Для удобства работы можно использовать файловые менеджеры, которые поддерживают ADB, например, Solid Explorer на смартфоне (в режиме ПК) или специализированные утилиты. Однако командная строка дает максимальный контроль и позволяет автоматизировать процессы через скрипты. Это особенно полезно, если вы хотите регулярно выгружать логи для анализа ошибок.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка подключения ADB</h4><label class="check-item"><input type="checkbox"><span>Открыть командную строку</span></label><label class="check-item"><input type="checkbox"><span>Перейти в папку adb</span></label><label class="check-item"><input type="checkbox"><span>Ввести команду adb shell</span></label><label class="check-item"><input type="checkbox"><span>Получить приглашение root</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="извлечение-карты-помещения-и-лог-файлов">Извлечение карты помещения и лог-файлов</h2>
+
+<p>Одной из главных причин подключения пылесоса <em>Xiaomi</em> к компьютеру является необходимость получения карты помещения в оригинальном разрешении. Стандартное приложение сжимает изображение, делая детали неразличимыми. Через ADB можно выгрузить файл карты, который представляет собой растровое изображение или векторные данные, сохраняющие каждую деталь планировки.</p>
+
+<p>Путь к карте обычно находится в директории <code>/data/data/com.xiaomi.vacuum/files/map</code> (путь может отличаться в зависимости от версии прошивки). Файлы могут иметь расширение <code>.png</code>, <code>.jpg</code> или бинарный формат. Для расшифровки бинарных файлов часто требуются специализированные парсеры, написанные энтузиастами.</p>
+
+<p>Кроме карт, вам могут потребоваться логи работы двигателя или сенсоров. Эти данные содержатся в файлах <code>.log</code> или <code>.txt</code> в системных папках. Они полезны при диагностике ошибок, когда робот выдает непонятные коды сбоев. Анализ этих файлов позволяет понять, на каком этапе возникла проблема: при движении, при зарядке или при навигации.</p>
+
+<p>Для удобства работы с картами существуют онлайн-инструменты и десктопные программы, которые позволяют загрузить сырой файл и получить красивую 2D-карту вашей квартиры. Это позволяет точно настраивать запретные зоны и виртуальные стены вне приложения Mi Home. <strong>Точность карты</strong> напрямую влияет на качество уборки и эффективность навигации.</p>
+
+<ul>
+ <li>🗺️ Выгрузите файлы карты через ADB pull.</li>
+ <li>🔍 Используйте онлайн-парсеры для конвертации бинарных карт.</li>
+ <li>📊 Проанализируйте логи для поиска причин сбоев.</li>
+ <li>🔒 Сохраните резервную копию карты перед любыми изменениями.</li>
+</ul>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если вы планируете часто выгружать карты, создайте скрипт на Python или Batch, который автоматически копирует файлы из папки карты в папку на вашем компьютере.</tip</p></div>
+
+<h2 id="управление-режимами-работы-через-командную-строку">Управление режимами работы через командную строку</h2>
+
+<p>Командная строка позволяет отправлять роботам-пылесосам <em>Xiaomi</em> команды, которые не доступны через интерфейс. Вы можете принудительно запустить уборку в конкретной зоне, изменить мощность всасывания или переключить режим работы (например, на пылесосение только без уборкитряпкой). Это достигается за счет отправки JSON-команд через интерфейс RPC.</p>
+
+<p>Для этого используется команда <code>adb shell miio-remote</code> или прямая отправка запросов через <code>curl</code>. Формат команды зависит от модели устройства. Например, для запуска уборки в конкретной зоне может потребоваться команда, содержащая координаты X и Y. Это дает полный контроль над поведением робота.</p>
+
+<p>Вы также можете отключить звуковые эффекты или изменить громкость, что часто требуется пользователям, живущим в многоквартирных домах. Команды управления звуком обычно простые и понятные. </p>
+
+<p>Доступ к таким функциям позволяет автоматизировать уборку через сценарии умного дома, используя не только стандартный шлюз, но и собственные решения. Интеграция с Home Assistant через ADB — популярный сценарий для продвинутых пользователей. <strong>Гибкость управления</strong> через ПК значительно расширяет возможности устройства.</p>
+
+<details class="faq-item"><summary>Примеры полезных команд</summary><div class="faq-answer"><p>Команда запуска уборки:"app_start"; Команда остановки:"app_stop"; Команда возврата на базу:"app_charge"; Команда изменения мощности:"set_custom_mode 102" (для слабых режимов)</p></div></details>
+
+<p>Однако, будьте осторожны при отправке неизвестных команд. Некорректный синтаксис или неверные параметры могут привести к зависанию процесса или сбросу настроек. Всегда делайте резервные копии конфигурационных файлов перед внесением изменений через командную строку. Это спасет вас от необходимости перепрошивать устройство.</p>
+
+<h2 id="таблица-популярных-команд-для-управления-роботом">Таблица популярных команд для управления роботом</h2>
+
+<p>Ниже приведена таблица с основными командами, которые часто используются при подключении робота-пылесоса <em>Xiaomi</em> к компьютеру. Эти команды могут варьироваться в зависимости от версии прошивки и модели устройства.</p>
+
+<table>
+ <thead>
+ <tr>
+ <th>Команда</th>
+ <th>Описание функции</th>
+ <th>Тип доступа</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td><code>app_start</code></td>
+ <td>Запуск стандартного режима уборки</td>
+ <td>Администратор</td>
+ </tr>
+ <tr>
+ <td><code>app_stop</code></td>
+ <td>Остановка текущей операции</td>
+ <td>Администратор</td>
+ </tr>
+ <tr>
+ <td><code>set_custom_mode 102</code></td>
+ <td>Установка мощности всасывания на минимум</td>
+ <td>Корневой</td>
+ </tr>
+ <tr>
+ <td><code>get_map_v1</code></td>
+ <td>Запрос текущей карты помещения</td>
+ <td>Чтение</td>
+ </tr>
+ <tr>
+ <td><code>set_sound_volume 50</code></td>
+ <td>Установка громкости на 50%</td>
+ <td>Пользователь</td>
+ </tr>
+ </tbody>
+</table>
+
+<blockquote>⚠️ Внимание: Некоторые команды могут быть заблокированы в официальных глобальных прошивках. Обход блокировок может привести к потере гарантии.</blockquote>
+
+<p>Использование этих команд требует точного знания параметров. Например, код режима всасывания может отличаться для разных моделей. Всегда сверяйтесь с технической документацией или форумами разработчиков перед выполнением экспериментов. <strong>Точность ввода</strong> параметров критична для успешного выполнения операции.</p>
+
+<p>Если вы не уверены в результате, лучше протестировать команду на виртуальной машине или в безопасном режиме. Это позволит избежать непредвиденных сбоев в работе основного устройства. Помните, что робот-пылесос — это сложное электронное устройство, требующее аккуратного обращения.</p>
+
+<h2 id="решение-частых-проблем-и-ошибок">Решение частых проблем и ошибок</h2>
+
+<p>При подключении к компьютеру пользователи часто сталкиваются с рядом типичных проблем. Самая частая — ошибка <code>Connection timed out</code>. Это означает, что компьютер не может найти робота в сети. Проверьте, что оба устройства находятся в одной подсети и IP-адреса совпадают с теми, что вы вводили.</p>
+
+<p>Другая проблема — отсутствие прав на запись в файловую систему. Даже при наличии root-доступа некоторые папки могут быть защищены от записи. В таких случаях можно попробовать изменить права доступа через команду <code>chmod</code>, но это рискованно. Лучше использовать специальные утилиты для обхода ограничений.</p>
+
+<p>Иногда робот не отвечает на команды ADB, хотя сеть работает. Это может быть связано с тем, что процесс обслуживания ADB на роботе упал. В этом случае поможет перезагрузка устройства или перезапуск сервиса через команду <code>adb shell stop; adb shell start</code>. Если это не помогает, придется перепрошить устройство.</p>
+
+<p>Также стоит отметить, что некоторые модели <em>Xiaomi</em> имеют разные версии прошивок для разных регионов. Глобальная версия может не поддерживать определенные команды, доступные в китайской версии. В таких случаях может потребоваться установка кастомной глобальной прошивки или использование специфических эксплойтов.</p>
+
+
+
+<p>Если вы столкнулись с ошибкой"Unauthorized", попробуйте отключить и снова подключить устройство в приложении Mi Home, а затем повторить попытку. Иногда это сбрасывает параметры авторизации и позволяет установить новое соединение. Это особенно актуально при смене паролей Wi-Fi или настройке сети.</p>
+
+<h2 id="альтернативные-методы-подключения-и-управления">Альтернативные методы подключения и управления</h2>
+
+<p>Помимо прямого подключения через ADB, существуют и другие способы взаимодействия с роботом-пылесосом <em>Xiaomi</em> на уровне ПК. Одним из них является использование API Mi Home, которое позволяет отправлять команды через интернет. Это более безопасный метод, но он имеет ограничения по скорости и функционалу.</p>
+
+<p>Другой вариант — использование посредника, такого как Home Assistant или Node-RED. Эти платформы позволяют создавать сложные сценарии автоматизации, используя локальное подключение к роботу. Они предоставляют удобный интерфейс и не требуют глубоких знаний Linux или ADB. <strong>Интеграция с умным домом</strong> — мощный инструмент для автоматизации.</p>
+
+<p>Также можно использовать специализированное ПО, написанное сообществом. Такие программы часто имеют графический интерфейс и упрощают процесс подключения. Они могут автоматически находить устройство, скачивать карты и отправлять команды. Однако, большинство таких программ требуют наличия root-прав.</p>
+
+<p>Выбор метода зависит от ваших целей. Если вам нужно просто управлять уборкой, достаточно стандартного приложения. Если же вы хотите анализировать данные, менять карту или автоматизировать сложные сценарии, подключение к компьютеру через ADB — лучший выбор. Оно дает максимальную свободу действий.</p>
+
+<details>
+ <summary>Как часто нужно обновлять прошивку робота?</summary>
+ <p>Обновление прошивки рекомендуется проводить не чаще одного раза в год, если только нет критических багов. Частые обновления могут привести к появлению новых ограничений на доступ к файловой системе.</p>
+</details>
+
+<details>
+ <summary>Можно ли подключить пылесос к компьютеру без root-прав?</summary>
+ <p>Без root-прав вы сможете только просматривать некоторые файлы и отправлять простые команды. Полный доступ к карте и настройкам требует root-прав или использования эксплойтов.</p>
+</details>
+
+<details>
+ <summary>Что делать, если робот перестал отвечать после подключения?</summary>
+ <p>Попробуйте перезагрузить робота через кнопку на корпусе или отключить его от базы на несколько минут. Если это не помогло, возможно, потребуется перепрошивка устройства.</p>
+</details>
+
+<details>
+ <summary>Безопасно ли использование кастомных прошивок?</summary>
+ <p>Использование кастомных прошивок несет риски. Неправильная установка может привести к"окирпичиванию" устройства. Всегда делайте резервные копии и следуйте инструкциям на форумах.</p>
+</details>
+
+<details>
+ <summary>Нужен ли специальный кабель для подключения?</summary>
+ <p>Для подключения через Wi-Fi кабель не нужен. Убедитесь только, что оба устройства подключены к одной сети. Для первоначальной настройки иногда может потребоваться USB-кабель для отладки.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#подготовка-оборудования-и-программного-обеспечения">Подготовка оборудования и программного обеспечения</a></li><li><a href="#настройка-сетевого-взаимодействия-и-ip-адресов">Настройка сетевого взаимодействия и IP-адресов</a></li><li><a href="#получение-доступа-к-файловой-системе-через-adb">Получение доступа к файловой системе через ADB</a></li><li><a href="#извлечение-карты-помещения-и-лог-файлов">Извлечение карты помещения и лог-файлов</a></li><li><a href="#управление-режимами-работы-через-командную-строку">Управление режимами работы через командную строку</a></li><li><a href="#таблица-популярных-команд-для-управления-роботом">Таблица популярных команд для управления роботом</a></li><li><a href="#решение-частых-проблем-и-ошибок">Решение частых проблем и ошибок</a></li><li><a href="#альтернативные-методы-подключения-и-управления">Альтернативные методы подключения и управления</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-mi-robot-vacuum-mop-essential-k-mi-home.html" class="related-card">Как подключить Xiaomi Mi Robot Vacuum Mop Essential к Mi Home: полная инструкция</a></li><li><a href="/articles/k/ka/kak-ustanovit-soedinenie-robota-pylesosa-s-vaj-faj.html" class="related-card">Как подключить робот-пылесос к Wi-Fi: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kak-sbrosit-nastrojki-robota-pylesosa-xiaomi-do-zavodskikh.html" class="related-card">Как сбросить настройки робота-пылесоса Xiaomi до заводских: полное руководство</a></li><li><a href="/articles/p/py/pylesos-samsung-kak-vklyuchit-gde-knopka.html" class="related-card">Как включить пылесос Samsung: Где находится кнопка и управление</a></li><li><a href="/articles/r/ro/robot-pylesos-panda-kh500-kak-vklyuchit.html" class="related-card">Как включить робот-пылесос XIAOMI Pandas X500: пошаговая инструкция</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-podklyuchit-robot-pylesos-xiaomi-mi-robot-vacuum-mop-essential-k-mi-home.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить Xiaomi Mi Robot Vacuum Mop Essential к Mi Home: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по настройке робот-пылесоса Xiaomi Mi Robot Vacuum Mop Essential. Подключение </span></a><a href="/articles/k/ka/kak-ustanovit-soedinenie-robota-pylesosa-s-vaj-faj.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос к Wi-Fi: пошаговая инструкция</span><span class="related-bottom-desc">Подробный гид по настройке соединения робота-пылесоса с домашней сетью. Решение частых ошибок, выбор</span></a><a href="/articles/k/ka/kak-sbrosit-nastrojki-robota-pylesosa-xiaomi-do-zavodskikh.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить настройки робота-пылесоса Xiaomi до заводских: полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по полному сбросу настроек Xiaomi Robot Vacuum. Причины ошибки, методы через пр</span></a><a href="/articles/p/py/pylesos-samsung-kak-vklyuchit-gde-knopka.html" class="related-bottom-card"><span class="related-bottom-title">Как включить пылесос Samsung: Где находится кнопка и управление</span><span class="related-bottom-desc">Пошаговая инструкция: где искать кнопку включения на роботах, вертикальных и обычных пылесосах Samsu</span></a><a href="/articles/r/ro/robot-pylesos-panda-kh500-kak-vklyuchit.html" class="related-bottom-card"><span class="related-bottom-title">Как включить робот-пылесос XIAOMI Pandas X500: пошаговая инструкция</span><span class="related-bottom-desc">Пошаговая инструкция: как включить робот-пылесос X500. Настройка приложения, активация кнопок, заряд</span></a><a href="/articles/v/vi/video-gde-alisa-irobot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Видео обзор: роботы-пылесосы iRobot и Алиса — работа, управление и тесты</span><span class="related-bottom-desc">Смотрите видео обзоры роботов-пылесосов iRobot с поддержкой Яндекс Алисы. Подключение, управление го</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

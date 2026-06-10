@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как программировать робота-пылесос Xiaomi: Настройка, сценарии и ADB — SOS-Пылесос</title>
+    <meta name="description" content="Полное руководство по программированию робота-пылесоса Xiaomi. Настройка сценариев через Mi Home, скрытые команды ADB и создание правил автоматизации.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-programmirovat-pylesos-xiaomi-robot.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как программировать робота-пылесос Xiaomi: Настройка, сценарии и ADB">
+    <meta property="og:description" content="Полное руководство по программированию робота-пылесоса Xiaomi. Настройка сценариев через Mi Home, скрытые команды ADB и создание правил автоматизации.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как программировать робота-пылесос Xiaomi: Настройка, сценарии и ADB</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Полное руководство: Как программировать робота-пылесос Xiaomi</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#базовые-настройки-и-сценарии-через-приложение-mi-home">Базовые настройки и сценарии через приложение Mi Home</a></li><li><a href="#создание-автоматизаций-и-правил-в-экосистеме">Создание автоматизаций и правил в экосистеме</a></li><li><a href="#продвинутое-управление-через-adb-и-локальную-сеть">Продвинутое управление через ADB и локальную сеть</a></li><li><a href="#таблица-команд-для-базовых-операций">Таблица команд для базовых операций</a></li><li><a href="#интеграция-с-голосовыми-помощниками-и-home-assistant">Интеграция с голосовыми помощниками и Home Assistant</a></li><li><a href="#частые-ошибки-при-программировании-и-их-исправление">Частые ошибки при программировании и их исправление</a></li><li><a href="#перспективы-развития-и-обновления-прошивки">Перспективы развития и обновления прошивки</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Многие владельцы умной техники задаются вопросом, как раскрыть весь потенциал своего помощника, выходя за рамки стандартного нажатия кнопки «Старт». Программирование робота-пылесоса <em>Xiaomi</em> — это не обязательно написание сложного кода на C++ или Python. В большинстве случаев речь идет о глубокой настройке логики работы через фирменное приложение, создание пользовательских сценариев и, в редких случаях, использование командной строки для продвинутого контроля.</p>
+
+<p>Понимание того, как <strong>взаимодействовать с API</strong> устройства, позволяет превратить обычный пылесос в автономного агента, действующего по вашему индивидуальному сценарию. Будь то уборка только в определенное время суток, обход конкретных зон или запуск глубокой чистки при обнаружении пыли — возможности <em>роботизированных систем</em> ограничены лишь креативностью пользователя.</p>
+
+<p>В этой статье мы разберем все уровни программирования: от базовых настроек в экосистеме <em>Smart Home</em> до продвинутых методов с использованием протокола ADB. Вы узнаете, как настроить <strong>виртуальные стены</strong> и зоны запрета, а также как заставить устройство следовать уникальным маршрутам, которые не предусмотрены заводской прошивкой.</p>
+
+<h2 id="базовые-настройки-и-сценарии-через-приложение-mi-home">Базовые настройки и сценарии через приложение Mi Home</h2>
+
+<p>Самый доступный и безопасный способ «программирования» устройства — это использование официального приложения <em>Mi Home</em> (или его альтернатив, таких как Xiaomi Home для других регионов). Здесь вы не пишете код, но задаете логику поведения через визуальный интерфейс. Основная задача — настроить расписание и зоны уборки.</p>
+
+<p>Для начала необходимо зайти в настройки конкретного устройства и найти раздел <code>Расписание уборки</code>. Здесь можно задать не просто время, но и конкретную силу всасывания, режим работы (обычный, тихий, турбо) и тип уборки (только пылесос или с протиркой).</p>
+
+<ul>
+  <li>📅 Установите ежедневный запуск в 10:00 утра, когда все уже вышли из дома.</li>
+  <li>🌊 Выберите режим «Пылесос + Тряпка» для поддержания чистоты на кухне.</li>
+  <li>🔇 Переключите режим работы на «Тихий» для уборки в ночное время.</li>
+  <li>🚫 Создайте карту с зонами запрета, где робот не будет убирать вообще.</li>
+</ul>
+
+<p>Важно отметить, что современные модели <em>Xiaomi Robot Vacuum</em> поддерживают создание многоэтажных карт. Это позволяет программировать устройство так, чтобы оно запоминало планировку каждого этажа и не пыталось строить карту заново при переносе на другой этаж.</p>
+
+<blockquote>⚠️ Внимание: При настройке зон запрета убедитесь, что вы не заблокировали проходы, ведущие к зарядной станции, иначе робот не сможет вернуться для подзарядки и прервет уборку.</blockquote>
+
+<h2 id="создание-автоматизаций-и-правил-в-экосистеме">Создание автоматизаций и правил в экосистеме</h2>
+
+<p>Настоящее программирование начинается там, где появляются условия «Если... То...». В приложении <em>Mi Home</em> для этого отведен раздел «Сценарии» или «Автоматизация». Это мощный инструмент, позволяющий связывать работу пылесоса с другими устройствами умного дома, такими как датчики движения, метеостанции или голосовые помощники.</p>
+
+<p>Вы можете настроить логику: «Если датчик движения в коридоре сработал, а на улице светит солнце, запустить уборку». Или еще сложнее: «Если датчик качества воздуха показывает высокий уровень пыли, запустить турбо-режим уборки в этой комнате». Такие сценарии делают устройство по-настоящему интеллектуальным.</p>
+
+<p>Для настройки сложных цепочек действий необходимо учитывать задержки. Например, перед запуском робота система может сначала закрыть шторы, чтобы не повредить их, или включить вытяжку на кухне. Все эти действия программируются через визуальный конструктор.</p>
+
+<div class="poll-widget" id="poll-a198897b"><div class="poll-widget-question">📊 Какой способ настройки вам ближе?</div><div class="poll-widget-option" data-poll="a198897b" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Через приложение Mi Home</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="a198897b" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Через голосового помощника</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="a198897b" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Через ADB и консоли</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="a198897b" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Не программирую, использую как есть</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="продвинутое-управление-через-adb-и-локальную-сеть">Продвинутое управление через ADB и локальную сеть</h2>
+
+<p>Для энтузиастов, которым функционала приложения недостаточно, существует метод прямого программирования через <strong>ADB (Android Debug Bridge)</strong>. Большинство моделей <em>Xiaomi</em> работают на базе Android, что позволяет отправлять им команды напрямую через компьютер в одной локальной сети с устройством.</p>
+
+<p>Этот метод требует предварительной подготовки: включение отладки по USB (если есть физический доступ) или использование эксплойтов для получения root-прав и доступа к токенам устройства. После получения токена вы можете отправлять команды в формате JSON через <code>telnet</code> или <code>ssh</code>.</p>
+
+<p>Пример команды для получения текущей карты может выглядеть как <code>miio.get_map</code>, а для принудительного возврата на базу — <code>miio.recharge</code>. Это позволяет писать собственные скрипты на Python или Bash, которые будут управлять роботом по уникальному алгоритму, например, собирать пыль только в углах комнаты.</p>
+
+<details class="faq-item"><summary>Что такое токен устройства и зачем он нужен?Токен — это ключ шифрования, который позволяет вашему компьютеру безопасно общаться с роботом в локальной сети без использования облачных серверов Xiaomi. Без него прямые команды будут отклонены устройством.-->
+
+<p>Использование ADB открывает доступ к скрытым функциям, которые производитель мог отключить в глобальной версии прошивки. Например, можно изменить скорость вращения щетки, принудительно откалибровать гироскоп или зафиксировать робота в одной точке для проведения измерений.</p>
+
+<blockquote>⚠️ Внимание</summary><div class="faq-answer"><p> Использование ADB и получение root-прав может привести к потере гарантии на устройство. Любые манипуляции с системными файлами производятся на ваш страх и риск.</blockquote>
+
+<h2 id="таблица-команд-для-базовых-операций">Таблица команд для базовых операций</h2>
+
+<p>Для тех, кто решил освоить консольное управление, ниже приведена таблица с наиболее часто используемыми командами. Эти команды отправляются в виде JSON-объектов и выполняют стандартные действия робота.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Действие</th>
+      <th>Команда (JSON)</th>
+      <th>Описание</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Старт уборки</td>
+      <td><code>{"method":"app_start"}</code></td>
+      <td>Запускает базовый цикл уборки</td>
+    </tr>
+    <tr>
+      <td>Остановка</td>
+      <td><code>{"method":"app_stop"}</code></td>
+      <td>Мгновенно останавливает двигатель и щетки</td>
+    </tr>
+    <tr>
+      <td>Возврат на базу</td>
+      <td><code>{"method":"app_charge"}</code></td>
+      <td>Робот ищет зарядную станцию и стыкуется</td>
+    </tr>
+    <tr>
+      <td>Пауза</td>
+      <td><code>{"method":"app_pause"}</code></td>
+      <td>Временная остановка процесса с сохранением карты</td>
+    </tr>
+    <tr>
+      <td>Очистка зоны</td>
+      <td><code>{"method":"app_zoned_clean"}</code></td>
+      <td>Уборка заданных прямоугольных зон (параметры координат)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Обратите внимание, что команды для зонной уборки требуют передачи массива координат <code>[x1, y1, x2, y2, repeat]</code>. Неправильное указание координат может привести к тому, что робот просто проигнорирует команду или начнет движение в случайном направлении.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка перед запуском ADB</h4><label class="check-item"><input type="checkbox"><span>Убедиться, что робот и ПК в одной Wi-Fi сети</span></label><label class="check-item"><input type="checkbox"><span>Получить токен устройства</span></label><label class="check-item"><input type="checkbox"><span>Установить ADB драйверы</span></label><label class="check-item"><input type="checkbox"><span>Проверить Ping до IP-адреса робота</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="интеграция-с-голосовыми-помощниками-и-home-assistant">Интеграция с голосовыми помощниками и Home Assistant</h2>
+
+<p>Если вы хотите программировать поведение робота через голосовые команды, интеграция с <em>Home Assistant</em> является наиболее гибким решением. Это открытая платформа, которая объединяет устройства разных брендов и позволяет писать сложную логику на языке YAML или с помощью визуального редактора.</p>
+
+<p>Через Home Assistant можно настроить сценарии, недоступные в родном приложении. Например, «Если я прихожу домой с работы, и в коридоре пыльно, запустить пылесос в режиме Silent». Или «Если открыта дверь на балкон, отменить уборку, чтобы не пропылесосить листья».</p>
+
+<p>Для интеграции часто используется компонент <code>xiaomi_miio</code>, который поддерживает большинство моделей. Настройка происходит через файл <code>configuration.yaml</code>, где прописываются IP-адрес и токен устройства.</p>
+
+<pre><code>vacuum:
+<p>- platform: xiaomi_miio</p>
+<p>name: Kitchen Robot</p>
+<p>host: 192.168.1.50</p>
+<p>token: !secret xiaomi_token</code></pre></p>
+
+<p>После настройки в системе появляются сущности, которыми можно управлять через веб-интерфейс, мобильное приложение Home Assistant или голосовые команды через <code>Google Assistant</code> и <code>Alexa</code>.</p>
+
+
+
+<h2 id="частые-ошибки-при-программировании-и-их-исправление">Частые ошибки при программировании и их исправление</h2>
+
+<p>При попытке «взломать» логику работы устройства пользователи часто сталкиваются с проблемами. Самая распространенная ошибка — попытка отправить команду <code>app_start</code> без предварительной проверки состояния батареи. Если заряд ниже 15%, робот может отклонить команду и вернуться на базу, даже если вы задали принудительный старт.</p>
+
+<p>Другая проблема возникает при работе с картами. Если вы программно очистили карту или изменили зону, робот может потерять ориентацию в пространстве и начать «беситься», пытаясь найти точку старта. В таких случаях необходимо сбрасывать позицию через команду <code>reset_carrier</code> или вручную переносить устройство на центр карты.</p>
+
+<ul>
+  <li>🛑 Не отправляйте команды слишком часто, робот может перегрузить свой процессор.</li>
+  <li>🔄 Всегда проверяйте статус <code>state</code> перед отправкой новой команды.</li>
+  <li>🗺️ Сохраняйте резервную копию карты перед внесением изменений через ADB.</li>
+  <li>🔋 Убедитесь, что контакт на зарядной базе чистый, иначе робот сообщит ошибку.</li>
+</ul>
+
+<p>Также стоит учитывать, что некоторые прошивки блокируют доступ к определенным командам, если устройство подключено к китайскому серверу, а вы используете глобальную версию приложения. В таких случаях помогает смена региона в настройках Mi Home.</p>
+
+<blockquote>⚠️ Внимание: Если робот начал работать некорректно после ввода кода, немедленно отключите его от сети и выполните полный сброс настроек к заводским.</blockquote>
+
+<h2 id="перспективы-развития-и-обновления-прошивки">Перспективы развития и обновления прошивки</h2>
+
+<p>С развитием экосистемы умного дома возможности программирования роботов <em>Xiaomi</em> только расширяются. Производители постепенно открывают больше API для разработчиков, что позволяет создавать более сложные и безопасные интеграции.</p>
+
+<p>Однако, при обновлении прошивки через официальный сервер, многие пользовательские скрипты и модификации могут быть удалены. Система автоматически перезапишет файлы, и вам придется настраивать всё заново. Поэтому важно понимать, какие функции вы используете и как они зависят от версии ПО.</p>
+
+<p>Если вы используете кастомные прошивки (например, для разблокировки режимов), будьте готовы к тому, что официальное приложение может перестать видеть устройство. В таких ситуациях лучше использовать локальные интерфейсы управления, такие как <em>Web UI</em> или Home Assistant, которые менее чувствительны к версиям прошивки.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Самый надежный способ управления — это комбинация официального приложения для базовых задач и Home Assistant для сложных сценариев, что позволяет сохранить гарантию и получить максимальную гибкость.</p></div>
+
+<p>В заключение, программирование робота-пылесоса — это увлекательный процесс, который превращает бытовую технику в часть интеллектуальной среды вашего дома. Независимо от того, выберете ли вы простой путь через Mi Home или погрузитесь в дебри ADB, результат всегда стоит усилий: чистый дом без вашего участия.</p>
+
+<h2 id="часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</h2>
+
+<details>
+  <summary>Можно ли управлять роботом Xiaomi без интернета?</summary>
+  <p>Да, если вы используете локальное управление через ADB или настроили Home Assistant в одной локальной сети с устройством. Интернет нужен только для первоначальной настройки и обновления прошивки.</p>
+</details>
+
+<details>
+  <summary>Как узнать токен устройства для подключения к ADB?</summary>
+  <p>Токен можно получить через приложение Mi Home (если версия приложения позволяет), используя специальные утилиты для перехвата пакетов или через скрипты, которые запрашивают данные напрямую с устройства по протоколу MiIO.</p>
+</details>
+
+<details>
+  <summary>Почему робот не выполняет команду уборки зоны?</summary>
+  <p>Чаще всего это связано с неправильными координатами в команде JSON. Координаты должны быть в пикселях карты, а не в метрах. Также убедитесь, что зона не накладывается на виртуальную стену или зону запрета.</p>
+</details>
+
+<details>
+  <summary>Можно ли изменить голос робота?</summary>
+  <p>В официальных прошивках выбор языков ограничен. Для смены голоса необходимо устанавливать кастомные прошивки или файлы голосовых пакетов через ADB, что требует прав root-доступа.</p>
+</details>
+
+<details>
+  <summary>Безопасно ли использовать кастомные скрипты?</summary>
+  <p>Скрипты безопасны, если они не отключают критические системные службы. Однако, некорректные команды могут привести к зависанию робота или потере карты. Всегда делайте резервные копии данных.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#базовые-настройки-и-сценарии-через-приложение-mi-home">Базовые настройки и сценарии через приложение Mi Home</a></li><li><a href="#создание-автоматизаций-и-правил-в-экосистеме">Создание автоматизаций и правил в экосистеме</a></li><li><a href="#продвинутое-управление-через-adb-и-локальную-сеть">Продвинутое управление через ADB и локальную сеть</a></li><li><a href="#таблица-команд-для-базовых-операций">Таблица команд для базовых операций</a></li><li><a href="#интеграция-с-голосовыми-помощниками-и-home-assistant">Интеграция с голосовыми помощниками и Home Assistant</a></li><li><a href="#частые-ошибки-при-программировании-и-их-исправление">Частые ошибки при программировании и их исправление</a></li><li><a href="#перспективы-развития-и-обновления-прошивки">Перспективы развития и обновления прошивки</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-proshit-pylesos-redmond.html" class="related-card">Как прошить пылесос Redmond: инструкция по обновлению ПО</a></li><li><a href="/articles/s/sk/skolko-chasov-zaryazhaetsya-robot-pylesos-redmond.html" class="related-card">Сколько часов заряжается робот-пылесос Redmond: время и нюансы</a></li><li><a href="/articles/k/ka/kak-otlichit-robot-pylesos-xiaomi-original-ot-poddelki.html" class="related-card">Как отличить робот-пылесос Xiaomi оригинал от подделки: чек-лист</a></li><li><a href="/articles/p/py/pylesos-robot-kak-rabotaet-na-kovrakh.html" class="related-card">Робот-пылесос на коврах: Как работает, особенности и лучшие модели</a></li><li><a href="/articles/k/ka/kak-rabotaet-robot-pylesos-dlya-bassejnov.html" class="related-card">Принцип работы робота-пылесоса для бассейна: технология и эффективность</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-proshit-pylesos-redmond.html" class="related-bottom-card"><span class="related-bottom-title">Как прошить пылесос Redmond: инструкция по обновлению ПО</span><span class="related-bottom-desc">Пошаговая инструкция по перепрошивке роботов-пылесосов Redmond. Обновление прошивки, устранение ошиб</span></a><a href="/articles/s/sk/skolko-chasov-zaryazhaetsya-robot-pylesos-redmond.html" class="related-bottom-card"><span class="related-bottom-title">Сколько часов заряжается робот-пылесос Redmond: время и нюансы</span><span class="related-bottom-desc">Узнайте, сколько времени занимает полная зарядка роботов Redmond. Время зарядки разных моделей, факт</span></a><a href="/articles/k/ka/kak-otlichit-robot-pylesos-xiaomi-original-ot-poddelki.html" class="related-bottom-card"><span class="related-bottom-title">Как отличить робот-пылесос Xiaomi оригинал от подделки: чек-лист</span><span class="related-bottom-desc">Узнайте 7 надежных способов проверки оригинальности робота-пылесоса Xiaomi. Обзор упаковки, серийных</span></a><a href="/articles/p/py/pylesos-robot-kak-rabotaet-na-kovrakh.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос на коврах: Как работает, особенности и лучшие модели</span><span class="related-bottom-desc">Разбираем, как робот-пылесос настраивается на ковры, какие датчики используются и почему он может за</span></a><a href="/articles/k/ka/kak-rabotaet-robot-pylesos-dlya-bassejnov.html" class="related-bottom-card"><span class="related-bottom-title">Принцип работы робота-пылесоса для бассейна: технология и эффективность</span><span class="related-bottom-desc">Подробный разбор технологии очистки воды и дна бассейна. Изучите алгоритмы навигации, системы фильтр</span></a><a href="/articles/o/os/oshibka-lazernogo-datchika-xiaomi-pylesos-kak-ispravit.html" class="related-bottom-card"><span class="related-bottom-title">Ошибка лазерного датчика Xiaomi пылесос: причины и способы исправить</span><span class="related-bottom-desc">Узнайте, как самостоятельно устранить ошибку лазерного дальномера робота-пылесоса Xiaomi. Пошаговая </span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

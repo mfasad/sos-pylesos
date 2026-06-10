@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как работает док-станция робот-пылесос: устройство и алгоритмы — SOS-Пылесос</title>
+    <meta name="description" content="Подробный разбор работы базы зарядки: от зарядки аккумулятора до навигации и автоматической уборки. Как избежать ошибок при стыковке.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/k/ka/kak-rabotaet-dok-stantsiya-robot-pylesos.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как работает док-станция робот-пылесос: устройство и алгоритмы">
+    <meta property="og:description" content="Подробный разбор работы базы зарядки: от зарядки аккумулятора до навигации и автоматической уборки. Как избежать ошибок при стыковке.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как работает док-станция робот-пылесос: устройство и алгоритмы</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Как работает док-станция робот-пылесос: полный разбор технологий</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#физический-принцип-поиска-и-стыковки">Физический принцип поиска и стыковки</a></li><li><a href="#алгоритмы-навигации-и-лидары">Алгоритмы навигации и лидары</a></li><li><a href="#процесс-зарядки-и-управление-питанием">Процесс зарядки и управление питанием</a></li><li><a href="#технологии-авто-очистки-и-промывки">Технологии авто-очистки и промывки</a></li><li><a href="#влияние-окружающей-среды-на-работу">Влияние окружающей среды на работу</a></li><li><a href="#ошибки-и-способы-их-устранения">Ошибки и способы их устранения</a></li><li><a href="#будущее-технологий-док-станций">Будущее технологий док-станций</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Робот-пылесос стал неотъемлемой частью современного быта, но его автономность была бы невозможна без умной базы, которую мы называем док-станцией. Это устройство выполняет функции не просто зарядки, а интеллектуального хаба, управляющего всем жизненным циклом уборки.</p>
+
+<p>Большинство пользователей воспринимают базу как пассивный объект, куда робот просто подъезжает для подзарядки. Однако за этим простым действием скрывается сложная система сенсоров, алгоритмов навигации и радиосвязи, обеспечивающая точное возвращение устройства в "дом".</p>
+
+<p>Понимание принципов работы док-станции помогает избежать частых ошибок: когда робот крутится в углу, не может найти базу или постоянно теряет заряд. Разберем механику и электронику этого процесса детально.</p>
+
+<h2 id="физический-принцип-поиска-и-стыковки">Физический принцип поиска и стыковки</h2>
+
+<p>Процесс поиска базы начинается с того, что робот-пылесос получает команду на зарядку, будь то низкий уровень <strong>аккумулятора</strong> или завершение уборки. В этот момент устройство переключает режим работы с "транспортировки" на "навигацию".</p>
+
+<p>Ключевым элементом здесь является инфракрасный <em>датчик стыковки</em>. Док-станция постоянно испускает невидимый для глаза инфракрасный сигнал, формируя конусообразное поле вокруг себя. Робот оснащается приемниками, которые улавливают этот сигнал.</p>
+
+<p>Чем ближе устройство к базе, тем сильнее интенсивность сигнала. <strong>Алгоритм</strong> управления двигателем анализирует разницу в силе сигнала, принимаемого левым и правым приемниками, чтобы корректировать траекторию движения.</p>
+
+<p>Если робот видит сигнал только с одной стороны, он поворачивается в ту сторону, где сигнал слабее, или наоборот, в зависимости от настройки прошивки, пока не выровняется по центру. Это похоже на игру в "горячо-холодно", только происходит за миллисекунды.</p>
+
+<blockquote><strong>⚠️ Внимание:</strong> Прямой солнечный свет, падающий на датчики базы, может "ослепить" их, создавая помехи, из-за которых робот не сможет найти станцию. Размещайте базу в тени или используйте инфракрасные фильтры.</blockquote>
+
+<p>Некоторые модели используют магнитные ленты или виртуальные стены для создания "коридора", ведущего к базе, что упрощает задачу первичного захвата сигнала.</p>
+
+<div class="poll-widget" id="poll-b6dbfab2"><div class="poll-widget-question">📊 Как часто ваш робот теряет базу?</div><div class="poll-widget-option" data-poll="b6dbfab2" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Никогда</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b6dbfab2" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Редко (1-2 раза в месяц)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b6dbfab2" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Часто (нужно ставить вручную)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="b6dbfab2" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Пользуюсь только с нажатием кнопки</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="алгоритмы-навигации-и-лидары">Алгоритмы навигации и лидары</h2>
+
+<p>В современных моделях, таких как <em>Roborock S7</em> или <em>Xiaomi Robot Vacuum</em>, роль инфракрасных сигналов дополняется или полностью заменяется лидарами и камерами. Это меняет сам подход к поиску базы.</p>
+
+<p>Навигационная система строит карту помещения. Когда заряд падает, робот не просто ищет сигнал, а вычисляет кратчайший путь до точки <strong>докования</strong>, которая записана в его памяти при первой настройке.</p>
+
+<p>Если препятствие (например, игрушка ребенка) блокирует прямой путь, робот перестраивает маршрут, объезжая объект, но цель остается прежней — вернуться на базу. Это делает процесс более надежным, чем простое следование за лучом.</p>
+
+<p>Использование <em>SLAM-технологий</em> (одновременная локализация и построение карты) позволяет роботу знать свое местоположение с точностью до сантиметра, даже если база была временно переставлена, хотя это и может вызвать ошибку.</p>
+
+<details class="faq-item"><summary>В чем разница между инфракрасной и лазерной док-станцией?</summary><div class="faq-answer"><p>Инфракрасная база требует прямой видимости и работает только на небольшом расстоянии, в то время как лазерная позволяет роботу найти базу через всю квартиру, ориентируясь по карте, а не только по сигналу.</p></div></details>
+
+<p>Сложные алгоритмы позволяют роботу не просто "чуть-чуть повернуть", а совершать сложные маневры: змейкой приближаться к базе, если проход узкий, или делать "разворот на 180 градусов" для корректного заезда.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка готовности к док-станции</h4><label class="check-item"><input type="checkbox"><span>Очистить зону вокруг базы от проводов</span></label><label class="check-item"><input type="checkbox"><span>Убедиться, что датчики чистые</span></label><label class="check-item"><input type="checkbox"><span>Проверить уровень заряда батареи</span></label><label class="check-item"><input type="checkbox"><span>Скорректировать карту в приложении</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="процесс-зарядки-и-управление-питанием">Процесс зарядки и управление питанием</h2>
+
+<p>После успешной механической стыковки контактов начинается электрический обмен данными. Контактная группа на базе и на корпусе робота замыкает цепь, и начинается процесс <strong>зарядки</strong>.</p>
+
+<p>Современные <em>Li-Ion аккумуляторы</em> требуют сложного профиля заряда. Станция не просто подает напряжение, а отслеживает температуру и ток, чтобы избежать перегрева и деградации ячеек.</p>
+
+<p>На первой стадии происходит быстрый заряд до определенного процента, затем ток снижается, чтобы аккумулировать энергию в химических ячейках без вреда для их ресурса. Это критически важно для долговечности устройства.</p>
+
+<p>Когда заряд достигает 100%, контроллер базы переводит питание в режим "капельной подпитки" или полностью отключает ток, ожидая, пока уровень снова не упадет ниже порога срабатывания.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Если робот долго стоит на базе и не убирается, проверьте, не включен ли у него режим "эко-зарядки" или "глубокого сна", который может ограничивать максимальный заряд до 80% для сохранения здоровья батареи.</p></div>
+
+<p>Регулярная полная зарядка раз в месяц рекомендуется для калибровки контроллера емкости, чтобы система точно знала, сколько энергии осталось.</p>
+
+<h2 id="технологии-авто-очистки-и-промывки">Технологии авто-очистки и промывки</h2>
+
+<p>Новое поколение баз, таких как <em>Roborock S8 Pro Ultra</em> или <em>Dreame L10s</em>, превратилось в полноценные сервисные центры. Они не только заряжают, но и обслуживают сам пылесос.</p>
+
+<p>После уборки робот подъезжает к станции, где <strong>автоматическая система</strong> вытряхивает мусор из внутреннего контейнера в мешок базы. Это избавляет пользователя от необходимости чистить пылесос вручную после каждой уборки.</p>
+
+<p>В моющих моделях робот поднимает <em>тряпку</em> и ставит её на вращающиеся щетки в базе, где она промывается в чистой воде, а грязная вода откачивается в отдельный резервуар.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип базы</th>
+<th>Функция очистки</th>
+<th>Объем мешка/бака</th>
+<th>Частота обслуживания</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Базовая зарядка</td>
+<td>Нет</td>
+<td>0 мл</td>
+<td>Еженедельно (контейнер)</td>
+</tr>
+<tr>
+<td>С авто-отсыпкой</td>
+<td>Откачка мусора</td>
+<td>2.5 - 3.5 л</td>
+<td>Раз в 2-3 месяца</td>
+</tr>
+<tr>
+<td>Моющая станция</td>
+<td>Промывка тряпки</td>
+<td>3 - 4 л (чистая/грязная)</td>
+<td>Раз в 2-4 недели</td>
+</tr>
+<tr>
+<td>Комбинированная</td>
+<td>Отсыпка + промывка + сушка</td>
+<td>3.5 л + 4 л</td>
+<td>Раз в 60-90 дней</td>
+</tr>
+</tbody>
+</table>
+
+<p>После промывки многие базы включают функцию <strong>сушки</strong> теплым воздухом, предотвращая появление бактерий и неприятного запаха на мягкой насадке робота.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Авто-очистка значительно экономит время, но требует регулярной замены фильтров и мешков в базе, иначе система может забиться и перестать работать.</p></div>
+
+<blockquote><strong>⚠️ Внимание:</strong> В моделях с функцией мытья полов обязательно меняйте воду в баках раз в неделю. Застоявшаяся вода может привести к появлению плесени, которая затем будет наноситься на пол при следующей уборке.</blockquote>
+
+<h2 id="влияние-окружающей-среды-на-работу">Влияние окружающей среды на работу</h2>
+
+<p>Даже самый совершенный алгоритм может дать сбой, если условия среды не соответствуют требованиям. Пол, освещение и даже ковры играют роль.</p>
+
+<p>Роботы-пылесосы часто используют оптические сенсоры для измерения высоты и пола. Глянцевый пол или зеркальная плитка могут "обмануть" датчики, заставив их думать, что перед ними пропасть, и робот откажется подъезжать к базе.</p>
+
+<p>Высокий ворс ковров может затруднить движение, и робот просто не сможет набрать нужную скорость для корректного заезда в "вход" базы. В таких случаях база должна стоять на твердом покрытии.</p>
+
+<p>Световые помехи, такие как яркие лампы накаливания или прямые лучи солнца, могут создать фон, который перебивает слабый инфракрасный сигнал стыковки.</p>
+
+<p>Иногда достаточно просто протереть датчики базы и робота сухой тряпкой, чтобы восстановить их работоспособность, так как слой пыли может блокировать сигнал.</p>
+
+<details class="faq-item"><summary>Что делать, если робот не может найти базу? </summary><div class="faq-answer"><p>Попробуйте переставить базу в более темное место, убрав прямые солнечные лучи. Очистите инфракрасные "глаза" базы и датчики на роботе. Уберите все препятствия в радиусе 1.5 метров от базы.</p></div></details>
+
+<h2 id="ошибки-и-способы-их-устранения">Ошибки и способы их устранения</h2>
+
+<p>Пользователи часто сталкиваются с ошибками, когда робот "крутит волчком" в одной точке, пытаясь найти базу. Это обычно означает, что сигнал неустойчив или приемник загрязнен.</p>
+
+<p>Другая частая проблема — робот подъезжает к базе, но не цепляется за контакты. В этом случае проверьте, не заблокированы ли контакты пылью или шерстью животных.</p>
+
+<p>Если робот регулярно теряет базу, возможно, проблема в прошивке. Обновление ПО может исправить ошибки в алгоритмах навигации или калибровке датчиков.</p>
+
+<p>В редких случаях проблема может быть в самом аккумуляторе: если он не держит заряд, робот может "умереть" по пути к базе, так и не успев завершить процесс стыковки.</p>
+
+<p>Для диагностики используйте специальные режимы в приложении, которые показывают интенсивность сигнала базы и уровень заряда в реальном времени.</p>
+
+<blockquote><strong>⚠️ Внимание:</strong> Если робот постоянно сталкивается с базой и издает механический звук, проверьте корректность установки базы. Неровный пол или наклон могут привести к поломке корпуса робота или базы.</blockquote>
+
+<p>Иногда помогает сброс карты и повторная настройка, чтобы робот заново запомнил координаты базы.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Регулярная очистка контактных групп и датчиков — это 90% успешной работы системы докования, даже если модель очень старая.</p></div>
+
+<h2 id="будущее-технологий-док-станций">Будущее технологий док-станций</h2>
+
+<p>Инженеры постоянно совершенствуют базы, делая их все более автономными. Новые модели уже способны самостоятельно смешивать моющие средства и заполнять резервуары водой из системы водоснабжения дома.</p>
+
+<p>Развивается технология <strong>искусственного интеллекта</strong>, который позволяет роботу распознавать типы загрязнений и решать, нужно ли ему мыть пол или просто пропылесосить, планируя заезды на базу оптимальным образом.</p>
+
+<p>В будущем мы, вероятно, увидим базы, которые сами перемещаются по квартире, следуя за роботом, чтобы всегда быть в зоне досягаемости, или используют 5G для мгновенной передачи данных о состоянии.</p>
+
+<p>Умные базы станут частью системы "умного дома", интегрируясь с голосовыми помощниками и другими устройствами, например, автоматически открывая вентиляцию при сушке тряпок.</p>
+
+<p>Важно следить за обновлениями стандартов и протоколов, так как совместимость старых роботов с новыми базами может быть ограничена.</p>
+
+<details>
+<summary>Как часто нужно менять мешок в базе с авто-отсыпкой?</summary>
+<p>Обычно мешок рассчитан на 2-3 месяца уборки, но это зависит от площади квартиры и степени загрязнения. Если вы видите, что мешок заполнен на 80%, его лучше заменить раньше, чтобы избежать задымления или поломки мотора отсыпки.</p>
+</details>
+
+<details>
+<summary>Почему робот не заезжает на базу, если я его туда поставил вручную?</summary>
+<p>Некоторые модели требуют, чтобы робот подъезжал к базе "своим ходом" для инициализации процесса зарядки и проверки датчиков. Если его просто поставить на контакты, система может не распознать команду "быть на базе" и продолжит работу или уедет.</p>
+</details>
+
+<details>
+<summary>Можно ли использовать базу в другой комнате?</summary>
+<p>Да, но для моделей с картой это потребует обновления карты в приложении. Для старых моделей с ИК-навигацией это не имеет значения, так как они ищут сигнал, а не карту. Однако убедитесь, что в новой комнате достаточно места для разворота.</p>
+</details>
+
+<details>
+<summary>Что делать, если база издает странный шум?</summary>
+<p>Странный шум может указывать на засорение системы отсыпки, износ подшипников или попадание мусора в вентилятор сушки. Попробуйте разобрать и почистить контейнер. Если шум не пропадает, возможно, потребуется замена модуля.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#физический-принцип-поиска-и-стыковки">Физический принцип поиска и стыковки</a></li><li><a href="#алгоритмы-навигации-и-лидары">Алгоритмы навигации и лидары</a></li><li><a href="#процесс-зарядки-и-управление-питанием">Процесс зарядки и управление питанием</a></li><li><a href="#технологии-авто-очистки-и-промывки">Технологии авто-очистки и промывки</a></li><li><a href="#влияние-окружающей-среды-на-работу">Влияние окружающей среды на работу</a></li><li><a href="#ошибки-и-способы-их-устранения">Ошибки и способы их устранения</a></li><li><a href="#будущее-технологий-док-станций">Будущее технологий док-станций</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-pereproshit-pylesos-xiaomi-vacuum-mop-essential.html" class="related-card">Как перепрошить пылесос Xiaomi Vacuum Mop Essential: полная инструкция</a></li><li><a href="/articles/k/ka/kakoj-robot-pylesos-kupit-na-ali.html" class="related-card">Робот пылесос с Али: как выбрать, топовые модели и советы по покупке</a></li><li><a href="/articles/p/py/pylesos-dlya-bassejna-kakoj-luchshe-vybrat-otzyvy-forum.html" class="related-card">Пылесос для бассейна: какой лучше выбрать — отзывы, форум, рейтинг 2026</a></li><li><a href="/articles/k/ka/kak-zaryadit-robot-pylesos-esli-on-polnostyu-razryazhen.html" class="related-card">Как зарядить робот-пылесос, если он полностью разряжен: пошаговая инструкция</a></li><li><a href="/articles/k/ka/kakoj-robot-pylesos-vybrat-dlya-uborki.html" class="related-card">Как выбрать робот-пылесос: гид по функциям и типам уборки</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-pereproshit-pylesos-xiaomi-vacuum-mop-essential.html" class="related-bottom-card"><span class="related-bottom-title">Как перепрошить пылесос Xiaomi Vacuum Mop Essential: полная инструкция</span><span class="related-bottom-desc">Пошаговое руководство по прошивке робота-пылесоса Xiaomi Vacuum Mop Essential. Смена региона, устран</span></a><a href="/articles/k/ka/kakoj-robot-pylesos-kupit-na-ali.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос с Али: как выбрать, топовые модели и советы по покупке</span><span class="related-bottom-desc">Гид по выбору робота-пылесоса на AliExpress: разбор брендов, характеристик, навигации и скрытых фише</span></a><a href="/articles/p/py/pylesos-dlya-bassejna-kakoj-luchshe-vybrat-otzyvy-forum.html" class="related-bottom-card"><span class="related-bottom-title">Пылесос для бассейна: какой лучше выбрать — отзывы, форум, рейтинг 2026</span><span class="related-bottom-desc">Честные отзывы с форумов о роботизированных и шланговых пылесосах. Сравнение брендов, советы по выбо</span></a><a href="/articles/k/ka/kak-zaryadit-robot-pylesos-esli-on-polnostyu-razryazhen.html" class="related-bottom-card"><span class="related-bottom-title">Как зарядить робот-пылесос, если он полностью разряжен: пошаговая инструкция</span><span class="related-bottom-desc">Робот-пылесос не включается? Узнайте, как безопасно реанимировать полностью разряженную батарею, вос</span></a><a href="/articles/k/ka/kakoj-robot-pylesos-vybrat-dlya-uborki.html" class="related-bottom-card"><span class="related-bottom-title">Как выбрать робот-пылесос: гид по функциям и типам уборки</span><span class="related-bottom-desc">Выбираете умного помощника? Узнайте, какой робот-пылесос подойдет для ковров, животных и сложной пла</span></a><a href="/articles/k/ka/kak-vyklyuchit-robot-pylesos-xiaomi-vacuum-mop-p.html" class="related-bottom-card"><span class="related-bottom-title">Как выключить робот-пылесос Xiaomi Vacuum Mop P: полное руководство</span><span class="related-bottom-desc">Подробная инструкция по полному отключению, переводу в спящий режим и перезагрузке робота Xiaomi Vac</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Герменевтика в робототехнике: что значит «понять» пылесос — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем, что означает герменевтический подход к пылесосу. Как интерпретировать данные сенсоров и поведение робота-уборщика для эффективной эксплуатации.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/c/ch/chto-znachit-ponyat-pylesos-germenevticheskij.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Герменевтика в робототехнике: что значит «понять» пылесос">
+    <meta property="og:description" content="Разбираем, что означает герменевтический подход к пылесосу. Как интерпретировать данные сенсоров и поведение робота-уборщика для эффективной эксплуатации.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Герменевтика в робототехнике: что значит «понять» пылесос</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Герменевтика в пылесосах: как робот «понимает» ваш дом</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#суть-герменевтического-подхода-в-робототехнике">Суть герменевтического подхода в робототехнике</a></li><li><a href="#как-робот-интерпретирует-сенсорные-данные">Как робот интерпретирует сенсорные данные</a></li><li><a href="#роль-нейросетей-в-семантическом-анализе">Роль нейросетей в семантическом анализе</a></li><li><a href="#практическое-применение-интерпретации-пространства">Практическое применение интерпретации пространства</a></li><li><a href="#ошибки-интерпретации-и-их-причины">Ошибки интерпретации и их причины</a></li><li><a href="#настройка-и-калибровка-для-точного-понимания">Настройка и калибровка для точного понимания</a></li><li><a href="#будущее-герменевтики-в-бытовых-приборах">Будущее герменевтики в бытовых приборах</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Понятие «герменевтический пылесос» звучит как оксюморон, соединяющий высокотехнологичную бытовую технику с философской наукой о толковании. В строгом смысле слова, ни один бытовой прибор не способен к философскому осмыслению реальности, однако в контексте современных алгоритмов искусственного интеллекта этот термин переродился. Он описывает способность устройства не просто обрабатывать сигналы, а <strong>интерпретировать</strong> семантическое значение окружающего пространства, отличая препятствие от мусора или мягкую мебель от хрупкой вазы.</p>
+
+<p>Когда мы говорим о том, что пылесос «понимает» ситуацию, мы имеем в виду переход от жесткой логики к <strong>контекстуальному анализу</strong>. Ранние модели двигались хаотично или по простым алгоритмам «стенка-стена», реагируя на удар датчика. Современные флагманы, такие как <em>Dreame X40</em> или <em>Roborock S8 Pro Ultra</em>, используют <strong>семантическую сегментацию</strong> изображений, чтобы строить карту не как набор препятствий, а как осмысленную структуру комнат, где ковры требуют особой обработки, а провода — обхода.</p>
+
+<h2 id="суть-герменевтического-подхода-в-робототехнике">Суть герменевтического подхода в робототехнике</h2>
+<p>Герменевтика традиционно занимается интерпретацией текстов и смыслов, но в мире робототехники «текстом» становится поток данных с лидаров и камер. Робот-пылесос не просто видит круглый объект, он анализирует его форму, текстуру и положение, чтобы принять решение.</p>
+<p>Ключевым отличием <strong>герменевтического взаимодействия</strong> является способность системы к обучению на лету. Если вы передвигаете стул, старый робот будет воспринимать его как новое, неизведанное препятствие каждый раз. Умная система, используя нейросети, «понимает», что это всё тот же стул, и корректирует маршрут, сохраняя историю изменений в <code>map_data</code> карты.</p>
+
+<h2 id="как-робот-интерпретирует-сенсорные-данные">Как робот интерпретирует сенсорные данные</h2>
+<p>Процесс «понимания» начинается с_raw_ данных, которые поступают с множества сенсоров: лидара, визуальных камер, инфракрасных датчиков и гироскопов. Сами по себе эти сигналы — лишь набор цифр, но алгоритм <strong>сенсорной интеграции</strong> превращает их в осмысленную картину.</p>
+<p>Например, когда датчик видит темный пятно на полу, простой алгоритм может сработать на (избегание) или просто проигнорировать его. Герменевтический алгоритм анализирует контекст: если это пятно на ковре, это ковер. Если же это темная нить на светлом паркете, это потенциальный мусор или опасность для колеса. Такая дифференциация требует мощного <strong>вычислительного ядра</strong>.</p>
+<p>Важно отметить, что интерпретация зависит от режима уборки. В режиме «Точечная уборка» приоритетом становится <strong>максимальное покрытие</strong>, и робот может игнорировать мелкие неровности. В режиме «Энергосбережение» он начинает «понимать» карту глубже, выбирая только самые загрязненные зоны, игнорируя чистые участки.</p>
+
+<div class="poll-widget" id="poll-a7e532fe"><div class="poll-widget-question">📊 Как ваш пылесос реагирует на препятствия?</div><div class="poll-widget-option" data-poll="a7e532fe" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Обходит аккуратно</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="a7e532fe" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Упирается и ищет путь</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="a7e532fe" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Пытается переехать</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="a7e532fe" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Застревает часто</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="роль-нейросетей-в-семантическом-анализе">Роль нейросетей в семантическом анализе</h2>
+<p>Сердцем любого современного «понимающего» пылесоса является <strong>нейросетевой процессор</strong> (NPU). Именно он выполняет задачи распознавания образов, которые ранее были недоступны для бытовой техники. Модель обучается на миллионах изображений бытовых объектов, что позволяет ей отличать обувь от игрушек.</p>
+<p>Алгоритмы <strong>глубинного обучения</strong> позволяют роботу классифицировать объекты с высокой точностью. Он может распознать, что перед ним не просто «препятствие», а «собачий корм», который категорически нельзя размазывать, или «кабель», который нужно аккуратно объехать, а не затянуть в щетку. Такая классификация критична для сохранения чистоты и целостности вещей.</p>
+<p>Разработчики постоянно совершенствуют базы данных объектов. Если вы добавляете в приложение новый тип препятствия, например, «детские конструкторы», робот начинает искать и избегать их, обучаясь на вашем примере. Это и есть процесс <strong>адаптивной герменевтики</strong>, где пользователь участвует в формировании логики устройства.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Проверяйте обновления прошивки раз в месяц — новые модели нейросетей часто добавляют распознавание дополнительных типов объектов, таких как носки или зарядные кабели.</p></div>
+
+<h2 id="практическое-применение-интерпретации-пространства">Практическое применение интерпретации пространства</h2>
+<p>Понимание геометрии комнаты позволяет роботу строить оптимальные маршруты, избегая «тупиков» и лишних проходов. <strong>Планирование пути</strong> становится не просто математической задачей покрытия площади, а логическим процессом навигации через «смысловые» зоны.</p>
+<p>Робот может «понять», что в коридоре узкое пространство, требующее медленного движения, а в гостиной — открытая зона для быстрого движения. Он адаптирует мощность всасывания и скорость вращения щеток <strong>в зависимости от типа поверхности</strong>, который он идентифицировал. На плитке он будет работать тише, а на ковре — мощнее.</p>
+<p>Особое внимание уделяется динамическим объектам. Если в комнате бегает ребенок или кошка, робот не пытается их «убрать» или игнорировать. Он интерпретирует их движение как временное препятствие, замедляется и ждет, пока объект уйдет, демонстрируя <strong>социальную адаптивность</strong> в домашней среде.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка интерпретации препятствий</h4><label class="check-item"><input type="checkbox"><span>Запустить тестовую уборку</span></label><label class="check-item"><input type="checkbox"><span>Поместить на пол разные объекты</span></label><label class="check-item"><input type="checkbox"><span>Наблюдать за реакцией робота</span></label><label class="check-item"><input type="checkbox"><span>Проверить карту в приложении</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="ошибки-интерпретации-и-их-причины">Ошибки интерпретации и их причины</h2>
+<p>Несмотря на сложность алгоритмов, роботы могут ошибаться в своей интерпретации реальности. <strong>Сенсорный шум</strong>, плохое освещение или нестандартная фактура предметов могут ввести нейросеть в заблуждение. Например, зеркальный пол может быть воспринят как пропажа, а черный ковер на черном ламинате — как единое пятно грязи.</p>
+<p>Часто проблема кроется в <strong>недостатке контекста</strong>. Если робот видит только часть объекта, он может принять его за что-то другое. Нить, протянутая через пол, может быть интерпретирована как граница зоны, а не как препятствие. В таких случаях требуется ручная коррекция карты или физическое удаление объекта.</p>
+<p>Иногда помехи создают отражения от окон или зеркал, которые сбивают лидар. В этом случае робот может «видеть» стены там, где их нет. Для решения таких проблем производители внедряют <strong>мультимодальную фильтрацию</strong>, когда данные с камеры проверяют показания лидара и наоборот.</p>
+
+<blockquote>⚠️ Внимание: Если робот упорно игнорирует определенную зону или «видит» несуществующие стены, это может быть признаком загрязнения оптических сенсоров. Протрите линзу камеры и датчики лидара сухой мягкой тканью перед повторной попыткой.</blockquote>
+
+<details class="faq-item"><summary>Что делать, если робот не распознает новые объекты?</summary><div class="faq-answer"><p>Попробуйте приблизить объект к роботу вручную и запустить режим обхода. Некоторые модели позволяют «научить» их новому объекту через приложение, сделав фото и задав имя, например «Носок».</p></div></details>
+
+<h2 id="настройка-и-калибровка-для-точного-понимания">Настройка и калибровка для точного понимания</h2>
+<p>Чтобы робот максимально точно «понимал» ваш дом, необходимо правильно настроить его параметры в приложении. Раздел <code>Настройки карты</code> позволяет откорректировать виртуальные стены и зоны запрета, которые дополняют автоматическую интерпретацию.</p>
+<p>Важно отметить, что <strong>качество освещения</strong> влияет на работу визуальных навигационных систем. В полной темноте камера перестает работать, и робот переходит в режим работы только по лидару, что может снизить точность распознавания цветов и текстур.</p>
+<p>Регулярная <strong>калибровка датчиков</strong> также необходима. Со временем колеса могут немного проскальзывать, и робот начнет «думать», что он прошел больше или меньше, чем на самом деле. Это приводит к смещению карты и ошибкам в позиционировании. В современных моделях эта процедура часто происходит автоматически при старте.</p>
+
+<table>
+<thead>
+<tr>
+<th>Тип понимания</th>
+<th>Сенсоры</th>
+<th>Результат интерпретации</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Геометрический</td>
+<td>Лидар, дальномеры</td>
+<td>Точная карта стен и препятствий</td>
+</tr>
+<tr>
+<td>Семантический</td>
+<td>Камеры, ИИ-процессор</td>
+<td>Идентификация объектов (ковер, ботинок, вода)</td>
+</tr>
+<tr>
+<td>Тактильный</td>
+<td>Бамперы, датчики колес</td>
+<td>Реакция на физический контакт и сопротивление</td>
+</tr>
+</tbody>
+</table>
+
+<blockquote>⚠️ Внимание: Не используйте робот-пылесос в условиях экстремальной темноты, если он полагается на оптическую навигацию. Отсутствие визуальных ориентиров может привести к потере позиционирования и столкновениям.</blockquote>
+
+<blockquote>⚠️ Внимание: Настройка чувствительности датчиков падения в приложении может варьироваться в зависимости от типа покрытия пола. Если робот «боится» темных ковров, снизьте чувствительность датчиков в настройках.</blockquote>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Идеальная интерпретация среды достигается комбинацией данных с лидара для геометрии и камеры для семантики, что позволяет роботу отличать просто препятствие от опасного объекта.</p></div>
+
+<h2 id="будущее-герменевтики-в-бытовых-приборах">Будущее герменевтики в бытовых приборах</h2>
+<p>Развитие технологий движется к созданию полностью автономных систем, способных не только убирать, но и <strong>анализировать состояние</strong> помещения. Роботы будущего будут «понимать», когда комната выглядит грязной визуально, и предлагать владельцу начать уборку, даже если датчики влажности еще не зафиксировали загрязнение.</p>
+<p>Интеграция с умным домом позволит пылесосу «понимать» расписание жизни семьи. Он будет знать, что в 18:00 все дома, и работать в режиме тишины, а в 08:00, когда никого нет, максимально быстро и шумно убрать всю квартиру. Это переход от реактивной уборки к <strong>проактивному планированию</strong>.</p>
+<p>Технологии <strong>эмоционального ИИ</strong> в будущем могут позволить роботу реагировать на поведение животных или детей, адаптируя свою работу не только под физику пространства, но и под психологический климат в доме.</p>
+
+<details>
+<summary>Что такое «герменевтический цикл» в контексте робота?</summary>
+<p>Это процесс постоянного уточнения понимания: робот смотрит на объект (текст), строит предположение (интерпретацию), проверяет его датчиками (контекст) и корректирует свои действия. Этот цикл повторяется миллионы раз в секунду.</p>
+</details>
+
+<details>
+<summary>Может ли робот понять, что на полу лужа?</summary>
+<p>Да, современные модели с функцией распознавания жидкостей могут определить лужу, остановиться и отправить уведомление владельцу, чтобы тот устранил причину, прежде чем робот начнет уборку.</p>
+</details>
+
+<details>
+<summary>Влияет ли цвет стен на работу лидара?</summary>
+<p>Лидары работают с лазерным лучом и почти не зависят от цвета стен, в отличие от визуальных камер, которые могут ошибаться на контрастных или слишком темных поверхностях.</p>
+</details>
+
+<details>
+<summary>Как часто нужно обновлять карты?</summary>
+<p>Если вы переставляете мебель, робот автоматически обновляет локальные данные, но полную перестройку карты стоит запускать вручную при капитальном ремонте или изменении планировки.</p>
+</details>
+
+<details>
+<summary>Что делать, если робот «путает» комнаты?</summary>
+<p>Это часто случается при изменении освещения или перестановке. Попробуйте провести <code>Рекалибровку карты</code> в приложении, запустив робота на полную уборку всей площади.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#суть-герменевтического-подхода-в-робототехнике">Суть герменевтического подхода в робототехнике</a></li><li><a href="#как-робот-интерпретирует-сенсорные-данные">Как робот интерпретирует сенсорные данные</a></li><li><a href="#роль-нейросетей-в-семантическом-анализе">Роль нейросетей в семантическом анализе</a></li><li><a href="#практическое-применение-интерпретации-пространства">Практическое применение интерпретации пространства</a></li><li><a href="#ошибки-интерпретации-и-их-причины">Ошибки интерпретации и их причины</a></li><li><a href="#настройка-и-калибровка-для-точного-понимания">Настройка и калибровка для точного понимания</a></li><li><a href="#будущее-герменевтики-в-бытовых-приборах">Будущее герменевтики в бытовых приборах</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-dobavit-pylesos-k-yandeks-stantsii.html" class="related-card">Как добавить пылесос к Яндекс Станции: полное руководство 2026</a></li><li><a href="/articles/k/ka/kak-sokhranit-marshrut-robota-pylesosa.html" class="related-card">Как сохранить и восстановить карту робота-пылесоса: Полное руководство</a></li><li><a href="/articles/k/ka/kak-zagruzit-russkij-yazyk-v-robot-pylesos-xiaomi-vacuum-cleaner.html" class="related-card">Как добавить русский язык в робот-пылесос Xiaomi: полные инструкции</a></li><li><a href="/articles/k/ka/kak-upravlyat-pylesosom-bez-vajfaya.html" class="related-card">Как управлять роботом-пылесосом без интернета: Полное руководство</a></li><li><a href="/articles/k/ka/kak-privyazat-kolonku-k-robotu-pylesosu.html" class="related-card">Как привязать колонку к роботу-пылесосу: пошаговая инструкция</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-dobavit-pylesos-k-yandeks-stantsii.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить пылесос к Яндекс Станции: полное руководство 2026</span><span class="related-bottom-desc">Пошаговая инструкция по привязке робота-пылесоса к умному дому Яндекса. Настройка голосового управле</span></a><a href="/articles/k/ka/kak-sokhranit-marshrut-robota-pylesosa.html" class="related-bottom-card"><span class="related-bottom-title">Как сохранить и восстановить карту робота-пылесоса: Полное руководство</span><span class="related-bottom-desc">Пошаговая инструкция по сохранению, экспорту и резервному копированию карты робота-пылесоса. Избегай</span></a><a href="/articles/k/ka/kak-zagruzit-russkij-yazyk-v-robot-pylesos-xiaomi-vacuum-cleaner.html" class="related-bottom-card"><span class="related-bottom-title">Как добавить русский язык в робот-пылесос Xiaomi: полные инструкции</span><span class="related-bottom-desc">Пошаговое руководство: как установить русский язык на роботы-пылесосы Xiaomi, Mi Home и Roborock. См</span></a><a href="/articles/k/ka/kak-upravlyat-pylesosom-bez-vajfaya.html" class="related-bottom-card"><span class="related-bottom-title">Как управлять роботом-пылесосом без интернета: Полное руководство</span><span class="related-bottom-desc">Узнайте, как запускать, настраивать и управлять роботом-пылесосом без Wi-Fi. Пошаговая инструкция по</span></a><a href="/articles/k/ka/kak-privyazat-kolonku-k-robotu-pylesosu.html" class="related-bottom-card"><span class="related-bottom-title">Как привязать колонку к роботу-пылесосу: пошаговая инструкция</span><span class="related-bottom-desc">Узнайте, как подключить умную колонку к роботу-пылесосу для голосового управления. Подробная настрой</span></a><a href="/articles/k/ka/kak-robot-pylesos-otpravit-v-druguyu-komnatu.html" class="related-bottom-card"><span class="related-bottom-title">Как отправить робот-пылесос в другую комнату: полное руководство</span><span class="related-bottom-desc">Узнайте, как переправить робота-пылесос в соседнюю комнату: управление через приложение, виртуальные</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

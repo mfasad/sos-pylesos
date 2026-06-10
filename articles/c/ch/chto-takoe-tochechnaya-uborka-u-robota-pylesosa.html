@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Точечная уборка робота-пылесоса: как работает режим Spot и его настройка — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем режим точечной уборки: принцип работы, когда использовать, как настроить в приложении и отличия от точечной зарядки. Полное руководство.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/c/ch/chto-takoe-tochechnaya-uborka-u-robota-pylesosa.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Точечная уборка робота-пылесоса: как работает режим Spot и его настройка">
+    <meta property="og:description" content="Разбираем режим точечной уборки: принцип работы, когда использовать, как настроить в приложении и отличия от точечной зарядки. Полное руководство.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Точечная уборка робота-пылесоса: как работает режим Spot и его настройка</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Точечная уборка робота-пылесоса: принцип работы и практическое применение</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#введение-в-режим-spot">Введение в режим Spot</a></li><li><a href="#принцип-работы-и-алгоритм-движения">Принцип работы и алгоритм движения</a></li><li><a href="#сценарии-использования-и-эффективность">Сценарии использования и эффективность</a></li><li><a href="#таблица-сравнения-режимов-уборки">Таблица сравнения режимов уборки</a></li><li><a href="#нюансы-настройки-и-управления">Нюансы настройки и управления</a></li><li><a href="#проблемы-и-их-решения">Проблемы и их решения</a></li><li><a href="#точечная-зарядка-и-другие-функции">Точечная зарядка и другие функции</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body"><h2 id="введение-в-режим-spot">Введение в режим Spot</h2>
+<p>Многие владельцы автономных устройств для уборки сталкиваются с непонятной иконкой на пульте или в мобильном приложении, изображающей спираль или точку. Это режим <strong>точечной уборки</strong> (Spot Cleaning), который предназначен для решения специфических задач, не покрываемых стандартным алгоритмом движения. Если в доме пролили кофе, рассыпали муку или разбили тарелку, запускать полную генеральную уборку всей квартиры — нерациональное решение, занимающее слишком много времени.</p>
+<p>В этом режиме робот-пылесос <em>обходит</em> ограниченный участок пола по спирали или зигзагу, тщательно промывая или выметая грязь в радиусе 1,5–2 метров от места запуска. Технология позволяет сконцентрировать мощность всасывания на одной зоне, обеспечивая максимальную чистоту там, где это необходимо прямо сейчас. Это не просто дополнительная функция, а важный инструмент для поддержания гигиены в динамичной среде.</p>
+<p>Важно понимать, что точечная уборка отличается от обычного прохода по комнате. Робот не строит карту помещения и не планирует маршрут, а начинает работать локально. После завершения цикла устройство обычно возвращается в точку старта или останавливается, ожидая новых команд. Понимание нюансов работы этого режима поможет вам эффективнее использовать интеллектуальные возможности вашей техники.</p>
+
+<h2 id="принцип-работы-и-алгоритм-движения">Принцип работы и алгоритм движения</h2>
+<p>Когда вы активируете команду <code>Start Spot</code>, <strong>модуль навигации</strong> переключается из глобального режима планирования в локальный. Датчики расстояния (LDS, iAdapt или другие системы) перестоят строить карту всего помещения и фокусируются на ближайшем окружении. Робот начинает движение от точки запуска, постепенно расширяя радиус захвата территории. Траектория движения чаще всего имеет форму спирали, что позволяет прибору проходить каждую точку заданной зоны несколько раз, увеличивая частоту контакта щеток с полом.</p>
+<p>В некоторых моделях, например в линейке <em>Xiaomi Robot Vacuum</em> или <em>Roborock S7</em>, алгоритм может быть зигзагообразным. Это позволяет быстрее покрыть большую площадь, если загрязнение имеет линейную природу, например, разлитая жидкость вдоль плинтуса. Робот движется вперед, затем поворачивает на 90 градусов, отъезжает назад и снова поворачивает, очищая пол полосами. Такой подход эффективен для удаления рассыпанных круп или песка, где важна ширина обработанной полосы.</p>
+<p>Скорость движения в режиме точечной уборки <strong>снижается</strong> по сравнению с обычным режимом. Это сделано намеренно, чтобы увеличить время контакта турбо-щетки с поверхностью и обеспечить более глубокое проникновение всасывания в ворс ковра. Если робот застревает в зоне загрязнения, он может попытаться выехать на несколько сантиметров и продолжить уборку, но не уедет далеко от точки старта, так как его виртуальные границы ограничены радиусом действия режима.</p>
+<blockquote>⚠️ Внимание: В режиме спирали робот может не заметить препятствия, которые он обычно объезжает, так как его алгоритм настроен на интенсивное перемешивание грязи. Всегда визуально проверяйте зону перед запуском, чтобы робот не затянул в щетку крупные игрушки или провода.</blockquote>
+
+<div class="poll-widget" id="poll-daba4feb"><div class="poll-widget-question">📊 Какой тип загрязнения требует точечной уборки чаще всего?</div><div class="poll-widget-option" data-poll="daba4feb" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Жидкости (кофе/вода)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="daba4feb" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Сыпучие продукты (крупы)</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="daba4feb" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Крупные крошки</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="daba4feb" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Толстый слой пыли</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="сценарии-использования-и-эффективность">Сценарии использования и эффективность</h2>
+<p>Режим точечной уборки незаменим в ситуациях, когда загрязнение ограничено четкой зоной. Это может быть пролитый суп на кухне, рассыпанная мука на столе или на полу, или даже кошачий наполнитель, высыпавшийся из лотка. В таких случаях вам не нужно ждать, пока робот проедет через всю квартиру, предварительно очищая коридор и гостиную. Вы просто ставите устройство на пол рядом с грязью и нажимаете соответствующую кнопку.</p>
+<p>Для владельцев животных этот режим становится настоящим спасением. Если кот или собака случайно пролили воду из миски или разбросали корм, <strong>мгновенная реакция</strong> с помощью точечной уборки предотвращает образование липких пятен и разводов. Робот быстро соберет основную массу грязи, после чего вам останется лишь протереть остатки влажной тряпкой. Это особенно актуально для моющих роботов, способных в этом режиме менять логику работы щеток или включение тряпки.</p>
+<p>Однако важно помнить о <strong>ограничениях</strong> данного метода. Если загрязнение растянулось по всей комнате или вы не знаете его точных границ, точечная уборка может быть неэффективной. Робот очистит только центр пятна, оставив края нетронутыми. В таких ситуациях лучше использовать режим «Уборка по комнате» или «Уборка всей площади», чтобы гарантировать чистоту всего пространства. Также, если вы запустили режим в центре комнаты, а грязь находится у стены, робот может не дотянуться до неё из-за ограниченного радиуса действия.</p>
+<p>Некоторые современные модели позволяют настраивать <strong>радиус уборки</strong> в приложении. Вы можете выбрать, чтобы робот прошел 1, 2 или 3 витка спирали. Это дает гибкость: для легких рассыпанных крошек достаточно одного витка, а для липких пятен потребуется более тщательная обработка с увеличенным временем. Возможность тонкой настройки делает этот режим универсальным инструментом в вашем арсенале.</p>
+
+<div class="checklist-block"><h4>☑️ Подготовка к точечной уборке</h4><label class="check-item"><input type="checkbox"><span>Осмотреть зону на наличие крупных предметов</span></label><label class="check-item"><input type="checkbox"><span>Убрать провода и кабели</span></label><label class="check-item"><input type="checkbox"><span>Убедиться, что робот имеет заряд</span></label><label class="check-item"><input type="checkbox"><span>Запустить режим в приложении</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="таблица-сравнения-режимов-уборки">Таблица сравнения режимов уборки</h2>
+<p>Чтобы лучше понять отличия между стандартной уборкой и точечным режимом, полезно сравнить их ключевые параметры. Ниже приведена таблица, демонстрирующая, как меняются параметры работы робота в зависимости от выбранного сценария.</p>
+<table>
+<thead>
+<tr>
+<th>Параметр</th>
+<th>Обычная уборка</th>
+<th>Точечная уборка (Spot)</th>
+<th>Уборка по комнате</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Радиус обработки</strong></td>
+<td>Всё помещение</td>
+<td>1.5 – 2.0 метра</td>
+<td>Одна выбранная комната</td>
+</tr>
+<tr>
+<td><strong>Скорость движения</strong></td>
+<td>Средняя</td>
+<td>Низкая (интенсивная)</td>
+<td>Средняя/Высокая</td>
+</tr>
+<tr>
+<td><strong>Траектория</strong></td>
+<td>Зигзаг + Спираль</td>
+<td>Плотная спираль</td>
+<td>Квадратные проходы</td>
+</tr>
+<tr>
+<td><strong>Время работы</strong></td>
+<td>До 3 часов</td>
+<td>3 – 10 минут</td>
+<td>15 – 45 минут</td>
+</tr>
+</tbody>
+</table>
+<p>Как видно из таблицы, точечная уборка жертвует скоростью и площадью покрытия ради максимальной концентрации на конкретной зоне. Это делает её идеальной для локальных задач. При этом потребление энергии в этом режиме также выше на единицу площади, но общее время работы устройства минимально, что позволяет сохранить заряд для последующих задач.</p>
+
+<h2 id="нюансы-настройки-и-управления">Нюансы настройки и управления</h2>
+<p>Управление режимом может осуществляться двумя способами: через физическую кнопку на корпусе робота или через мобильное приложение. На многих моделях <em>Roborock</em> или <em>Eufy</em> есть отдельная кнопка с иконкой спирали. Короткое нажатие запускает стандартный цикл, а длительное удержание (обычно 3 секунды) может запустить режим с увеличенным радиусом или усиленной мощностью. В приложениях интерфейс часто предлагает выбор радиуса: «Малый», «Средний», «Большой».</p>
+<p>Если вы используете голосовых помощников, таких как <em>Яндекс Станция</em> или <em>Alexa</em>, вы можете активировать режим голосом. Фраза «Алиса, запусти точечную уборку» сработает, если ваш робот интегрирован в умный дом. Однако стоит учитывать, что голосовые команды могут не иметь возможности выбора радиуса уборки, запуская стандартный шаблон. Для более тонкой настройки лучше использовать графический интерфейс приложения.</p>
+<p>Важно отметить, что не все модели поддерживают <strong>точечную уборку</strong> одинаково эффективно. Бюджетные модели иногда используют упрощенный алгоритм, где робот просто едет по кругу, не меняя радиуса, что снижает качество очистки углов. В то время как флагманские модели с LiDAR-навигацией могут сканировать границы загрязнения и останавливаться, как только зона считается чистой. Проверяйте характеристики вашей модели перед покупкой, если этот режим для вас критичен.</p>
+<blockquote>⚠️ Внимание: Если робот часто «застревает» в режиме точечной уборки, проверьте, не слишком ли велик радиус для вашей комнаты. В узких коридорах или маленьких кухнях стандартная спираль может упираться в стены слишком часто, вызывая зависание алгоритма.</blockquote>
+
+<details class="faq-item"><summary>Как работает точечная уборка в моющих роботах?</summary><div class="faq-answer"><p>В моющих роботах режим спирали часто сопровождается вибрацией тряпки или увеличением подачи воды. Робот проходит по одному месту несколько раз, чтобы размочить и собрать засохшие пятна. Это особенно эффективно для высыхающих жидкостей, таких как сок или вино.</p></div></details>
+
+<h2 id="проблемы-и-их-решения">Проблемы и их решения</h2>
+<p>Иногда пользователи сталкиваются с ситуацией, когда робот запускает режим, но не убирает грязь эффективно. Одной из частых причин является низкий уровень заряда батареи. Если робот работает от батареи менее 20%, он может автоматически переключиться в режим <strong>экономии энергии</strong>, снижая мощность всасывания. Рекомендуется запускать точечную уборку только при заряде выше 50% для достижения максимальной эффективности.</p>
+<p>Еще одной проблемой может быть неправильная интерпретация карты. Если робот не видит границ пола (например, на светлой плитке или у стеклянных дверей), он может выйти за пределы заданного радиуса. В таких случаях используйте <strong>виртуальные стены</strong> или физические барьеры (ленты, магнитные ленты), чтобы ограничить зону уборки. Это особенно актуально для моделей без переднего оптического датчика высоты.</p>
+<p>Также стоит учитывать тип напольного покрытия. На длинноворсовом ковре точечная уборка может быть менее эффективной, так как робот проваливается в ворс и теряет ориентацию. В таких ситуациях лучше использовать режим «Только подметание» или предварительно поднять ковер, если это возможно. Если же у вас моющий робот, убедитесь, что функция поднятия тряпки активна, чтобы не намочить ковер чрезмерно.</p>
+<p>Некоторые пользователи отмечают, что робот в этом режиме часто <strong>натыкается</strong> на ножки стульев или другие препятствия. Это нормальное поведение, так как алгоритм спирали предполагает частые повороты и сближение с объектами. Если препятствия слишком частые, лучше переместить их временно или выбрать режим «Уборка по комнате», который более аккуратно обходит мебель.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Точечная уборка — это не замена генеральной уборке, а инструмент для оперативного реагирования на локальные загрязнения. Используйте её правильно, чтобы экономить время и ресурсы.</p></div>
+
+<h2 id="точечная-зарядка-и-другие-функции">Точечная зарядка и другие функции</h2>
+<p>Помимо уборки, существует термин «точечная зарядка», который иногда путают с уборкой. Это функция, при которой робот возвращается на базу не по кратчайшему пути, а двигается по спирали или зигзагу, пока не найдет базу. Однако в контексте очистки пола речь идет именно о <em>Spot Cleaning</em>. Важно не путать эти режимы, чтобы не запускать уборку, когда вам нужен просто заряд.</p>
+<p>В некоторых приложениях есть возможность настроить <strong>автоматическую точечную уборку</strong> при обнаружении препятствия. Например, если робот ударился о предмет, он может сам запустить краткий цикл уборки вокруг него, чтобы проверить, не застрял ли он там из-за грязи. Это продвинутая функция, доступная на топовых моделях с ИИ-анализом.</p>
+<p>Также стоит упомянуть, что в моющих роботах точечная уборка может включать функцию <strong>увеличения давления</strong> тряпки. Это позволяет размягчить засохшие пятна, которые невозможно удалить при обычном проходе. Если у вас есть такая возможность, обязательно используйте её для сложных загрязнений, таких как следы от обуви или пятна от еды.</p>
+<blockquote>⚠️ Внимание: При использовании режима точечной уборки на коврах убедитесь, что робот не застрянет в ворсе. Если ковер слишком густой, лучше отключить функцию всасывания и использовать только подметание, либо переместить ковер.</blockquote>
+
+<p>В заключение, режим точечной уборки — это мощный инструмент, который значительно расширяет возможности вашего робота-пылесоса. Он позволяет быстро устранять локальные загрязнения, экономя время и ресурсы. Однако для его эффективного использования важно понимать особенности алгоритмов движения и правильно выбирать сценарии применения.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед запуском точечной уборки всегда осматривайте зону на наличие мелких предметов (монеты, батарейки, мелкие игрушки), которые робот может случайно засосать и повредить внутренности.</p></div>
+
+<h2 id="часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</h2>
+<details>
+<summary>Как долго длится точечная уборка?</summary>
+<p>Время работы зависит от модели и настроек, но обычно составляет от 3 до 10 минут. Робот успевает пройти несколько витков спирали, после чего останавливается или возвращается на базу.</p>
+</details>
+<details>
+<summary>Можно ли запустить точечную уборку на ковре?</summary>
+<p>Да, можно, но эффективность может снизиться из-за ворса. Рекомендуется использовать режим только для подметания или убедиться, что робот способен поднимать щетки и тряпку.</p>
+</details>
+<details>
+<summary>Что делать, если робот не убирает в центре спирали?</summary>
+<p>Возможно, он застрял или не видит пол. Попробуйте переместить его в центр загрязнения и перезапустить. Также проверьте, не слишком ли велик радиус для данной зоны.</p>
+</details>
+<details>
+<summary>Есть ли разница между режимами на разных брендах?</summary>
+<p>Да, алгоритмы движения могут отличаться (спираль, зигзаг, круг). Некоторые модели позволяют настраивать радиус, другие работают по фиксированной программе.</p>
+</details>
+<details>
+<summary>Можно ли использовать режим для уборки лестниц?</summary>
+<p>Категорически нет. Роботы-пылесосы не предназначены для уборки лестниц, и режим точечной уборки не меняет это правило. Используйте его только на горизонтальных поверхностях.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#введение-в-режим-spot">Введение в режим Spot</a></li><li><a href="#принцип-работы-и-алгоритм-движения">Принцип работы и алгоритм движения</a></li><li><a href="#сценарии-использования-и-эффективность">Сценарии использования и эффективность</a></li><li><a href="#таблица-сравнения-режимов-уборки">Таблица сравнения режимов уборки</a></li><li><a href="#нюансы-настройки-и-управления">Нюансы настройки и управления</a></li><li><a href="#проблемы-и-их-решения">Проблемы и их решения</a></li><li><a href="#точечная-зарядка-и-другие-функции">Точечная зарядка и другие функции</a></li><li><a href="#часто-задаваемые-вопросы-faq">Часто задаваемые вопросы (FAQ)</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/k/ka/kak-uznat-versiyu-pylesosa-xiaomi.html" class="related-card">Как узнать версию и модель робота-пылесоса Xiaomi: 3 рабочих способа</a></li><li><a href="/articles/k/ka/kak-otkryt-musorosbornik-u-robota-pylesosa-tefal.html" class="related-card">Как открыть мусоросборник робота пылесоса Tefal: пошаговая инструкция</a></li><li><a href="/articles/r/ro/robot-pylesos-kakoj-moshchnosti-vybrat.html" class="related-card">Робот пылесос: какую мощность всасывания выбрать в 2026 году</a></li><li><a href="/articles/p/po/pochemu-ne-vklyuchaetsya-robot-pylesos-tefal-60.html" class="related-card">Робот пылесос Tefal не включается: причины и способы ремонта</a></li><li><a href="/articles/r/ro/robot-pylesos-ipc-chto-eto.html" class="related-card">Робот-пылесос IPC: что это, характеристики и особенности эксплуатации</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/k/ka/kak-uznat-versiyu-pylesosa-xiaomi.html" class="related-bottom-card"><span class="related-bottom-title">Как узнать версию и модель робота-пылесоса Xiaomi: 3 рабочих способа</span><span class="related-bottom-desc">Узнайте, как точно определить версию прошивки, модель и ревизию пылесоса Xiaomi через приложение, на</span></a><a href="/articles/k/ka/kak-otkryt-musorosbornik-u-robota-pylesosa-tefal.html" class="related-bottom-card"><span class="related-bottom-title">Как открыть мусоросборник робота пылесоса Tefal: пошаговая инструкция</span><span class="related-bottom-desc">Подробное руководство по открытию контейнера для пыли у роботов Tefal. Удаление мусора, чистка фильт</span></a><a href="/articles/r/ro/robot-pylesos-kakoj-moshchnosti-vybrat.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос: какую мощность всасывания выбрать в 2026 году</span><span class="related-bottom-desc">Как подобрать робот-пылесос по мощности? Разбираем разницу между Вт и Па, влияние на уборку ковров и</span></a><a href="/articles/p/po/pochemu-ne-vklyuchaetsya-robot-pylesos-tefal-60.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос Tefal не включается: причины и способы ремонта</span><span class="related-bottom-desc">Полное руководство по диагностике и устранению причин, почему не включается робот пылесос Tefal сери</span></a><a href="/articles/r/ro/robot-pylesos-ipc-chto-eto.html" class="related-bottom-card"><span class="related-bottom-title">Робот-пылесос IPC: что это, характеристики и особенности эксплуатации</span><span class="related-bottom-desc">Разбираемся, что такое робот-пылесос IPC. Обзор характеристик, сценариев уборки и нюансов выбора умн</span></a><a href="/articles/k/ka/kakoj-robot-pylesos-vybrat-v-2025-godu.html" class="related-bottom-card"><span class="related-bottom-title">Выбор лучшего робота-пылесоса в 2026 году: гид по моделям и технологиям</span><span class="related-bottom-desc">Актуальный обзор роботов-пылесосов 2026 года. Сравнение навигации, мощности всасывания и автобаз. Ка</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

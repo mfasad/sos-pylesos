@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Локальная уборка роботом: что это и как работает — SOS-Пылесос</title>
+    <meta name="description" content="Разбираем понятие локальной уборки в роботах-пылесосах. Когда она нужна, как запускать и какие ограничения существуют у этой функции.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/l/lo/lokalnaya-uborka-robot-pylesos-eto-chto.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Локальная уборка роботом: что это и как работает">
+    <meta property="og:description" content="Разбираем понятие локальной уборки в роботах-пылесосах. Когда она нужна, как запускать и какие ограничения существуют у этой функции.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/nastrojki-i-podklyuchenie/">Настройки и подключение</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Локальная уборка роботом: что это и как работает</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Локальная уборка: что это такое и зачем она нужна</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#основные-принципы-работы-режима">Основные принципы работы режима</a></li><li><a href="#способы-запуска-локальной-уборки">Способы запуска локальной уборки</a></li><li><a href="#отличия-от-полной-и-точечной-уборки">Отличия от полной и точечной уборки</a></li><li><a href="#ограничения-и-технические-нюансы">Ограничения и технические нюансы</a></li><li><a href="#практическое-применение-в-быту">Практическое применение в быту</a></li><li><a href="#сравнение-функционала-ведущих-брендов">Сравнение функционала ведущих брендов</a></li><li><a href="#заключение">Заключение</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p><strong>Локальная уборка</strong> — это режим работы робота-пылесоса, при котором устройство очищает не всю квартиру, а только строго ограниченный участок помещения. В отличие от стандартного сценария, когда <em>робот</em> строит карту и проходит по всем комнатам, эта функция позволяет сфокусировать усилия на конкретной зоне, требующей немедленного внимания.</p>
+
+<p>Многие пользователи сталкиваются с ситуацией, когда рассыпали муку или разбили чашку именно в углу гостиной. Запуск полной уборки в такой момент нецелесообразен: он занимает много времени и расходует заряд батареи зря. <strong>Локальная уборка</strong> решает эту проблему, позволяя быстро устранить локальное загрязнение без участия человека в самом процессе.</p>
+
+<p>Технология основана на способности современных моделей ориентироваться в пространстве. Робот не просто едет туда, куда вы указали пальцем, а строит оптимальный маршрут внутри выбранного сектора, обеспечивая тщательную <strong>адаптивную уборку</strong> даже в труднодоступных углах. Это делает процесс не только быстрым, но и энергоэффективным.</p>
+
+<h2 id="основные-принципы-работы-режима">Основные принципы работы режима</h2>
+
+<p>Суть метода заключается в разделении пространства. Робот получает координаты зоны, которую нужно обработать, и игнорирует остальные части дома. Это достигается за счет использования <strong>лазерных сенсоров</strong> или визуальных навигационных систем, которые создают цифровую модель комнаты.</p>
+
+<p>Когда вы выбираете зону на экране смартфона, устройство анализирует геометрию помещения. <em>Робот-пылесос</em> рассчитывает траекторию так, чтобы проехать по выбранному квадрату несколько раз, обеспечивая максимальную очистку. Важно понимать, что эффективность зависит от точности настройки границ на виртуальной карте.</p>
+
+<p>В некоторых моделях алгоритмы работы отличаются. Одни просто едут к центру зоны и начинают спиралевидное движение, другие же строят полноценный <strong>картографический маршрут</strong> с возвратом в док-станцию после завершения. Разница в качестве уборки может быть существенной, особенно если зона имеет сложную форму.</p>
+
+<blockquote>⚠️ Внимание: При выборе очень маленькой зоны (меньше 20х20 см) некоторые модели могут отменить задание, посчитав его ошибкой, так как риск столкновения или зависания возрастает.</blockquote>
+
+<h2 id="способы-запуска-локальной-уборки">Способы запуска локальной уборки</h2>
+
+<p>Существует несколько методов активации этой функции. Самый популярный — через мобильное приложение, где нарисован план квартиры. Вы просто нажимаете на нужный участок или обводите его мышью/пальцем. Это наиболее точный способ, так как он опирается на актуальную <strong>схему помещения</strong>.</p>
+
+<p>Некоторые бренды предлагают альтернативный вариант: создание виртуальных стен или магнитных лент. Если вы используете <em>активные барьеры</em>, робот будет убирать пространство внутри замкнутого контура. Это удобно, если вам нужно регулярно чистить одно и то же место, например, под столом или в коридоре.</p>
+
+<p>В продвинутых моделях с голосовым управлением можно отдать команду напрямую. Фразы вроде «убери здесь» или «очисти кухню» распознаются искусственным интеллектом, который определяет текущее положение машины и запускает <strong>точечную уборку</strong> в радиусе нескольких метров от неё.</p>
+
+<div class="poll-widget" id="poll-9b011bdf"><div class="poll-widget-question">📊 Как вы чаще всего запускаете уборку?</div><div class="poll-widget-option" data-poll="9b011bdf" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Через приложение с карты</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="9b011bdf" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Голосовой помощник</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="9b011bdf" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Кнопка на корпусе</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="9b011bdf" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Магнитные ленты</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="отличия-от-полной-и-точечной-уборки">Отличия от полной и точечной уборки</h2>
+
+<p>Часто пользователи путают <strong>локальную уборку</strong> с точечным режимом (Spot Clean). В режиме точечной уборки робот стоит на месте и начинает двигаться по спирали, расширяя радиус действия. Это эффективно для удаления грязи прямо под собой, но не подходит для очистки большой зоны.</p>
+
+<p>Локальная же уборка подразумевает движение по заданному периметру. Робот проходит весь выделенный квадрат или прямоугольник, возвращаясь к начальным точкам для повторного прохода. Это гарантирует, что ни один сантиметр выбранной площади не останется без внимания, в отличие от простого спирального движения.</p>
+
+<p>Полная уборка охватывает всю доступную площадь дома. Локальная же игнорирует закрытые двери и виртуальные стены, фокусируясь исключительно на целевом участке. Это критически важно при работе в <strong>многокомнатных квартирах</strong>, где не нужно тревожить животных в других комнатах.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Перед запуском зоны убедитесь, что в ней нет проводов и мелких предметов, которые робот может засосать, так как в локальном режиме он может не успеть среагировать на препятствие так же быстро, как при полном обходе дома.</p></div>
+
+<h2 id="ограничения-и-технические-нюансы">Ограничения и технические нюансы</h2>
+
+<p>Не все роботы поддерживают эту функцию. В моделях без навигации (случайного движения) локальная уборка невозможна в принципе. Для её работы необходим <strong>гироскоп</strong>, лидар или камера, способные запоминать координаты. Если у вас старая модель, возможно, потребуется обновление прошивки или покупка новой.</p>
+
+<p>Размер зоны также имеет значение. Слишком узкие коридоры могут быть недоступны для выбора, так как робот физически не сможет развернуться в них. К тому же, если зона находится в «мертвой зоне» карты (которая еще не построена), система может предложить сначала провести <strong>обучающий проход</strong>.</p>
+
+<p>Важно учитывать заряд батареи. Если необходимо убрать большую площадь, а заряд низок, робот может не завершить процесс и вернуться на базу. В таких случаях некоторые устройства умеют дозаряжаться и <strong>возобновлять уборку</strong> с того же места, но не все модели поддерживают эту опцию для локальных задач.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Тип уборки</th>
+      <th>Движение</th>
+      <th>Площадь покрытия</th>
+      <th>Время работы</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Полная</td>
+      <td>По всей карте</td>
+      <td>Все помещение</td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>Локальная</td>
+      <td>По заданной зоне</td>
+      <td>Выбранный сектор</td>
+      <td>Зависит от размера</td>
+    </tr>
+    <tr>
+      <td>Точечная</td>
+      <td>Спираль на месте</td>
+      <td>Окружность 1-2 м</td>
+      <td>Коротко</td>
+    </tr>
+    <tr>
+      <td>Уборка одной комнаты</td>
+      <td>По комнате</td>
+      <td>Одна гео-ячейка</td>
+      <td>Среднее</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="checklist-block"><h4>☑️ Подготовка к локальной уборке</h4><label class="check-item"><input type="checkbox"><span>Убедиться в наличии заряда батареи</span></label><label class="check-item"><input type="checkbox"><span>Проверить карту в приложении</span></label><label class="check-item"><input type="checkbox"><span>Убрать крупные препятствия</span></label><label class="check-item"><input type="checkbox"><span>Выбрать правильную зону</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="практическое-применение-в-быту">Практическое применение в быту</h2>
+
+<p>Этот режим незаменим при работе с домашними животными. Если кошка случайно опрокинула миску или собака оставила лужу, вам не нужно ждать, пока робот пройдет всю квартиру. Вы можете выделить <strong>зоны активности</strong> питомца и быстро устранить последствия.</p>
+
+<p>Также функция полезна для уборки после ремонта или генеральной уборки. Когда на полу лежит строительный мусор или крупный песок, локальная уборка позволяет сосредоточить мощь всасывания в одном месте, не пугая робота мусорными ведрами в других комнатах.</p>
+
+<p>Для людей с ограниченными возможностями это способ поддерживать чистоту в часто используемых зонах без необходимости управлять сложными процессами. Достаточно выбрать область у кресла или кровати, чтобы поддерживать высокий уровень <strong>гигиены</strong> в месте постоянного нахождения.</p>
+
+<blockquote>⚠️ Внимание: Убедитесь, что виртуальные стены или магнитные ленты не блокируют путь к базе, иначе робот может застрять в выбранной зоне и не сможет вернуться на зарядку.</blockquote>
+
+<details class="faq-item"><summary>Как влияет на карту?</summary><div class="faq-answer"><p>При локальной уборке робот может обновлять данные о свободном пространстве и препятствиях внутри выбранной зоны, что улучшает общую точность карты в будущем.</p></div></details>
+
+<h2 id="сравнение-функционала-ведущих-брендов">Сравнение функционала ведущих брендов</h2>
+
+<p>Разные производители реализуют эту функцию по-разному. У <em>Xiaomi</em> и <em>Roborock</em> это обычно «выбор комнаты» или «выделение зоны» на карте с возможностью корректировки размеров. У <em>Dreame</em> часто встречается режим «Smart Clean», который предлагает убрать именно то место, где находится робот.</p>
+
+<p>Бренды уровня <em>iRobot</em> (серия Roomba) часто используют зонирование, но их подход к локальной уборке может быть менее гибким в плане рисования произвольных фигур. Они больше полагаются на виртуальные стены и заранее заданные <strong>зоны запрета</strong> или очистки.</p>
+
+<p>При выборе устройства стоит обратить внимание на то, насколько легко настраиваются границы. В некоторых интерфейсах можно выделить зону квадратом, в других — произвольным многоугольником. Второй вариант дает больше свободы для обхода мебели сложной формы.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Локальная уборка — это экономия времени и энергии, позволяющая решать точечные задачи быстро и эффективно без запуска всего механизма полной очистки квартиры.</p></div>
+
+<details class="faq-item"><summary>Можно ли объединять зоны?</summary><div class="faq-answer"><p>В некоторых продвинутых моделях можно выделить сразу несколько несмежных комнат для последовательной уборки, создавая сложный маршрут из нескольких локальных зон.</p></div></details>
+
+<h2 id="заключение">Заключение</h2>
+
+<p><strong>Локальная уборка</strong> превращает робота-пылесос из просто автоматического устройства в умного помощника, реагирующего на конкретные потребности. Возможность сфокусироваться на одном участке делает уход за домом более гибким и рациональным.</p>
+
+<p>Используя эту функцию, вы продлеваете жизнь аккумулятору и фильтрам, так как они работают не на холостом ходу во всей квартире, а выполняют целевую работу. Правильное использование режима — залог долгой службы <em>вашего гаджета</em>.</p>
+
+<p>Развивая технологии, производители делают управление еще проще. В будущем мы, возможно, увидим полностью автономное распознавание пятен грязи без участия человека, но уже сейчас <strong>локальная уборка</strong> является мощным инструментом в арсенале каждого владельца.</p>
+
+<blockquote>⚠️ Внимание: Реализация функций может меняться в зависимости от версии программного обеспечения. Всегда сверяйте инструкции в приложении бренда на момент использования.</blockquote>
+
+<details>
+  <summary>Что такое локальная уборка простыми словами?</summary>
+  <p>Это режим, при котором робот убирает только выбранную вами часть комнаты, а не всю квартиру целиком.</p>
+</details>
+
+<details>
+  <summary>Нужна ли карта для локальной уборки?</summary>
+  <p>Да, в большинстве случаев необходим накопленный файл карты помещения, чтобы робот понимал границы выбранной зоны.</p>
+</details>
+
+<details>
+  <summary>Можно ли убрать только один угол комнаты?</summary>
+  <p>Да, если приложение поддерживает выделение произвольных форм (многоугольников) или маленьких прямоугольников на виртуальной карте.</p>
+</details>
+
+<details>
+  <summary>Сколько времени занимает локальная уборка?</summary>
+  <p>Время зависит от размера зоны. Обычно это занимает от 5 до 15 минут для стандартного участка комнаты.</p>
+</details>
+
+<details>
+  <summary>Что делать, если робот не может найти путь в зону?</summary>
+  <p>Проверьте, не перекрывают ли зону физические препятствия или виртуальные стены, и попробуйте очистить карту заново.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#основные-принципы-работы-режима">Основные принципы работы режима</a></li><li><a href="#способы-запуска-локальной-уборки">Способы запуска локальной уборки</a></li><li><a href="#отличия-от-полной-и-точечной-уборки">Отличия от полной и точечной уборки</a></li><li><a href="#ограничения-и-технические-нюансы">Ограничения и технические нюансы</a></li><li><a href="#практическое-применение-в-быту">Практическое применение в быту</a></li><li><a href="#сравнение-функционала-ведущих-брендов">Сравнение функционала ведущих брендов</a></li><li><a href="#заключение">Заключение</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/i/in/inteks-pylesos-dlya-bassejna-kak-podklyuchit.html" class="related-card">Как подключить пылесос для бассейна Intex: пошаговая инструкция</a></li><li><a href="/articles/c/ch/chto-takoe-kastomizatsiya-v-robote-pylesose.html" class="related-card">Кастомизация в роботе-пылесосе: что это и как настроить уборку</a></li><li><a href="/articles/k/ku/kuda-podsoedinit-pylesos-dlya-bassejna.html" class="related-card">Куда подсоединить пылесос для бассейна: подробная схема подключения</a></li><li><a href="/articles/k/ka/kak-uznat-token-pylesosa-xiaomi-vacuum-cleaner-1s.html" class="related-card">Как узнать токен пылесоса Xiaomi Vacuum Cleaner 1S: полная инструкция</a></li><li><a href="/articles/k/ka/kak-podklyuchit-alisu-k-robotu-pylesosu-xiaomi-mijia.html" class="related-card">Как подключить робот-пылесос Xiaomi к Алисе: Инструкция 2026</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/i/in/inteks-pylesos-dlya-bassejna-kak-podklyuchit.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить пылесос для бассейна Intex: пошаговая инструкция</span><span class="related-bottom-desc">Подробное руководство: как правильно подключить и настроить пылесос Intex для бассейна. Инструкция п</span></a><a href="/articles/c/ch/chto-takoe-kastomizatsiya-v-robote-pylesose.html" class="related-bottom-card"><span class="related-bottom-title">Кастомизация в роботе-пылесосе: что это и как настроить уборку</span><span class="related-bottom-desc">Что такое кастомизация в роботе-пылесосе? Полный гайд по созданию зон, карт и сценариев уборки. Науч</span></a><a href="/articles/k/ku/kuda-podsoedinit-pylesos-dlya-bassejna.html" class="related-bottom-card"><span class="related-bottom-title">Куда подсоединить пылесос для бассейна: подробная схема подключения</span><span class="related-bottom-desc">Полное руководство по подключению пылесоса для бассейна. Инструкция для скиммера, перелива и донного</span></a><a href="/articles/k/ka/kak-uznat-token-pylesosa-xiaomi-vacuum-cleaner-1s.html" class="related-bottom-card"><span class="related-bottom-title">Как узнать токен пылесоса Xiaomi Vacuum Cleaner 1S: полная инструкция</span><span class="related-bottom-desc">Узнайте, как получить токен доступа для робота-пылесоса Xiaomi Vacuum Cleaner 1S. Пошаговая инструкц</span></a><a href="/articles/k/ka/kak-podklyuchit-alisu-k-robotu-pylesosu-xiaomi-mijia.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос Xiaomi к Алисе: Инструкция 2026</span><span class="related-bottom-desc">Пошаговая настройка интеграции робота-пылесоса Xiaomi Mijia с голосовым помощником Алиса. Решение пр</span></a><a href="/articles/k/ka/kak-obedinit-alisu-i-robot-pylesos.html" class="related-bottom-card"><span class="related-bottom-title">Как подключить робот-пылесос к Алисе: полная инструкция по настройке</span><span class="related-bottom-desc">Пошаговая настройка умного дома: как привязать робот-пылесос к Яндекс Алисе, настроить голосовые сце</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><text y=%27.9em%27 font-size=%2790%27>🧹</text></svg>">
+    <title>Как робот-пылесос DeBot 900 ищет зарядную станцию: пошаговый алгоритм — SOS-Пылесос</title>
+    <meta name="description" content="Подробный разбор алгоритма поиска док-станции DeBot 900. Узнайте, как работает навигация, почему пылесос теряет базу и как настроить корректное возвращение для чистой уборки.">
+    <link rel="canonical" href="https://sos-pylesos.vercel.app/articles/r/ro/robot-pylesos-debot-900-kak-ishchet-zaryadnoe-ustrojstvo.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Как робот-пылесос DeBot 900 ищет зарядную станцию: пошаговый алгоритм">
+    <meta property="og:description" content="Подробный разбор алгоритма поиска док-станции DeBot 900. Узнайте, как работает навигация, почему пылесос теряет базу и как настроить корректное возвращение для чистой уборки.">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css?v=1781110874">
+    <style>
+    .site-footer-premium {
+        margin-top: 60px; padding: 40px 0 0; background: #1e293b; color: #94a3b8;
+    }
+    .footer-grid {
+        display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px;
+        padding-bottom: 32px; border-bottom: 1px solid #334155;
+    }
+    .footer-brand { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-bottom: 12px; }
+    .footer-about { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; }
+    .footer-updated { font-size: 0.8rem; color: #64748b; }
+    .footer-col h4 { color: #f1f5f9; font-size: 0.95rem; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 8px; }
+    .footer-col a { color: #94a3b8; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-col a:hover { color: #60a5fa; }
+    .footer-bottom { padding: 20px 0; text-align: center; font-size: 0.85rem; }
+    @media (max-width: 640px) {
+        .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    .cookie-popup {
+        position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: #fff;
+        padding: 16px; transition: transform 0.5s ease; z-index: 9999; border-top: 2px solid #2563eb;
+        transform: translateY(100%);
+    }
+    .cookie-popup.visible { transform: translateY(0); }
+    .cookie-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 0.9rem; }
+    .cookie-btn { background: #2563eb; color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .cookie-btn:hover { background: #1d4ed8; }
+    @media (max-width: 640px) {
+        .cookie-inner { flex-direction: column; text-align: center; }
+    }
+</style>
+    
+    <!--#include virtual="/ssi/head.html" -->
+</head>
+<body>
+        <!--#include virtual="/ssi/body_top.html" -->
+    <style>
+    .nav-dropdown { position: relative; display: inline-block; }
+    .dropdown-toggle {
+        background: none; border: none; cursor: pointer;
+        font: inherit; color: inherit; padding: 8px 12px;
+        border-radius: 8px; transition: background 0.2s;
+    }
+    .dropdown-toggle:hover { background: rgba(0,0,0,0.05); }
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%;
+        min-width: 240px; max-height: 70vh; overflow-y: auto;
+        background: var(--card-bg, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        padding: 8px 0; z-index: 1000;
+    }
+    .nav-dropdown::after {
+        content: ''; position: absolute; left: 0; right: 0;
+        top: 100%; height: 12px;
+    }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu { display: block; }
+    .dropdown-item {
+        display: block; padding: 10px 20px; color: var(--text, #1f2937);
+        text-decoration: none; font-size: 0.95rem; transition: background 0.15s;
+        white-space: nowrap;
+    }
+    .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--primary, #2563eb); }
+    @media (max-width: 768px) {
+        .main-nav > .nav-link { display: none; }
+        .dropdown-toggle { display: none; }
+        .dropdown-menu {
+            display: block !important; position: static;
+            box-shadow: none; border: none; border-radius: 0;
+            min-width: auto; max-height: none; padding: 0;
+            background: transparent;
+        }
+        .dropdown-item {
+            padding: 8px 0; font-size: 1rem;
+        }
+    }
+    </style>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="/" class="logo">
+                <span class="logo-icon">🧹</span>
+                <span>SOS-Пылесос</span>
+            </a>
+            <button class="mobile-menu-btn" aria-label="Меню" id="menuBtn">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a href="/category/roboty-pylesosy/" class="nav-link">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="nav-link">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="nav-link">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="nav-link">🏗️ Строительная уборка</a>
+<div class="nav-dropdown">
+            <button class="nav-link dropdown-toggle">📂 Все разделы ▾</button>
+            <div class="dropdown-menu"><a href="/category/roboty-pylesosy/" class="dropdown-item">🤖 Роботы-пылесосы</a>
+<a href="/category/vertikalnye-modeli/" class="dropdown-item">🧹 Вертикальные модели</a>
+<a href="/category/avtomobilnye-pylesosy/" class="dropdown-item">🚗 Автомобильные пылесосы</a>
+<a href="/category/stroitelnaya-uborka/" class="dropdown-item">🏗️ Строительная уборка</a>
+<a href="/category/remont-i-zapchasti/" class="dropdown-item">🔧 Ремонт и запчасти</a>
+<a href="/category/filtry-i-raskhodniki/" class="dropdown-item">🌬️ Фильтры и расходники</a>
+<a href="/category/nastrojki-i-podklyuchenie/" class="dropdown-item">📱 Настройки и подключение</a>
+<a href="/category/uborka-s-zhivotnymi/" class="dropdown-item">🐈 Уборка с животными</a>
+<a href="/category/moyushchie-sistemy/" class="dropdown-item">💧 Моющие системы</a>
+<a href="/category/sravnenie-brendov/" class="dropdown-item">⚖️ Сравнение брендов</a>
+<a href="/category/problemy-i-resheniya/" class="dropdown-item">⚠️ Проблемы и решения</a>
+<a href="/category/vybor-dlya-doma/" class="dropdown-item">🏠 Выбор для дома</a>
+<a href="/category/ukhod-za-tekhnikoj/" class="dropdown-item">✨ Уход за техникой</a>
+<a href="/category/spetsnaznacheniya/" class="dropdown-item">🏥 Спецназначения</a>
+<a href="/category/drugoe/" class="dropdown-item">📁 Другое</a></div>
+        </div>
+            </nav>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs" aria-label="Навигация">
+        <div class="container"><a href="/">Главная</a><span class="breadcrumb-sep">›</span><a href="/category/roboty-pylesosy/">Роботы-пылесосы</a><span class="breadcrumb-sep">›</span><span class="breadcrumb-current">Как робот-пылесос DeBot 900 ищет зарядную станцию: пошаговый алгоритм</span></div>
+    </nav>
+
+    <main class="site-main">
+        <div class="container">
+            <div class="article-layout">
+                <article class="article-main">
+                    
+                    <h1>Алгоритм поиска зарядной станции роботом-пылесосом DeBot 900</h1>
+                    <nav class="mobile-toc"><details><summary>📋 Содержание</summary><ul><li><a href="#принципы-работы-навигационной-системы-debot-900">Принципы работы навигационной системы DeBot 900</a></li><li><a href="#этапы-алгоритма-поиска-зарядной-базы">Этапы алгоритма поиска зарядной базы</a></li><li><a href="#факторы-мешающие-корректному-обнаружению-базы">Факторы, мешающие корректному обнаружению базы</a></li><li><a href="#подготовка-помещения-для-успешного-поиска">Подготовка помещения для успешного поиска</a></li><li><a href="#технические-нюансы-работы-датчиков-и-сигнала">Технические нюансы работы датчиков и сигнала</a></li><li><a href="#что-делать-если-робот-не-может-найти-базу">Что делать, если робот не может найти базу</a></li><li><a href="#оптимизация-работы-через-мобильное-приложение">Оптимизация работы через мобильное приложение</a></li></ul></details></nav>
+                    <!--#include virtual="/ssi/article_before.html" -->
+                    <div class="article-body">
+
+<p>Работа автоматической уборки дома строится на двух ключевых этапах: самом процессе пылесосения и гарантированном возвращении к базе для подзарядки. Модель <em>DeBot 900</em> использует комбинированную систему навигации, которая позволяет ей эффективно ориентироваться в пространстве и находить <strong>зарядную станцию</strong> даже при значительном удалении. Если вы заметили, что робот застревает или не может вернуться, важно понимать логику его действий, чтобы вовремя вмешаться и скорректировать обстановку.</p>
+<p>Процесс поиска базы не является хаотичным блужданием. Это строго регламентированный алгоритм, заложенный в <strong>прошивку</strong> устройства. Понимание того, как именно <em>DeBot 900</em> определяет местоположение дока, поможет вам избежать частых ошибок при расстановке мебели и оптимизировать работу <strong>навигационных сенсоров</strong>.</p>
+
+<h2 id="принципы-работы-навигационной-системы-debot-900">Принципы работы навигационной системы DeBot 900</h2>
+<p>В основе поиска док-станции лежит технология инфракрасного (ИК) обнаружения в сочетании с визуальными маркерами. Когда уровень <strong>аккумулятора</strong> падает до критической отметки или пользователь инициирует команду возврата, робот переключается в режим поиска. Он не просто движется наугад, а сканирует пространство в поисках специфического сигнала, исходящего от базы.</p>
+<p>Основным ориентиром служит инфракрасный луч, который испускает <em>зарядная станция</em>. Этот сигнал имеет определенную частоту и угол раскрытия, который улавливается датчиками, расположенными на передней панели и иногда на боковых гранях <strong>робота-пылесоса</strong>. Важно отметить, что ИК-луч не проходит сквозь большинство твердых предметов, поэтому наличие препятствий в прямой видимости критически влияет на успех операции.</p>
+<p>Кроме того, система использует данные о карте помещения (если модель поддерживает построение карты) или о пройденном пути. <em>DeBot 900</em> запоминает координаты базы в начале уборки. Если сигнал не находится на коротком расстоянии, робот пытается вернуться к последним известным координатам, а затем начинает расширенный поиск, двигаясь по спирали или зигзагообразно.</p>
+
+<blockquote>⚠️ <strong>Внимание:</strong> Инфракрасный сигнал от базы может быть экранирован прозрачными, но плотными материалами (например, толстым стеклом или зеркалами), которые не пропускают ИК-лучи так же эффективно, как воздух. Это частая причина потери сигнала в стильных интерьерах.</blockquote>
+
+<h2 id="этапы-алгоритма-поиска-зарядной-базы">Этапы алгоритма поиска зарядной базы</h2>
+<p>Когда <strong>система управления</strong> принимает решение о необходимости подзарядки, запускается последовательность действий. Первый этап — это попытка захватить сигнал базы с текущего места. Робот вращается вокруг своей оси, сканируя помещение датчиками. Если сигнал обнаружен, он мгновенно корректирует траекторию движения, выравниваясь по оси навигации.</p>
+<p>Если сигнал не найден сразу, начинается второй этап — активный поиск. Робот начинает движение к последнему известному положению базы, используя данные энкодеров колес и гироскопа. На этом этапе <em>DeBot 900</em> может двигаться хаотично, но с четкой целью: увеличить зону охвата для обнаружения <strong>ИК-импульса</strong>. Движения становятся более плавными, чтобы не терять ориентацию при малейшем сдвиге сигнала.</p>
+<p>Третий этап — финальный заход. Как только датчики фиксируют сигнал, робот замедляется и начинает поправочные маневры. Он может двигаться вперед-назад или поворачиваться на небольшие углы, чтобы идеально выровнять контактные площадки. Этот процесс требует <strong>точности позиционирования</strong> и отсутствия вибраций пола, которые могут сбить датчики с толку.</p>
+<p>В случае полной потери сигнала после длительного поиска (обычно 15-20 минут), модель переходит в режим "защиты батареи". Она останавливается в безопасном месте и подает сигнал через мобильное приложение, сообщая о невозможности завершения цикла уборки.</p>
+
+<div class="poll-widget" id="poll-c1841a4a"><div class="poll-widget-question">📊 Встречалась ли проблема с поиском базы?</div><div class="poll-widget-option" data-poll="c1841a4a" data-idx="0" onclick="pbPollVote(this)"><span class="poll-widget-label">Да, часто</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="c1841a4a" data-idx="1" onclick="pbPollVote(this)"><span class="poll-widget-label">Редко, раз в месяц</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="c1841a4a" data-idx="2" onclick="pbPollVote(this)"><span class="poll-widget-label">Только при низком заряде</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div><div class="poll-widget-option" data-poll="c1841a4a" data-idx="3" onclick="pbPollVote(this)"><span class="poll-widget-label">Нет, работает идеально</span><span class="poll-widget-bar"></span><span class="poll-widget-pct"></span></div></div>
+
+<h2 id="факторы-мешающие-корректному-обнаружению-базы">Факторы, мешающие корректному обнаружению базы</h2>
+<p>Существует ряд внешних факторов, которые могут блокировать или искажать сигнал, необходимый для успешного поиска. Самым распространенным препятствием является неправильная расстановка мебели. Если базу заставляют в нишу коридора или ставят слишком близко к стене, угол приема сигнала может быть ограничен. Для <em>DeBot 900</em> критически важно иметь <strong>свободное пространство</strong> перед станцией минимум в 1,5–2 метра.</p>
+<p>Освещение в помещении играет не менее важную роль. Прямые солнечные лучи, падающие на инфракрасные датчики базы или робота, могут создавать мощный "шум", который заглушает полезный сигнал. Также отражения от глянцевых поверхностей могут создавать ложные точки приема, заставляя робота искать базу там, где её нет.</p>
+<ul>
+<li>🚫 Высокие пороги или ковры с длинным ворсом могут физически блокировать движение, даже если сигнал найден.</li>
+<li>🚫 Использование прозрачных штор или перегородок перед базой экранирует ИК-луч.</li>
+<li>🚫 Громкая музыка или работа других электронных устройств могут создавать электромагнитные помехи (хотя это редкость).</li>
+</ul>
+<p>Ещё одним фактором является состояние датчиков. Пыль, шерсть животных или грязь на линзах приемников робота или передатчика базы могут значительно снизить дальность обнаружения. Регулярная очистка <strong>оптических сенсоров</strong> обязательна для стабильной работы.</p>
+
+<div class="attention-box attention-tip"><span class="attention-icon">💡</span><p>Периодически протирайте инфракрасные окна на базе и на передней панели робота сухой мягкой тканью. Это уберет до 90% проблем с потерей сигнала на коротких дистанциях.</p></div>
+
+<h2 id="подготовка-помещения-для-успешного-поиска">Подготовка помещения для успешного поиска</h2>
+<p>Чтобы робот <em>DeBot 900</em> гарантированно находил зарядку, необходимо правильно организовать пространство. База должна стоять на ровной твердой поверхности. Ковер с высоким ворсом под станцией недопустим, так как это может привести к неправильному расположению контактных площадок и, как следствие, к плохому контакту или сбою в определении позиции.</p>
+<p>Зона вокруг базы должна быть свободной от препятствий на расстоянии минимум 1,5 метра по бокам и 2 метра спереди. Не ставьте рядом стулья, вазы, напольные светильники или игрушки. Эти предметы могут случайно отбросить робота с верного курса или создать ложные отражения сигнала. <strong>Чистота зоны</strong> — залог успешного стыковки.</p>
+<p>Также стоит обратить внимание на электропитание. Если в доме часто происходят скачки напряжения, база может кратковременно отключаться, прерывая передачу сигнала. Использование стабилизатора или UPS для базы обеспечит непрерывную работу <strong>передатчика</strong> и повысит надежность поиска.</p>
+
+<div class="checklist-block"><h4>☑️ Проверка условий для базы</h4><label class="check-item"><input type="checkbox"><span>Ровное твердое покрытие</span></label><label class="check-item"><input type="checkbox"><span>Свободная зона 2 метра спереди</span></label><label class="check-item"><input type="checkbox"><span>Отсутствие прямых солнечных лучей</span></label><label class="check-item"><input type="checkbox"><span>Чистые датчики на базе и роботе</span></label><div class="check-progress">Выполнено: <span class="check-count">0</span> / 4</div></div>
+
+<h2 id="технические-нюансы-работы-датчиков-и-сигнала">Технические нюансы работы датчиков и сигнала</h2>
+<p>Внутри <em>DeBot 900</em> используется сложная логика обработки сигнала. Датчики не просто включают свет при обнаружении луча, они анализируют его интенсивность и фазу. Это позволяет роботу отличать сигнал базы от фоновых источников инфракрасного излучения. Если интенсивность сигнала падает, робот не меняет направление резко, а начинает "плавать", пытаясь поймать более сильный импульс.</p>
+<p>Важно понимать, что сигнал базы не является лучом точечной направленности, как лазер. Это широкий конус излучения. Однако, с расстоянием интенсивность падает, и на больших площадях (свыше 100 кв.м) робот может терять сигнал, если он убегает слишком далеко. В таких случаях срабатывает алгоритм возврата по памяти, что является <mark>единственным способом вернуться на базу без прямой видимости ИК-луча на длинных дистанциях</mark>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Параметр</th>
+      <th>Характеристика</th>
+      <th>Влияние на поиск</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Дальность сигнала</td>
+      <td>До 3-4 метров</td>
+      <td>При удалении свыше 4м поиск усложняется</td>
+    </tr>
+    <tr>
+      <td>Угол раскрытия</td>
+      <td>±45 градусов</td>
+      <td>Робот должен быть выровнен относительно базы</td>
+    </tr>
+    <tr>
+      <td>Тип сигнала</td>
+      <td>Инфракрасный импульс</td>
+      <td>Чувствителен к солнечному свету и пыли</td>
+    </tr>
+    <tr>
+      <td>Частота обновления</td>
+      <td>10-15 Гц</td>
+      <td>Обеспечивает плавную коррекцию траектории</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Если вы используете приложение для управления, можно принудительно запустить поиск базы через меню <code>Настройки устройства → Управление → Вернуться на базу</code>. Это сбросит текущий алгоритм поиска и заставит систему начать сканирование заново, что иногда помогает при "зависании" логики.</p>
+
+<blockquote>⚠️ <strong>Внимание:</strong> Не перемещайте базу вручную во время уборки. Если вы передвинете станцию, а робот вернется к старым координатам в памяти, он будет искать базу там, где её больше нет, и может сесть в "тупик" на пустом месте.</blockquote>
+
+<h2 id="что-делать-если-робот-не-может-найти-базу">Что делать, если робот не может найти базу</h2>
+<p>Если <em>DeBot 900</em> не может найти зарядку в течение длительного времени, необходимо провести диагностику. Первым делом проверьте, горят ли индикаторы на базе. Если база не получает питание, сигнальный луч не будет излучаться. Убедитесь, что кабель питания надежно вставлен в розетку и в блок базы.</p>
+<p>Следующий шаг — очистка. Аккуратно протрите датчики базы и робота. Используйте сухую ватную палочку или мягкую ткань. Уберите все предметы, которые могут перекрывать линию прямой видимости. Попробуйте временно переместить базу в центр комнаты, чтобы исключить влияние стен и мебели, и запустите тестовый режим поиска.</p>
+<p>Если проблема сохраняется, возможно, требуется диагностика датчиков. В некоторых случаях помогает сброс настроек до заводских через <code>Длительное нажатие кнопки "Home" + "Power"</code> (уточните в инструкции, так как комбинация может варьироваться). Это обновит карту и калибровку сенсоров.</p>
+
+<details class="faq-item"><summary>Что если база переехала во время уборки?Если вы переставили базу (например, для генеральной уборки), робот вернется к старым координатам. Вам нужно вручную поставить его на базу один раз, чтобы он "обновил" память о новом местоположении, или перепрограммировать карту через приложение.-->
+
+<h2 id="оптимизация-работы-через-мобильное-приложение">Оптимизация работы через мобильное приложение</h2>
+<p>Современные версии <strong>DeBot 900</strong> позволяют настраивать параметры поиска через приложение. В разделе "Управление" можно задать зоны, которые робот должен обходить при поиске базы, если они часто приводят к тупикам. Также доступна функция "Виртуальная стена", которая помогает направить робота в правильную сторону, если он заблудился в соседней комнате.</p>
+<p>Регулярное обновление прошивки также критично. Разработчики часто выпускают патчи, улучшающие алгоритмы обработки сигнала и снижающие количество ложных срабатываний. Проверьте наличие обновлений в разделе <code>Система → Обновление ПО</code>. Новая версия может существенно улучшить стабильность возврата.</p>
+<p>Не забывайте о режиме энергосбережения. Если в приложении включен режим "Тихая уборка", робот может двигаться медленнее, что увеличивает время поиска базы. В режиме "Максимальная мощность" он быстрее находит сигнал, но потребляет больше энергии. Оптимальным выбором для балансировки является стандартный режим.</p>
+
+<!--WIDGET</summary><div class="faq-answer"><p>keypoint:Регулярная очистка датчиков и свободная зона перед базой — это 90% успеха в работе алгоритма поиска. Если робот не находит базу, начинайте диагностику именно с этих двух пунктов.</p></div></details>
+
+<details>
+  <summary>Почему робот ездит кругами вокруг базы, но не садится на неё?</summary>
+  <p>Это означает, что сигнал захвачен, но робот не может выровняться по оси. Часто причина в неровном полу, ковровом покрытии у базы или грязных контактах. Попробуйте убрать ковер и протереть контактные площадки.</p>
+</details>
+
+<details>
+  <summary>Можно ли переставить базу после начала уборки?</summary>
+  <p>Нет, это категорически не рекомендуется. Робот запомнил координаты базы в начале уборки. Если вы переместите её, он будет искать её в старом месте и, скорее всего, не найдет, пока не разрядится.</p>
+</details>
+
+<details>
+  <summary>Как долго робот может искать базу?</summary>
+  <p>Обычно алгоритм поиска длится около 15-20 минут. Если за это время сигнал не найден, робот переходит в режим ожидания и сообщает об ошибке через приложение.</p>
+</details></div>
+                    <!--#include virtual="/ssi/article_after.html" -->
+
+                </article>
+                <aside class="article-sidebar"><!--#include virtual="/ssi/sidebar_top.html" --><nav class="sidebar-search"><div class="sidebar-search-box"><input type="text" id="globalSearchInput" placeholder="🔍 Поиск статей..." autocomplete="off"><div class="search-dropdown" id="globalSearchDropdown"></div></div></nav><!--#include virtual="/ssi/sidebar_before_toc.html" --><nav class="sidebar-toc" id="sidebarToc"><h3>Содержание</h3><ul><li><a href="#принципы-работы-навигационной-системы-debot-900">Принципы работы навигационной системы DeBot 900</a></li><li><a href="#этапы-алгоритма-поиска-зарядной-базы">Этапы алгоритма поиска зарядной базы</a></li><li><a href="#факторы-мешающие-корректному-обнаружению-базы">Факторы, мешающие корректному обнаружению базы</a></li><li><a href="#подготовка-помещения-для-успешного-поиска">Подготовка помещения для успешного поиска</a></li><li><a href="#технические-нюансы-работы-датчиков-и-сигнала">Технические нюансы работы датчиков и сигнала</a></li><li><a href="#что-делать-если-робот-не-может-найти-базу">Что делать, если робот не может найти базу</a></li><li><a href="#оптимизация-работы-через-мобильное-приложение">Оптимизация работы через мобильное приложение</a></li></ul></nav><!--#include virtual="/ssi/sidebar_before_related.html" --><nav class="sidebar-related"><h3>Похожие статьи</h3><ul><li><a href="/articles/s/sk/skolko-vremeni-nado-zaryazhatsya-robotu-pylesosu.html" class="related-card">Сколько времени заряжается робот-пылесос: полное руководство</a></li><li><a href="/articles/k/ka/kak-robota-pylesosa-otpravit-na-bazu.html" class="related-card">Как отправить робота-пылесоса на базу: полное руководство</a></li><li><a href="/articles/c/ch/chto-znachit-lokalnaya-uborka-v-robote-pylesose.html" class="related-card">Локальная уборка в роботе-пылесосе: функции, настройка и использование</a></li><li><a href="/articles/k/ka/kak-sbrosit-robot-pylesos-xiaomi-dream-f9.html" class="related-card">Как сбросить робот-пылесос Xiaomi Dreame F9: полное руководство</a></li><li><a href="/articles/k/ka/kakoj-firmy-luchshe-robot-pylesos-s-vlazhnoj-uborkoj-otzyvy.html" class="related-card">Робот пылесос с влажной уборкой: какой фирмы лучше выбрать в 2026 году</a></li></ul></nav><!--#include virtual="/ssi/sidebar_after_related.html" --></aside>
+            </div>
+        </div>
+    </main>
+
+    <!--#include virtual="/ssi/before_related_bottom.html" -->
+    <section class="related-bottom">
+        <div class="container">
+            <h2 class="related-bottom-heading">📖 Читайте также</h2>
+            <div class="related-bottom-grid"><a href="/articles/s/sk/skolko-vremeni-nado-zaryazhatsya-robotu-pylesosu.html" class="related-bottom-card"><span class="related-bottom-title">Сколько времени заряжается робот-пылесос: полное руководство</span><span class="related-bottom-desc">Узнайте, сколько времени нужно для зарядки робота-пылесоса. Факторы, влияющие на скорость, типы акку</span></a><a href="/articles/k/ka/kak-robota-pylesosa-otpravit-na-bazu.html" class="related-bottom-card"><span class="related-bottom-title">Как отправить робота-пылесоса на базу: полное руководство</span><span class="related-bottom-desc">Узнайте, как вручную или автоматически отправить робота-пылесоса на базу для зарядки. Разбор всех кн</span></a><a href="/articles/c/ch/chto-znachit-lokalnaya-uborka-v-robote-pylesose.html" class="related-bottom-card"><span class="related-bottom-title">Локальная уборка в роботе-пылесосе: функции, настройка и использование</span><span class="related-bottom-desc">Что такое локальная уборка? Полный разбор режимов точечной чистки, зонной обработки и навигации. Инс</span></a><a href="/articles/k/ka/kak-sbrosit-robot-pylesos-xiaomi-dream-f9.html" class="related-bottom-card"><span class="related-bottom-title">Как сбросить робот-пылесос Xiaomi Dreame F9: полное руководство</span><span class="related-bottom-desc">Инструкция по сбросу настроек и Wi-Fi робот-пылесоса Xiaomi Dreame F9. Решение ошибок подключения, п</span></a><a href="/articles/k/ka/kakoj-firmy-luchshe-robot-pylesos-s-vlazhnoj-uborkoj-otzyvy.html" class="related-bottom-card"><span class="related-bottom-title">Робот пылесос с влажной уборкой: какой фирмы лучше выбрать в 2026 году</span><span class="related-bottom-desc">Честный обзор брендов роботов-пылесосов с функцией влажной уборки. Сравнение технологий, анализ отзы</span></a><a href="/articles/k/ka/kak-pravilno-stavit-robot-pylesos-na-zaryadku.html" class="related-bottom-card"><span class="related-bottom-title">Как правильно ставить робот-пылесос на зарядку: инструкция и советы</span><span class="related-bottom-desc">Узнайте, как корректно ставить робота на базу и почему он не ищет контакты. Полная инструкция по ухо</span></a></div>
+        </div>
+    </section>
+    <!--#include virtual="/ssi/after_related_bottom.html" -->
+
+    <footer class="site-footer-premium">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-brand">🧹 SOS-Пылесос</div>
+                    <p class="footer-about">Полный справочник по выбору, ремонту и эксплуатации всех видов пылесосов: от роботов до строительных моделей.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Разделы</h4>
+                    <ul><li><a href="/category/roboty-pylesosy/">🤖 Роботы-пылесосы</a></li>
+<li><a href="/category/vertikalnye-modeli/">🧹 Вертикальные модели</a></li>
+<li><a href="/category/avtomobilnye-pylesosy/">🚗 Автомобильные пылесосы</a></li>
+<li><a href="/category/stroitelnaya-uborka/">🏗️ Строительная уборка</a></li>
+<li><a href="/category/remont-i-zapchasti/">🔧 Ремонт и запчасти</a></li>
+<li><a href="/category/filtry-i-raskhodniki/">🌬️ Фильтры и расходники</a></li></ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Информация</h4>
+                    <ul>
+                        <li><a href="/">Главная</a></li>
+                        <li><a href="/about.html">О проекте</a></li>
+                        <li><a href="/categories.html">Все разделы</a></li>
+                        <li><a href="/contact.html">Контакты</a></li>
+                        <li><a href="/privacy.html">Конфиденциальность</a></li>
+                        <li><a href="/sitemap.xml">Карта сайта</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© SOS-Пылесос. Все права защищены.</p>
+                <!--LiveInternet counter--><div style="margin-top:10px;"><a href="https://www.liveinternet.ru/click"
+                target="_blank"><img id="licnt06C4" width="88" height="15" style="border:0" 
+                title="LiveInternet: показано число посетителей за сегодня"
+                src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAEALAAAAAABAAEAAAIBTAA7"
+                alt=""/></a><script>(function(d,s){d.getElementById("licnt06C4").src=
+                "https://counter.yadro.ru/hit?t26.5;r"+escape(d.referrer)+
+                ((typeof(s)=="undefined")?"":";s"+s.width+"*"+s.height+"*"+
+                (s.colorDepth?s.colorDepth:s.pixelDepth))+";u"+escape(d.URL)+
+                ";h"+escape(d.title.substring(0,150))+";"+Math.random()})(document,screen)</script></div><!--/LiveInternet-->
+            </div>
+        </div>
+    </footer>
+    <div id="cookie-consent" class="cookie-popup">
+        <div class="cookie-inner">
+            <span>🍪 Мы используем файлы cookie для улучшения работы сайта.</span>
+            <button id="cookie-accept" class="cookie-btn">Принять</button>
+        </div>
+    </div>
+    <script src="/static/js/main.js"></script>
+    <script>
+    (function() {
+        const popup = document.getElementById('cookie-consent');
+        const btn = document.getElementById('cookie-accept');
+        if (popup && btn && !localStorage.getItem('cookie-accepted')) {
+            popup.classList.add('visible');
+            btn.onclick = () => {
+                localStorage.setItem('cookie-accepted', 'true');
+                popup.classList.remove('visible');
+            };
+        }
+    })();
+    </script>
+    <script>
+    function pbPollVote(el) {
+        var poll = el.closest('.poll-widget');
+        if (poll.classList.contains('voted')) return;
+        poll.classList.add('voted');
+        el.classList.add('selected');
+        var opts = poll.querySelectorAll('.poll-widget-option');
+        var n = opts.length;
+        var raw = [];
+        var sum = 0;
+        for (var i = 0; i < n; i++) {
+            var v = Math.random() * 50 + 5;
+            if (opts[i] === el) v += 30;
+            raw.push(v);
+            sum += v;
+        }
+        var pcts = raw.map(function(v) { return Math.round(v / sum * 100); });
+        var diff = 100 - pcts.reduce(function(a,b){ return a+b; }, 0);
+        pcts[Array.from(opts).indexOf(el)] += diff;
+        setTimeout(function() {
+            opts.forEach(function(opt, i) {
+                opt.querySelector('.poll-widget-bar').style.width = pcts[i] + '%';
+                opt.querySelector('.poll-widget-pct').textContent = pcts[i] + '%';
+            });
+        }, 50);
+    }
+    </script>
+    <!--#include virtual="/ssi/body_bottom.html" -->
+    <script src="/static/js/inject.js" defer></script>
+</body>
+</html>
